@@ -4,6 +4,7 @@ import "Main.less";
 
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+
 import {StringUtils} from 'solidify-lib/utils/StringUtils';
 
 import {TestComponent} from "./components/testComponent/TestComponent";
@@ -53,7 +54,7 @@ export class Main
 	{
 		console.log('Loading splitted code ... ');
 
-		let target = await import('./async/customerArea/pages/TestPage');
+		let target = await import('./async/customerArea/pages/testPage/TestPage');
 
 		console.log( 'Loaded ! ', target );
 	}

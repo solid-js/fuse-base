@@ -4,12 +4,15 @@
   "description": "",
   "main": "fuse.js",
   "dependencies": {
+    "fuse-box-typechecker": "^2.6.3",
+    "gsap": "^1.20.3",
     "normalize.css": "^7.0.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "solidify-lib": "^1.0.0"
   },
   "devDependencies": {
+    "@types/gsap": "^1.19.1",
     "@types/react": "^16.0.25",
     "@types/react-dom": "^16.0.3",
     "autoprefixer": "^7.2.1",
@@ -17,6 +20,7 @@
     "less": "^2.7.3",
     "postcss-clean": "^1.1.0",
     "tslib": "^1.8.0",
+    "tslint": "^5.8.0",
     "typescript": "^2.6.2",
     "uglify-es": "^3.2.1",
     "uglify-js": "^3.2.1"

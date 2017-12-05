@@ -3,6 +3,12 @@ import 'TestComponent.less';
 import * as React from 'react';
 import {StringUtils} from "solidify-lib/utils/StringUtils";
 
+import TweenLite = gsap.TweenLite;
+import Power3 = gsap.Power3;
+
+
+//import 'gsap/src/uncompressed/TweenLite';
+
 
 export interface Props
 {
@@ -17,6 +23,8 @@ export interface States
 export class TestComponent extends React.Component<Props, States>
 {
 	protected _counterInterval:number;
+
+	protected _root:HTMLDivElement;
 
 	constructor (props:Props, context:any)
 	{
@@ -59,9 +67,22 @@ export class TestComponent extends React.Component<Props, States>
 		});
 	}
 
+	componentDidUpdate ()
+	{
+		TweenLite.to(this._root, 1 / 2, {
+			x: 10,
+			ease: Power3.easeInOut
+		});
+		TweenLite.to(this._root, 1 / 2, {
+			x: 0,
+			delay: 1 / 2,
+			ease: Power3.easeInOut
+		});
+	}
+
 	render ()
 	{
-		return <div className="TestComponent">
+		return <div className="TestComponent" ref={r => this._root = r}>
 			<h3>I'm a test 51</h3>
 			<ul className="TestComponent_element">
 				<li key={0}>0</li>
