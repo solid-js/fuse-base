@@ -1,0 +1,68 @@
+
+# FIXME WIP
+
+
+# ------------------------------------------------------------------------------ COMPILED BUNDLES
+
+# Compiled bundles
+dist/index.html
+dist/*.js
+dist/*.css
+
+# Compiled resources
+dist/resources/*
+
+
+# ------------------------------------------------------------------------------ LOGS FILES
+
+# Npm logs
+npm-debug.log*
+
+# Other logs
+*.log
+
+
+# ------------------------------------------------------------------------------ IDE FILES
+
+# IntelliJ IDE
+# TODO : Keep coding style ?
+.idea/
+
+# Other IDEs
+.project
+.settings
+
+
+# ------------------------------------------------------------------------------ TEMP AND BUILD FILES
+
+.fusebox
+.alm/
+build/
+.DS_Store
+.tmp/
+
+
+# ------------------------------------------------------------------------------ MODULES SYSTEMS
+
+# Node modules
+node_modules/
+
+# Yarn lock file
+yarn.lock
+
+
+# ------------------------------------------------------------------------------ FIXME LEGACY
+
+#playground
+#_playground
+
+# FuseBox Loader API built type definition
+# Which is then exported as a module from `src`
+#src/modules/fuse-loader/LoaderAPI.ts
+
+# FuseBox modules built from TS
+#modules/fsbx-default-css-plugin/
+#modules/fusebox-hot-reload/
+#modules/fusebox-websocket/
+#modules/fuse-loader/
+#modules/fuse-hmr/

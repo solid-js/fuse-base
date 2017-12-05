@@ -1,0 +1,21 @@
+
+
+@import (reference) '/src/Main.less';
+
+
+.TestComponent
+{
+	position : relative;
+
+	&_element
+	{
+		display: flex;
+		flex: 1;
+		border: 3px solid green;
+		flex-direction: row;
+		list-style: none;
+
+		@placePadding: 2px;
+		//.place(@placePadding, @placePadding, @placePadding, @placePadding);
+	}
+}
