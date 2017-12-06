@@ -43,28 +43,42 @@ module.exports = {
 	{
 		const shimOutput = {};
 
+		const addShimOutput = (libFile, libName) =>
+		{
+			shimOutput[ libName ] = {
+				source : libFile,
+				exports : libName
+			};
+		};
+
 		Object.keys( pShims ).map( libPath =>
 		{
-			pShims[ libPath ].map( fileName =>
+			const pathFiles = pShims[ libPath ];
+
+			if ( !Array.isArray(pathFiles) )
 			{
-				let libName, libFile;
-
-				if ( Array.isArray(fileName) )
+				addShimOutput(
+					libPath + pathFiles,
+					path.parse( pathFiles ).name
+				);
+			}
+			else
+			{
+				pathFiles.map( fileName =>
 				{
-					libName = fileName[0];
-					libFile = libPath + fileName[1];
-				}
-				else
-				{
-					libName = path.parse( fileName ).name;
-					libFile = libPath + fileName;
-				}
+					Array.isArray( fileName )
 
-				shimOutput[ libName ] = {
-					source : libFile,
-					exports : libName
-				};
-			});
+					? addShimOutput(
+						libPath + fileName[1],
+						fileName[0]
+					)
+
+					: addShimOutput(
+						libPath + fileName,
+						path.parse( fileName ).name
+					);
+				});
+			}
 		});
 
 		return shimOutput;

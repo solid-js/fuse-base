@@ -8,26 +8,36 @@
 
 		"lib": ["es6", "dom", "es2015.promise"],
 
-    "baseUrl": ".",
+    "baseUrl": "src",
     "paths": {
-      "solidify-lib": ["node_modules/solidify-lib/"]
+      "solidify-lib": ["../node_modules/solidify-lib/*"]
     },
 
 		"isolatedModules": false,
     "noEmitOnError": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "declaration": true,
+
+    "declaration": false,
     "noImplicitAny": false,
-    "noLib": false,
-    "noImplicitUseStrict": false,
+    "suppressImplicitAnyIndexErrors": true,
+
     "removeComments": true,
     "preserveConstEnums": true,
-    "suppressImplicitAnyIndexErrors": true,
+
 		"importHelpers" : true,
 		"noEmitHelpers" : true
   },
-	"exclude": [],
+
+	"include" : [
+		"./**/*",
+		"../node_modules/solidify-lib/*"
+	],
+
+	"exclude": [
+		"../node_modules/*"
+	],
+
   "compileOnSave": false,
   "buildOnSave": false,
 	"atom": {

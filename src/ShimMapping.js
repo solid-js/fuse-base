@@ -1,3 +1,0 @@
-
-//
-window['gsap'] = window['GreenSockGlobals'];

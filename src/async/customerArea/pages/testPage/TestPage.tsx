@@ -34,6 +34,7 @@ export class TestPage extends React.Component<Props, States>
 
 	componentDidMount ()
 	{
+
 	}
 
 	componentWillUnmount ()
@@ -43,8 +44,7 @@ export class TestPage extends React.Component<Props, States>
 	render ()
 	{
 		return <div className="TestPage">
-			<h3 className="TestPage_pageElement">Test Page !</h3>
+			<h3 className="TestPage_pageElement">Test Page ! 2</h3>
 		</div>
 	}
-
 }

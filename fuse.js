@@ -3,8 +3,7 @@
 
 /**
  * TODO :
- * - SYNC Typecheck ? Check typescript before reloading ?
- * - BIP when fail !
+ * - Update ^3.0.0-next.20
  * - Tout tester !
  * - Refacto du framework avec nouvelle API
  * - Deployer
@@ -21,6 +20,9 @@
  * - If possible : assets folder, this is cleaner !
  * - tsconfig JSON5
  *
+ * DONE : Shims / TweenLite ...
+ * DONE : SYNC Typecheck ? Check typescript before reloading ?
+ * DONE : BIP when fail !
  * DONE : Bundles CSS en option pour éviter le full JS
  * DONE : Task dev + task production
  * DONE : Sparky
@@ -46,6 +48,7 @@ const {
 } = require("fuse-box");
 const path = require("path");
 const { TypeHelper } = require('fuse-box-typechecker');
+const colors = require('colors'); // @see : https://github.com/marak/colors.js/
 const { getAsyncBundlesFromFileSystem, generateShims } = require("./helpers/fuse-helpers");
 
 
@@ -61,7 +64,7 @@ const dist = 'dist/';
 const resources = 'resources/';
 
 // Default apps entry point
-const entryPoint = 'Main.tsx';
+const entryPoint = 'index.tsx';
 
 // Async bundle folders (inside src)
 const async = 'async/';
@@ -96,46 +99,9 @@ const includedFoldersWithoutImports = ['pages', 'components'];
 const cssBundleFile = false;
 
 /**
- * Include those libs into the vendors bundle.
- * Will include using http://fuse-box.org/page/configuration#shimming
- * Through fuse-helpers to ease writing. @see ./helpers/fuse-helper.js#generateShims
+ * TODO : DOC
  */
-const vendorShims = {
-
-	// GSAP lib from node_modules
-	'node_modules/gsap/' : [
-
-		// TweenLite core
-		'TweenLite.js',
-		'TimelineLite.js',
-
-		// Easings
-		'EasePack.js',
-
-		// Plugins
-		//'AttrPlugin.js',
-		'BezierPlugin.js',
-		'ColorPropsPlugin.js',
-		//'CSSPlugin.js',
-		//'CSSRulePlugin.js',
-		'DirectionalRotationPlugin.js',
-		//'Draggable.js',
-		//'EaselPlugin.js',
-		//'EndArrayPlugin.js',
-		//'jquery.gsap.js',
-		'ModifiersPlugin.js',
-		//'PixiPlugin.js',
-		//'RaphaelPlugin.js',
-		'RoundPropsPlugin.js',
-		'ScrollToPlugin.js',
-		//'TextPlugin.js',
-	],
-
-	// Import shim mapper to patch global declarations
-	'./' : [
-		`${src}ShimMapping.js`
-	]
-};
+const vendorShims = {};
 
 
 // ----------------------------------------------------------------------------- FUSE BOX CONFIG
@@ -161,6 +127,9 @@ Sparky.task('config:fuse', () =>
 		// Typescript config file
 		tsConfig: 'tsconfig.json',
 
+		// Force typescript compiler on JS files
+		useTypescriptCompiler : true,
+
 		// Require those libs with module properties
 		useJsNext: ['react', 'react-dom'],
 
@@ -185,13 +154,8 @@ Sparky.task('config:fuse', () =>
 		log: options.verbose,
 		debug: options.verbose,
 
-
-		// TODO ?
-		/*
-		alias: {
-			'solidify' : 'solidify-lib'
-		},
-		*/
+		// @see : http://fuse-box.org/page/configuration#alias
+		alias: { },
 
 		plugins: [
 			// Styling config
@@ -273,9 +237,8 @@ Sparky.task('config:fuse', () =>
 			&&
 			WebIndexPlugin({
 				template: `${src}index.html`,
-				path: './'
-				//path: './assets/',
-				//target: '../index.html',
+				path: './',
+				target: 'index.html',
 				//resolve : output => 'assets/'+output.lastPrimaryOutput.filename
 			}),
 
@@ -288,7 +251,16 @@ Sparky.task('config:fuse', () =>
 				bakeApiIntoBundle: vendorsBundleName,
 
 				// Enable tree-shaking capability
-				treeshake: true,
+				// FIXME : Custom treeshake
+				treeshake: true, /*{
+
+					// Select files to remove manually
+					shouldRemove: file =>
+					{
+						console.log('>', file.packageAbstraction.name);
+						return null;
+					}
+				},*/
 
 				// Uglify output on production
 				// Will use uglify-es on non legacy mode
@@ -305,7 +277,11 @@ Sparky.task('config:fuse', () =>
 				polyfills: legacySupport ? ['Promise'] : [],
 
 				// ES5 compatible in legacy mode
-				ensureES5 : legacySupport
+				ensureES5 : legacySupport,
+
+				// FIXME ?
+				//target : 'browser',
+				//replaceTypeOf: true
 			})
 		]
 	});
@@ -329,10 +305,7 @@ Sparky.task('config:bundles', () =>
 
 			// Include shimmed libs
 			// @see : http://fuse-box.org/page/configuration#shimming
-			// Through fuse-helpers to ease writing. @see ./helpers/fuse-helper.js#generateShims
-			.shim(
-				generateShims( vendorShims )
-			)
+			.shim( vendorShims )
 
 			// Globals exports
 			// @see : http://fuse-box.org/page/configuration#global-variables
@@ -390,13 +363,18 @@ Sparky.task('config:bundles', () =>
 			port: options.port
 		});
 
-		// Enable watch / HMR and sourceMaps on every bundles
+		// Enable watch / HMR on bundles
 		appBundles.map( (app) =>
 		{
+			// Watch all bundles
+			app.watch();
+
+			// Do not HMR vendor bundle
+			// FIXME ? Otherwise TypeChecking will dispatch 2 page reload
 			if ( app.name === vendorsBundleName ) return;
 
-			app.hmr({reload: options.reload});
-			app.watch();
+			// Launch HMR and watch
+			app.hmr({ reload: options.reload });
 		});
 	}
 });
@@ -405,25 +383,36 @@ Sparky.task('config:bundles', () =>
 // ----------------------------------------------------------------------------- BUNDLES CONFIG
 
 /**
- * Configure Typescript Checker
+ * Configure Type Checker
  */
-Sparky.task('config:typeHelper', () =>
+Sparky.task('config:typeChecking', () =>
 {
-	// TODO : A notypecheck option to discard this ?
+	// Disabled type checking from options
+	if (options.noTypeCheck)
+	{
+		console.log(`\n > Warning, type checking disabled.`.red.bold);
+		return;
+	}
 
 	// Create TypeHelper
+	// @see : https://github.com/fuse-box/fuse-box-typechecker
 	let typeHelper = TypeHelper({
-		tsConfig: './tsconfig.json',
-		basePath:'./',
-		// TODO : Check this
-		//tsLint:'./tslint.json', //you do not haveto do tslint too.. just here to show how.
-		name: 'TypeChecker'
+		name: 'TypeChecker',
+		tsConfig: '../tsconfig.json',
+		basePath: src,
+		shortenFilenames: true,
+
+		// BETTER : Tslint ?
+		//tsLint:'./tslint.json'
 	});
+
+	// Do not watch to TypeCheck if we are Quantum is enabled
+	if ( options.quantum ) return;
 
 	// Browser every bundles
 	appBundles.map( app =>
 	{
-		// Do not listen vendors app
+		// Do not listen vendors app to type check
 		if (app.name === vendorsBundleName) return;
 
 		// When an app complete compilation
@@ -432,9 +421,17 @@ Sparky.task('config:typeHelper', () =>
 			// Do not type check vendors
 			if (proc.bundle.name === vendorsBundleName) return;
 
-			console.log(`\x1b[36m%s\x1b[0m`, `Typechecking ${proc.bundle.name} ...`);
+			// Type checking can be long, so we show this to know what is going on
+			console.log(`\nTypechecking ${proc.bundle.name} ...`.cyan);
 
-			typeHelper.runSync();
+			// Run type checker
+			( typeHelper.runSync() > 0 )
+
+			// Play a sound from the terminal if there is an error
+			? console.log("\007")
+
+			// No error, show ok message
+			: console.log(`\n${proc.bundle.name} ok !`.green);
 		});
 	});
 });
@@ -459,7 +456,8 @@ Sparky.task('config:production', () =>
 		quantum: true,
 		uglify: true,
 		reload: false,
-		verbose: false
+		verbose: false,
+		noTypeCheck: false
 	};
 });
 
@@ -488,32 +486,39 @@ const cli = CLI({
 			type: 'boolean',
 			default: false
 		},
+		'noTypeCheck' : {
+			type: 'boolean',
+			default: false
+		},
 	},
 	taskDescriptions: {
 		'default' : 'Show this message',
-		'run' : `
-			Run fuse and compile all bundles.
+		'dev' : `
+			Run fuse, compile all bundles and watch.
 
-			@param --quantum
+			${'@param --quantum'.bold}
 				- Enable code splitting, async modules will be in separated bundled files.
 				- Enable treeshaking
 				- Disable Hot Module Reloading and changes watching
 
-			@param --uglify
+			${'@param --uglify'.bold}
 				- Uglify bundles
 				- Works only if quantum is enabled
 
-			@param --reload
+			${'@param --reload'.bold}
 				- Force full page reloading and disable Hot Module Reloading
 
-			@param --port
+			${'@param --port'.bold}
 				- Change HMR listening port, if running other fuse projects at the same time.
-				- Default is 4445
-			@param --verbose
+
+			${'@param --verbose'.bold}
 				- Enable debug and verbose mode on fuse
+
+			${'@param --noTypeCheck'.bold}
+				- Disable type checking, only for quick tests !
 		`,
 		'production' : `
-			Run fuse and compile all bundles with quantum and uglify parameters enabled.
+			Run fuse and compile all bundles for production (Quantum + Uglify enabled).
 		`
 	}
 });
@@ -533,13 +538,13 @@ Sparky.task('default', () =>
  * Config tasks to be able to build.
  * Needs options before.
  */
-let configTasks = ['config:fuse', 'config:bundles', 'config:typeHelper'];
+let configTasks = ['config:fuse', 'config:bundles', 'config:typeChecking'];
 
 /**
  * Load configs and run fuse !
  * Will read options from CLI.
  */
-Sparky.task('run', ['config:options'].concat( configTasks ), () =>
+Sparky.task('dev', ['config:options'].concat( configTasks ), () =>
 {
 	fuse.run();
 });
