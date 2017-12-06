@@ -39,6 +39,7 @@ export class TestPage extends React.Component<Props, States>
 
 	componentWillUnmount ()
 	{
+
 	}
 
 	render ()

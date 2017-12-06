@@ -406,8 +406,30 @@ Sparky.task('config:typeChecking', () =>
 		//tsLint:'./tslint.json'
 	});
 
-	// Do not watch to TypeCheck if we are Quantum is enabled
-	if ( options.quantum ) return;
+	// Shortcut method to run Type Checking with alerts if anything failed
+	const runTypeCheck = ( bundleName ) =>
+	{
+		// Type checking can be long, so we show this to know what is going on
+		console.log(`\nTypechecking ${bundleName} ...`.cyan);
+
+		// Run type checker
+		const totalErrors = typeHelper.runSync();
+
+		// If we have errors
+		(totalErrors > 0)
+
+		// Play a sound from the terminal if there is an error
+		? console.log("\007")
+
+		// No error, show ok message
+		: console.log(`Bundle ${bundleName} checked !`.green);
+
+		// Quit with an error if we are in quantum mode
+		if (options.quantum)
+		{
+			process.exit(1);
+		}
+	}
 
 	// Browser every bundles
 	appBundles.map( app =>
@@ -415,23 +437,21 @@ Sparky.task('config:typeChecking', () =>
 		// Do not listen vendors app to type check
 		if (app.name === vendorsBundleName) return;
 
+		// Do not watch to TypeCheck if we are Quantum is enabled
+		if ( options.quantum )
+		{
+			// We TypeCheck directly
+			runTypeCheck( app.name );
+			return;
+		}
+
 		// When an app complete compilation
 		app.completed( (proc) =>
 		{
 			// Do not type check vendors
 			if (proc.bundle.name === vendorsBundleName) return;
 
-			// Type checking can be long, so we show this to know what is going on
-			console.log(`\nTypechecking ${proc.bundle.name} ...`.cyan);
-
-			// Run type checker
-			( typeHelper.runSync() > 0 )
-
-			// Play a sound from the terminal if there is an error
-			? console.log("\007")
-
-			// No error, show ok message
-			: console.log(`\n${proc.bundle.name} ok !`.green);
+			runTypeCheck( proc.bundle.name );
 		});
 	});
 });
