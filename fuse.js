@@ -425,7 +425,7 @@ Sparky.task('config:typeChecking', () =>
 		: console.log(`Bundle ${bundleName} checked !`.green);
 
 		// Quit with an error if we are in quantum mode
-		if (options.quantum)
+		if (options.quantum && totalErrors > 0)
 		{
 			process.exit(1);
 		}
