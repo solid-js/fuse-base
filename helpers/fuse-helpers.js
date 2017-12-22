@@ -1,6 +1,8 @@
 
 const path = require('path');
 const glob = require('glob');
+const fse = require('fs-extra');
+const colors = require('colors'); // @see : https://github.com/marak/colors.js/
 
 /*
 'node_modules/another-lib/' : [
@@ -82,5 +84,17 @@ module.exports = {
 		});
 
 		return shimOutput;
+	},
+
+
+	cleanPath : (pGlob) =>
+	{
+		console.log(`Cleaning ${pGlob} ...`.yellow);
+
+		// Remove every compiled js
+		glob.sync( pGlob ).map( file =>
+		{
+			fse.removeSync( file ) && console.log( `	Deleted ${file}`.grey );
+		});
 	}
 };
