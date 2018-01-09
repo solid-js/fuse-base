@@ -5,9 +5,11 @@ const fs = require("fs");
 const fse = require('fs-extra');
 const colors = require('colors'); // @see : https://github.com/marak/colors.js/
 
+
+
 /**
  * FileList class.
- * Can represent a list of files or a folder.
+ * Can represent a list of files or folders.
  * Can't represent both files and folders.
  * Target files from a glob.
  * @see https://github.com/isaacs/node-glob
@@ -16,29 +18,40 @@ class FileList
 {
 	/**
 	 * Target files list or folder from a glog.
-	 * @param pGlob Glob pattern
-	 * @param pOnlyFiles If true, will only target existing files. If false, will only target existing folders.
+	 * Can target files and folder if not filtered.
+	 * @param pGlob Glob pattern.
+	 * @param pOnlyFiles If true, will only target existing files.
+	 * @param pOnlyFolders If true, will only target existing folders.
 	 */
-	constructor (pGlob, pOnlyFiles)
+	constructor (pGlob, pOnlyFiles, pOnlyFolders)
 	{
 		// Record glob for logging
-		this._glob = pGlob;
+		this.glob = pGlob;
 
 		// Target files with glob
-		const files = glob.sync( this._glob );
+		this.files = glob.sync( this.glob );
 
+		// Filter files or folders
+		pOnlyFiles && this.onlyExistingFiles();
+		pOnlyFolders && this.onlyExistingFolders();
+	}
+
+	onlyExistingFiles ()
+	{
 		// Filter files or folder
-		this._files = files.filter(
-			file => (
-				// Get only files
-				pOnlyFiles
-				? fs.lstatSync( file ).isFile()
-
-				// Or get only folders
-				: fs.lstatSync( file ).isDirectory()
-			)
+		this.files = this.files.filter(
+			file => fs.lstatSync( file ).isFile()
 		);
 	}
+
+	onlyExistingFolders ()
+	{
+		// Filter files or folder
+		this.files = this.files.filter(
+			file => fs.lstatSync( file ).isDirectory()
+		);
+	}
+
 
 	/**
 	 * Check if this glob is targeting existing files or folders.
@@ -46,7 +59,7 @@ class FileList
 	 */
 	exists ()
 	{
-		return (this._files.length > 0);
+		return (this.files.length > 0);
 	}
 
 	/**
@@ -55,7 +68,7 @@ class FileList
 	 */
 	all ( pHandler )
 	{
-		return this._files.map( pHandler );
+		return this.files.map( pHandler );
 	}
 
 	/**
@@ -64,10 +77,10 @@ class FileList
 	 */
 	delete ()
 	{
-		console.log(`FileList.delete ${this._glob} ...`.yellow);
+		console.log(`FileList.delete ${this.glob} ...`.yellow);
 
 		// Browse files or folders
-		this._files.map( file =>
+		this.files.map( file =>
 		{
 			// Remove
 			fse.removeSync( file );
@@ -81,10 +94,10 @@ class FileList
 	 */
 	moveTo ( pDest )
 	{
-		console.log(`FileList.moveTo ${this._glob} ...`.yellow);
+		console.log(`FileList.moveTo ${this.glob} ...`.yellow);
 
 		// Browse files or folders
-		this._files.map( file =>
+		this.files.map( file =>
 		{
 			// Get file name and compute destination file name
 			const fileName = path.basename( file );
@@ -102,10 +115,10 @@ class FileList
 	 */
 	copyTo ( pDest )
 	{
-		console.log(`FileList.copyTo ${this._glob} ...`.yellow);
+		console.log(`FileList.copyTo ${this.glob} ...`.yellow);
 
 		// Browse files or folders
-		this._files.map( file =>
+		this.files.map( file =>
 		{
 			// Get file name and compute destination file name
 			const fileName = path.basename( file );
@@ -116,23 +129,53 @@ class FileList
 			console.log( `	${file} copied to ${destination}`.grey );
 		});
 	}
+
+	read (pEncoding = 'utf-8')
+	{
+		// Read file from disk
+		return fs.readFileSync( this.glob, { encoding: pEncoding } );
+	}
+
+	write (pContent = '', pEncoding = 'utf-8')
+	{
+		// Create parent folders recursively
+		fse.ensureDirSync( path.dirname( this.glob ) );
+
+		// Write file to disk
+		fs.writeFileSync( this.glob, pContent, { encoding: pEncoding } );
+	}
+
+	createFolders ()
+	{
+		fse.ensureDirSync( this.glob );
+	}
+
+	alter ( pHandler )
+	{
+		this.write(
+			pHandler(
+				this.read()
+			)
+		);
+	}
 }
 
 /**
- * Shortcut to create a FileList of files from a glob.
+ * Shortcut to create a FileList of existing files from a glob.
  */
-const Files = pGlob => new FileList(pGlob, true);
+const Files = pGlob => new FileList(pGlob, true, false);
 
 /**
- * Shortcut to create a FileList of one folder from a glob.
+ * Shortcut to create a FileList of one not yet existing file.
  */
-const Folder = pGlob => new FileList(pGlob, false);
+const NewFile = pGlob => new FileList(pGlob, false, false);
+
+/**
+ * Shortcut to create a FileList of existing folders from a glob.
+ */
+const Folders = pGlob => new FileList(pGlob, false, true);
 
 /**
  * Exports public API
  */
-module.exports = {
-	FileList,
-	Files,
-	Folder
-}
+module.exports = { FileList, Files, Folders, NewFile };

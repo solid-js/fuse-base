@@ -1,0 +1,10 @@
+
+
+
+export class %%capitalBundleName%%
+{
+	static isEntryPoint ()
+	{
+		return true;
+	}
+}

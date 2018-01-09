@@ -15,13 +15,13 @@
  * BETTER :
  * - Test inferno à la place de react
  * - If possible : assets folder, this is cleaner !
- * - tsconfig JSON5
- *
+ * - tsconfig JSON5 ?
  */
 
 
 // ----------------------------------------------------------------------------- IMPORTS
 
+// Get Fusebox and its modules
 const {
 	FuseBox,
 	CLI,
@@ -33,78 +33,25 @@ const {
 	CSSPlugin,
 	CSSResourcePlugin
 } = require("fuse-box");
+const Sparky = require("fuse-box/sparky");
 
-//const Sparky = require("fuse-box/sparky");
-
+// Some colors in the terminal
 const colors = require('colors'); // @see : https://github.com/marak/colors.js/
+
+// Path management utils
 const path = require("path");
 
+// Get Typescript checking helper
 const { TypeHelper } = require('fuse-box-typechecker');
 
+// Get fuse helpers
 const { getAsyncBundlesFromFileSystem } = require("./helpers/fuse-helpers");
-const { Files, Folder } = require("./helpers/file-list");
 
+// Get FileList helper for easy Files/Folder manipulating
+const { Files, Folders } = require("./helpers/file-list");
 
-// ----------------------------------------------------------------------------- PATHS AND CONSTANTS
-
-// Source folder
-const srcPath = 'src/';
-
-// Output directory
-const distPath = 'dist/';
-
-// Bundle path from dist path
-const bundlesPath = 'assets/bundles/';
-
-// Compiled resources folder (inside dist)
-const resourcesPath = 'assets/resources/';
-
-// Default apps entry point
-const entryPoint = 'index.ts';
-
-// Async bundle folders (inside src)
-const asyncPath = 'async/';
-
-// Vendors bundle name
-const vendorsBundleName = 'vendors';
-
-
-// ----------------------------------------------------------------------------- CONFIG
-
-/**
- * Generate an index.html from template.
- * If false, and quantum is enabled, will generate a quantum.json manifest file.
- * If enabled, dist/index.html will be removed when cleaning.
- */
-const generateWebIndex = true;
-
-/**
- * Support old browsers like IE 11 or iOS 7
- */
-const legacySupport = true;
-
-/**
- * Folders to include in every bundles, even if they are not implicitly imported.
- * Useful for async import.
- */
-const includedFoldersWithoutImports = ['elements', 'components', 'pages'];
-
-/**
- * Default included extensions for not implicit imports.
- */
-const extensions = ['ts', 'tsx', 'less'];
-
-/**
- * Set to false to include all CSS files as JS bundles.
- * Allows HMR and code splitting for CSS.
- * Set to a 'filename.css' to generate a unique css bundle including every css instructions.
- */
-const cssBundleFile = false; // `${bundlesPath}styles.css`;
-
-/**
- * TODO : WIP
- */
-const vendorShims = {};
+// Get fuse switches
+const switches = require('./fuse-switches');
 
 
 // ----------------------------------------------------------------------------- FUSE BOX CONFIG
@@ -123,10 +70,10 @@ Sparky.task('config:fuse', () =>
 	fuse = FuseBox.init({
 
 		// Sources directory
-		homeDir: srcPath,
+		homeDir: switches.srcPath,
 
 		// Bundles output path format
-		output: `${distPath}${bundlesPath}$name.js`,
+		output: `${switches.distPath}${switches.bundlesPath}$name.js`,
 
 		// Typescript config file
 		tsConfig: 'tsconfig.json',
@@ -145,7 +92,7 @@ Sparky.task('config:fuse', () =>
 		experimentalFeatures: true,
 
 		// Output format, we support es5 if legacy mode is enabled
-		target: 'browser@' + (legacySupport ? 'es5' : 'es6'),
+		target: 'browser@' + (switches.legacySupport ? 'es5' : 'es6'),
 
 		// Use hashes and disable cache when building with Quantum
 		hash: options.uglify,
@@ -195,13 +142,13 @@ Sparky.task('config:fuse', () =>
 							// BrowersList syntax : https://github.com/ai/browserslist
 							browsers: [
 								// All browsers version supports
-								`last ${legacySupport ? 4 : 2} versions`,
+								`last ${switches.legacySupport ? 4 : 2} versions`,
 
 								// IE and Edge support
-								(legacySupport ? `ie >= 11` : 'edge >= 10'),
+								(switches.legacySupport ? `ie >= 11` : 'edge >= 10'),
 
 								// iOS Support
-								`iOS >= ${legacySupport ? 7 : 10}`
+								`iOS >= ${switches.legacySupport ? 7 : 10}`
 							]
 						}),
 
@@ -223,10 +170,10 @@ Sparky.task('config:fuse', () =>
 				CSSResourcePlugin({
 
 					// Write resources to that folder
-					dist: `${distPath}${resourcesPath}`,
+					dist: `${switches.distPath}${switches.resourcesPath}`,
 
 					// Rewriting resources paths
-					resolve: (f) => `${resourcesPath}${f}`,
+					resolve: (f) => `${switches.resourcesPath}switches.${f}`,
 
 					// Include images as Base64 into bundle
 					// Please use Less data-uri instead @see http://lesscss.org/functions/#misc-functions-data-uri
@@ -235,9 +182,9 @@ Sparky.task('config:fuse', () =>
 
 				// @see : http://fuse-box.org/plugins/css-plugin
 				// Export a CSS file and do not inject CSS into JS bundles if cssBundleFile is a string
-				CSSPlugin( !cssBundleFile ? {} : {
-					group: cssBundleFile,
-					outFile: `${distPath}${cssBundleFile}`
+				CSSPlugin( !switches.cssBundleFile ? {} : {
+					group: switches.cssBundleFile,
+					outFile: `${switches.distPath}${switches.cssBundleFile}`
 				})
 			],
 
@@ -251,14 +198,14 @@ Sparky.task('config:fuse', () =>
 			}),
 
 			// Generate index.html from template
-			generateWebIndex
+			switches.generateWebIndex
 			&&
 			WebIndexPlugin({
 				// Index template
-				template: `${srcPath}index.html`,
+				template: `${switches.srcPath}index.html`,
 
 				// Relative path to bundles
-				path: bundlesPath,
+				path: switches.bundlesPath,
 				//resolve : output => 'assets/'+output.lastPrimaryOutput.filename
 
 				// Index file name, relative to bundle path, cheap trick
@@ -271,7 +218,7 @@ Sparky.task('config:fuse', () =>
 			&&
 			QuantumPlugin({
 				// Inject Quantum API into vendors bundle
-				bakeApiIntoBundle: vendorsBundleName,
+				bakeApiIntoBundle: switches.vendorsBundleName,
 
 				// Enable tree-shaking capability
 				treeshake: true,
@@ -284,18 +231,18 @@ Sparky.task('config:fuse', () =>
 				// Will use uglify-es on non legacy mode
 				uglify: (
 					options.uglify
-					? { es6 : !legacySupport }
+					? { es6 : !switches.legacySupport }
 					: false
 				),
 
 				// Generate a manifest.json file containing bundles list if no index.html is built
-				manifest: (generateWebIndex ? false : 'quantum.json'),
+				manifest: (switches.generateWebIndex ? false : 'quantum.json'),
 
 				// Promise API support for legacy browsers
-				polyfills: legacySupport ? ['Promise'] : [],
+				polyfills: switches.legacySupport ? ['Promise'] : [],
 
 				// ES5 compatible in legacy mode
-				ensureES5 : legacySupport
+				ensureES5 : switches.legacySupport
 			})
 		]
 	});
@@ -312,14 +259,14 @@ Sparky.task('config:bundles', () =>
 	// Configure vendors bundle, add it to app bundles
 	appBundles.push(
 
-		fuse.bundle( vendorsBundleName )
+		fuse.bundle( switches.vendorsBundleName )
 
 		// Contains everything but the app files
-		.instructions(`~ ${entryPoint}`)
+		.instructions(`~ ${switches.entryPoint}`)
 
 		// Include shimmed libs
 		// @see : http://fuse-box.org/page/configuration#shimming
-		.shim( vendorShims )
+		.shim( switches.vendorShims )
 
 		// Globals exports
 		// @see : http://fuse-box.org/page/configuration#global-variables
@@ -332,45 +279,45 @@ Sparky.task('config:bundles', () =>
 	 */
 
 	// Glob string to target all included extensions files
-	const extensionsGlob = `+(${extensions.join('|')})`;
+	const extensionsGlob = `+(${ switches.extensions.join('|') })`;
 
 	// Glog string to target included folders
-	const includedFoldersGlob = `+(${includedFoldersWithoutImports.join('|')})`;
+	const includedFoldersGlob = `+(${ switches.includedFoldersWithoutImports.join('|') })`;
 
 	// Init main app bundle and add it to app bundles
-	const mainApp = fuse.bundle('mainApp');
-	appBundles.push(mainApp);
+	const mainBundle = fuse.bundle('main');
+	appBundles.push(mainBundle);
 
 	// Configure code splitting
-	mainApp.splitConfig({
+	mainBundle.splitConfig({
 
 		// Relative path from main bundle to load code splitted bundles
-		browser: `assets/bundles/`,
+		browser: switches.bundlesPath,
 
 		// Where to put async bundles. Default is same directory than regular bundles.
-		//dest: `assets/bundles/`
+		//dest: switches.bundlesPath
 	});
 
 	// We use this helper to get async modules list from file system using this glob
-	getAsyncBundlesFromFileSystem( `${srcPath}${asyncPath}*/*.+(ts|tsx)` ).map( (asyncEntry) =>
+	getAsyncBundlesFromFileSystem( `${switches.srcPath}${switches.asyncPath}*/*.+(ts|tsx)` ).map( (asyncEntry) =>
 	{
 		// Here we define code splitting instructions.
 		// @see : http://fuse-box.org/page/code-splitting#instructions
-		mainApp.split(
+		mainBundle.split(
 
 			// Match every file inside bundle directory
-			`${ asyncPath }${ asyncEntry.bundleName }/**`,
+			`${ switches.asyncPath }${ asyncEntry.bundleName }/**`,
 
 			// Name of the bundle > Entry point of the bundle
-			`${ asyncEntry.bundleName } > ${ asyncPath }${ asyncEntry.bundleName }/${ asyncEntry.entryPoint }`
+			`${ asyncEntry.bundleName } > ${ switches.asyncPath }${ asyncEntry.bundleName }/${ asyncEntry.entryPoint }`
 		);
 	});
 
 	// Main app compilation instruction
-	mainApp.instructions([
+	mainBundle.instructions([
 
 		// Setup and auto-start application entry point
-		`!> [${ entryPoint }]`,
+		`!> [${ switches.entryPoint }]`,
 
 		// FIXME : Does not work ???
 
@@ -378,7 +325,7 @@ Sparky.task('config:bundles', () =>
 		`+ [${includedFoldersGlob}/*/*.${extensionsGlob}]`,
 
 		// Include non imported async files, Quantum will split the bundle
-		`+ [${ asyncPath }*/${includedFoldersGlob}/*/*.${extensionsGlob}]`,
+		`+ [${ switches.asyncPath }*/${includedFoldersGlob}/*/*.${extensionsGlob}]`,
 
 	].join(' '));
 
@@ -403,7 +350,7 @@ Sparky.task('config:bundles', () =>
 
 			// Do not HMR vendor bundle
 			// FIXME ? Otherwise TypeChecking will dispatch 2 page reload
-			if ( app.name === vendorsBundleName ) return;
+			if ( app.name === switches.vendorsBundleName ) return;
 
 			// Launch HMR and watch
 			app.hmr({ reload: options.reload });
@@ -431,7 +378,7 @@ Sparky.task('config:typeChecking', () =>
 	let typeHelper = TypeHelper({
 		name: 'TypeChecker',
 		tsConfig: '../tsconfig.json',
-		basePath: srcPath,
+		basePath: switches.srcPath,
 		shortenFilenames: true,
 
 		// Tslint file ?
@@ -450,8 +397,8 @@ Sparky.task('config:typeChecking', () =>
 		// If we have errors
 		// Play a sound from the terminal if there is an error
 		(totalErrors > 0)
-			? console.log("\007")
-			: console.log(`Bundle ${bundleName} checked !`.green);
+		? console.log("\007")
+		: console.log(`Bundle ${bundleName} checked !`.green);
 
 		// Quit with an error if we are in quantum mode
 		if (options.quantum && totalErrors > 0)
@@ -464,7 +411,7 @@ Sparky.task('config:typeChecking', () =>
 	appBundles.map( app =>
 	{
 		// Do not listen vendors app to type check
-		if (app.name === vendorsBundleName) return;
+		if (app.name === switches.vendorsBundleName) return;
 
 		// Do not watch to TypeCheck if we are Quantum is enabled
 		if ( options.quantum )
@@ -478,7 +425,7 @@ Sparky.task('config:typeChecking', () =>
 		app.completed( (proc) =>
 		{
 			// Do not type check vendors
-			if (proc.bundle.name === vendorsBundleName) return;
+			if (proc.bundle.name === switches.vendorsBundleName) return;
 			runTypeCheck( proc.bundle.name );
 		});
 	});
@@ -539,6 +486,9 @@ const cli = CLI({
 			default: false
 		},
 	},
+
+	// TODO : DOES NOT WORK ANYMORE ?
+
 	taskDescriptions: {
 		'default' : 'Show this message',
 		'dev' : `
@@ -570,6 +520,12 @@ const cli = CLI({
 		`,
 		'clean' : `
 			Clean fuse cache. Automatically done before dev and production tasks. 
+		`,
+		'scaffold' : `
+			Create a new component interactively. 
+		`,
+		'sprites' : `
+			Process and compile sprites. 
 		`
 	}
 });
@@ -583,9 +539,6 @@ Sparky.task('default', () =>
 });
 
 
-// ----------------------------------------------------------------------------- FILES
-
-
 // ----------------------------------------------------------------------------- TASKS
 
 /**
@@ -594,18 +547,18 @@ Sparky.task('default', () =>
 Sparky.task('clean', () =>
 {
 	// Clear cache before each command
-	Folder('.fusebox').delete();
+	Folders('.fusebox').delete();
 
 	// Remove every compiled bundles
-	Folder(`${distPath}${bundlesPath}`).delete();
+	Folders(`${switches.distPath}${switches.bundlesPath}`).delete();
 
 	// Remove compiled html if we have one
-	generateWebIndex
+	switches.generateWebIndex
 	&&
-	Files(`${distPath}index.html`).delete();
+	Files(`${switches.distPath}index.html`).delete();
 
 	// Remove resources
-	Folder( resourcesPath ).delete();
+	Folders( switches.resourcesPath ).delete();
 });
 
 /**
@@ -632,10 +585,25 @@ Sparky.task('production', ['clean', 'config:production'].concat( configTasks ), 
 	fuse.run();
 });
 
+/**
+ * Create a new component interactively
+ */
+Sparky.task('scaffold', async () =>
+{
+	return require('./fuse-scaffold');
+});
 
+/**
+ * Process and compile sprites.
+ */
+Sparky.task('sprites', async () =>
+{
+	return require('./fuse-sprites');
+});
 
 
 // ----------------------------------------------------------------------------- /!\ TESTING ZONE /!\
+
 
 
 /*
@@ -662,12 +630,12 @@ Sparky.task('testFile', () =>
 
 	/*
 	console.log('TEST FOLDER 1');
-	Folder('dist/assets/bundles/').all( file => console.log( '> ' + file ) );
+	Folders('dist/assets/bundles/').all( file => console.log( '> ' + file ) );
 	*/
 
 	/*
 	console.log('TEST FOLDER 2');
-	Folder('dist/assets/bundles/').delete();
+	Folders('dist/assets/bundles/').delete();
 	*/
 
 	/*

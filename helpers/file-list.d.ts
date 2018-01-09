@@ -3,6 +3,9 @@
 
 declare export class FileList
 {
+	glob	:string;
+	files	:string[];
+
 	constructor (pGlob:boolean, pOnlyFiles?:boolean);
 
 	exists ():boolean;
@@ -18,4 +21,4 @@ declare export class FileList
 
 declare export const Files = pGlob => new FileList(pGlob, true);
 
-declare export const Folder = pGlob => new FileList(pGlob, false);
+declare export const Folders = pGlob => new FileList(pGlob, false);
