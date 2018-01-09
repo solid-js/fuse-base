@@ -6,8 +6,7 @@
 
 # Compiled bundles
 dist/index.html
-dist/*.js
-dist/*.css
+dist/assets/bundles/*
 
 # Compiled resources
 dist/resources/*

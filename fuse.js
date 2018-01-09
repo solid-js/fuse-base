@@ -3,8 +3,6 @@
 
 /**
  * TODO :
- * - Update ^3.0.0-next.20
- * - Tout tester !
  * - Refacto du framework avec nouvelle API
  * - Deployer
  * - Sprite generator
@@ -12,7 +10,6 @@
  * - IMG ?
  * - IMG base 64 ?
  * - React en production mode ?
- *
  * - http://fuse-box.org/plugins/banner-plugin ?
  *
  * BETTER :
@@ -20,14 +17,6 @@
  * - If possible : assets folder, this is cleaner !
  * - tsconfig JSON5
  *
- * DONE : Shims / TweenLite ...
- * DONE : SYNC Typecheck ? Check typescript before reloading ?
- * DONE : BIP when fail !
- * DONE : Bundles CSS en option pour éviter le full JS
- * DONE : Task dev + task production
- * DONE : Sparky
- * DONE : Code splitting CSS
- * DONE : Code splitting JS
  */
 
 
@@ -35,7 +24,6 @@
 
 const {
 	FuseBox,
-	Sparky,
 	CLI,
 	EnvPlugin,
 	WebIndexPlugin,
@@ -43,8 +31,11 @@ const {
 	LESSPlugin,
 	PostCSSPlugin,
 	CSSPlugin,
-	CSSResourcePlugin
+	CSSResourcePlugin,
 } = require("fuse-box");
+
+const Sparky = require("fuse-box/sparky");
+
 
 const path = require("path");
 const { TypeHelper } = require('fuse-box-typechecker');
@@ -55,19 +46,22 @@ const { getAsyncBundlesFromFileSystem, generateShims, cleanPath } = require("./h
 // ----------------------------------------------------------------------------- PATHS AND CONSTANTS
 
 // Source folder
-const src = 'src/';
+const srcPath = 'src/';
 
 // Output directory
-const dist = 'dist/';
+const distPath = 'dist/';
+
+// Bundle path from dist path
+const bundlesPath = 'assets/bundles/';
 
 // Compiled resources folder (inside dist)
-const resources = 'assets/resources/';
+const resourcesPath = 'assets/resources/';
 
 // Default apps entry point
 const entryPoint = 'index.ts';
 
 // Async bundle folders (inside src)
-const async = 'async/';
+const asyncPath = 'async/';
 
 // Vendors bundle name
 const vendorsBundleName = 'vendors';
@@ -78,13 +72,14 @@ const vendorsBundleName = 'vendors';
 /**
  * Generate an index.html from template.
  * If false, and quantum is enabled, will generate a quantum.json manifest file.
+ * If enabled, dist/index.html will be removed when cleaning.
  */
 const generateWebIndex = true;
 
 /**
  * Support old browsers like IE 11 or iOS 7
  */
-const legacySupport = false;
+const legacySupport = true;
 
 /**
  * Folders to include in every bundles, even if they are not implicitly imported.
@@ -100,10 +95,10 @@ const extensions = ['ts', 'tsx', 'less'];
 /**
  * Set to false to include all CSS files as JS bundles.
  * Allows HMR and code splitting for CSS.
- * IMPORTANT : Set to a 'filename.css' to generate a unique css bundle including every css instructions.
+ * Set to a 'filename.css' to generate a unique css bundle including every css instructions.
  */
 const cssBundleFile = false;
-//const cssBundleFile = 'styles.css';
+//const cssBundleFile = `${bundlesPath}styles.css`;
 
 /**
  * TODO : WIP
@@ -127,10 +122,10 @@ Sparky.task('config:fuse', () =>
 	fuse = FuseBox.init({
 
 		// Sources directory
-		homeDir: src,
+		homeDir: srcPath,
 
-		// JS bundles output files
-		output: `${dist}$name.js`,
+		// Bundles output path format
+		output: `${distPath}${bundlesPath}$name.js`,
 
 		// Typescript config file
 		tsConfig: 'tsconfig.json',
@@ -165,13 +160,20 @@ Sparky.task('config:fuse', () =>
 		// @see : http://fuse-box.org/page/configuration#alias
 		alias: { },
 
+		// @see : https://fuse-box.org/page/configuration#auto-import
+		autoImport : {
+
+			// Will automatically var Inferno = require('inferno') when a script is using Inferno.anything ...
+			// Inferno: "inferno"
+		},
+
 		plugins: [
 			// Styling config
 			[
 				// @see : http://fuse-box.org/plugins/less-plugin
 				LESSPlugin({
 					// FIXME : Not working now... See also PostCSS sourceMap config if enabled.
-					//sourceMap: true,
+					sourceMap: true,
 
 					// Disable IE-compat so data-uri can be huge
 					ieCompat: false,
@@ -184,8 +186,8 @@ Sparky.task('config:fuse', () =>
 
 				// @see : http://fuse-box.org/plugins/post-css-plugin
 				// FIXME : Only enabled with quantum (so no HMR) for now... https://github.com/fuse-box/fuse-box/issues/723
-				options.quantum
-				&&
+				//options.quantum
+				//&&
 				PostCSSPlugin([
 
 					// @see : https://github.com/postcss/autoprefixer
@@ -219,7 +221,7 @@ Sparky.task('config:fuse', () =>
 					//dist: `${dist}${resources}`,
 
 					// Rewriting resources paths
-					resolve: (f) => `${resources}${f}`,
+					resolve: (f) => `${resourcesPath}${f}`,
 
 					// FIXME : A tester et à exposer en haut
 					// Include images as Base64 into bundle
@@ -230,7 +232,7 @@ Sparky.task('config:fuse', () =>
 				// Export a CSS file and do not inject CSS into JS bundles if cssBundleFile is a string
 				CSSPlugin( !cssBundleFile ? {} : {
 					group: cssBundleFile,
-					outFile: `${dist}${cssBundleFile}`
+					outFile: `${distPath}${cssBundleFile}`
 				})
 			],
 
@@ -243,10 +245,15 @@ Sparky.task('config:fuse', () =>
 			generateWebIndex
 			&&
 			WebIndexPlugin({
-				template: `${src}index.html`,
-				path: './',
-				target: 'index.html',
+				// Index template
+				template: `${srcPath}index.html`,
+
+				// Relative path to bundles
+				path: bundlesPath,
 				//resolve : output => 'assets/'+output.lastPrimaryOutput.filename
+
+				// Index file name, relative to bundle path, cheap trick
+				target: '../../index.html',
 			}),
 
 			// Compress and optimize bundle with Quantum on production
@@ -324,26 +331,38 @@ Sparky.task('config:bundles', () =>
 	 * MAIN APP BUNDLE
 	 */
 
-		// TODO : DOC
+	// Glob string to target all included extensions files
 	const extensionsGlob = `+(${extensions.join('|')})`;
+
+	// Glog string to target included folders
 	const includedFoldersGlob = `+(${includedFoldersWithoutImports.join('|')})`;
 
 	// Init main app bundle and add it to app bundles
 	const mainApp = fuse.bundle('mainApp');
 	appBundles.push(mainApp);
 
+	// Configure code splitting
+	mainApp.splitConfig({
+
+		// Relative path from main bundle to load code splitted bundles
+		browser: `assets/bundles/`,
+
+		// Where to put bundle.
+		//dest: `assets/bundles/`
+	});
+
 	// We use this helper to get async modules list from file system using this glob
-	getAsyncBundlesFromFileSystem( `${src}${async}*/*.+(ts|tsx)` ).map( (asyncEntry) =>
+	getAsyncBundlesFromFileSystem( `${srcPath}${asyncPath}*/*.+(ts|tsx)` ).map( (asyncEntry) =>
 	{
 		// Here we define code splitting instructions.
 		// @see : http://fuse-box.org/page/code-splitting#instructions
 		mainApp.split(
 
 			// Match every file inside bundle directory
-			`${ async }${ asyncEntry.bundleName }/**`,
+			`${ asyncPath }${ asyncEntry.bundleName }/**`,
 
 			// Name of the bundle > Entry point of the bundle
-			`${ asyncEntry.bundleName } > ${ async }${ asyncEntry.bundleName }/${ asyncEntry.entryPoint }`
+			`${ asyncEntry.bundleName } > ${ asyncPath }${ asyncEntry.bundleName }/${ asyncEntry.entryPoint }`
 		);
 	});
 
@@ -359,7 +378,7 @@ Sparky.task('config:bundles', () =>
 		`+ [${includedFoldersGlob}/*/*.${extensionsGlob}]`,
 
 		// Include non imported async files, Quantum will split the bundle
-		`+ [${ async }*/${includedFoldersGlob}/*/*.${extensionsGlob}]`,
+		`+ [${ asyncPath }*/${includedFoldersGlob}/*/*.${extensionsGlob}]`,
 
 	].join(' '));
 
@@ -372,7 +391,8 @@ Sparky.task('config:bundles', () =>
 	{
 		// Enable embedded server for HMR reloading
 		fuse.dev({
-			port: options.port
+			port: options.port,
+			httpServer: false
 		});
 
 		// Enable watch / HMR on bundles
@@ -411,7 +431,7 @@ Sparky.task('config:typeChecking', () =>
 	let typeHelper = TypeHelper({
 		name: 'TypeChecker',
 		tsConfig: '../tsconfig.json',
-		basePath: src,
+		basePath: srcPath,
 		shortenFilenames: true,
 
 		// BETTER : Tslint ?
@@ -564,6 +584,8 @@ Sparky.task('default', () =>
 
 
 // ----------------------------------------------------------------------------- FILES
+
+
 // ----------------------------------------------------------------------------- TASKS
 
 /**
@@ -574,15 +596,16 @@ Sparky.task('clean', () =>
 	// Clear cache before each command
 	cleanPath('.fusebox');
 
-	// Remove every compiled js
-	cleanPath(`${dist}*.js`);
-	cleanPath(`${dist}*.map`);
+	// Remove every compiled bundles
+	cleanPath(`${distPath}${bundlesPath}`);
 
-	// Remove compiled html
-	cleanPath(`${dist}index.html`);
+	// Remove compiled html if we have one
+	generateWebIndex
+	&&
+	cleanPath(`${distPath}index.html`);
 
 	// Remove resources
-	cleanPath(`${resources}`);
+	cleanPath( resourcesPath );
 });
 
 /**
@@ -607,4 +630,18 @@ Sparky.task('dev', ['clean', 'config:options'].concat( configTasks ), () =>
 Sparky.task('production', ['clean', 'config:production'].concat( configTasks ), () =>
 {
 	fuse.run();
+});
+
+
+
+Sparky.task('testFile', () =>
+{
+	console.log('TEST');
+
+	Sparky.src("testfile.json").file("*", file =>
+	{
+		console.log( file );
+	}).exec();
+
+	console.log('after');
 });
