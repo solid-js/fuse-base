@@ -1,15 +1,10 @@
 
-# FIXME WIP
-
-
 # ------------------------------------------------------------------------------ COMPILED BUNDLES
 
-# Compiled bundles
+# Compiled bundles and resources
 dist/index.html
 dist/assets/bundles/*
-
-# Compiled resources
-dist/resources/*
+dist/assets/resources/*
 
 
 # ------------------------------------------------------------------------------ LOGS FILES

@@ -31,16 +31,18 @@ const {
 	LESSPlugin,
 	PostCSSPlugin,
 	CSSPlugin,
-	CSSResourcePlugin,
+	CSSResourcePlugin
 } = require("fuse-box");
 
-const Sparky = require("fuse-box/sparky");
+//const Sparky = require("fuse-box/sparky");
 
-
-const path = require("path");
-const { TypeHelper } = require('fuse-box-typechecker');
 const colors = require('colors'); // @see : https://github.com/marak/colors.js/
-const { getAsyncBundlesFromFileSystem, generateShims, cleanPath } = require("./helpers/fuse-helpers");
+const path = require("path");
+
+const { TypeHelper } = require('fuse-box-typechecker');
+
+const { getAsyncBundlesFromFileSystem } = require("./helpers/fuse-helpers");
+const { Files, Folder } = require("./helpers/file-list");
 
 
 // ----------------------------------------------------------------------------- PATHS AND CONSTANTS
@@ -97,8 +99,7 @@ const extensions = ['ts', 'tsx', 'less'];
  * Allows HMR and code splitting for CSS.
  * Set to a 'filename.css' to generate a unique css bundle including every css instructions.
  */
-const cssBundleFile = false;
-//const cssBundleFile = `${bundlesPath}styles.css`;
+const cssBundleFile = false; // `${bundlesPath}styles.css`;
 
 /**
  * TODO : WIP
@@ -173,7 +174,7 @@ Sparky.task('config:fuse', () =>
 				// @see : http://fuse-box.org/plugins/less-plugin
 				LESSPlugin({
 					// FIXME : Not working now... See also PostCSS sourceMap config if enabled.
-					sourceMap: true,
+					sourceMap: false,
 
 					// Disable IE-compat so data-uri can be huge
 					ieCompat: false,
@@ -185,46 +186,50 @@ Sparky.task('config:fuse', () =>
 				}),
 
 				// @see : http://fuse-box.org/plugins/post-css-plugin
-				// FIXME : Only enabled with quantum (so no HMR) for now... https://github.com/fuse-box/fuse-box/issues/723
-				//options.quantum
-				//&&
-				PostCSSPlugin([
+				PostCSSPlugin(
+					// PostCSS plugins
+					[
+						// @see : https://github.com/postcss/autoprefixer
+						require('autoprefixer')({
 
-					// @see : https://github.com/postcss/autoprefixer
-					require('autoprefixer')({
+							// BrowersList syntax : https://github.com/ai/browserslist
+							browsers: [
+								// All browsers version supports
+								`last ${legacySupport ? 4 : 2} versions`,
 
-						// BrowersList syntax : https://github.com/ai/browserslist
-						browsers: [
-							// All browsers version supports
-							`last ${legacySupport ? 4 : 2} versions`,
+								// IE and Edge support
+								(legacySupport ? `ie >= 11` : 'edge >= 10'),
 
-							// IE and Edge support
-							(legacySupport ? `ie >= 11` : 'edge >= 10'),
+								// iOS Support
+								`iOS >= ${legacySupport ? 7 : 10}`
+							]
+						}),
 
-							// iOS Support
-							`iOS >= ${legacySupport ? 7 : 10}`
-						]
-					}),
-
-					// Clean output CSS
-					require('postcss-clean')({
-						// Keeps breaks on uglify mode and beautify otherwise
-						format: ( options.uglify ? 'keep-breaks' : 'beautify' ),
-						advanced: true
-					})
-				]),
+						// Clean output CSS
+						require('postcss-clean')({
+							// Keeps breaks on uglify mode and beautify otherwise
+							format: ( options.uglify ? 'keep-breaks' : 'beautify' ),
+							advanced: true
+						})
+					],
+					// PostCSS options
+					{
+						sourceMaps: false,
+						from: 0
+					}
+				),
 
 				// @see : http://fuse-box.org/plugins/css-resource-plugin
 				CSSResourcePlugin({
 
 					// Write resources to that folder
-					//dist: `${dist}${resources}`,
+					dist: `${distPath}${resourcesPath}`,
 
 					// Rewriting resources paths
 					resolve: (f) => `${resourcesPath}${f}`,
 
-					// FIXME : A tester et à exposer en haut
 					// Include images as Base64 into bundle
+					// Please use Less data-uri instead @see http://lesscss.org/functions/#misc-functions-data-uri
 					//inline: true
 				}),
 
@@ -236,9 +241,13 @@ Sparky.task('config:fuse', () =>
 				})
 			],
 
-			// Convert node env to production if we use quantum
+			// EnvPlugin for process.env emulation in the browser @see https://fuse-box.org/page/env-plugin
 			EnvPlugin({
-				NODE_ENV: ( options.quantum ? 'production' : 'development' )
+				// Convert node env to production if we use quantum
+				NODE_ENV: ( options.quantum ? 'production' : 'development' ),
+
+				// Inject package.json version
+				VERSION: require('./package.json').version
 			}),
 
 			// Generate index.html from template
@@ -265,18 +274,9 @@ Sparky.task('config:fuse', () =>
 				bakeApiIntoBundle: vendorsBundleName,
 
 				// Enable tree-shaking capability
-				// FIXME : Custom treeshake
-				treeshake: true, /*{
+				treeshake: true,
 
-					// Select files to remove manually
-					shouldRemove: file =>
-					{
-						console.log('>', file.packageAbstraction.name);
-						return null;
-					}
-				},*/
-
-				// FIXME ?
+				// ??
 				//target : 'browser',
 				//replaceTypeOf: true
 
@@ -284,8 +284,8 @@ Sparky.task('config:fuse', () =>
 				// Will use uglify-es on non legacy mode
 				uglify: (
 					options.uglify
-						? { es6 : !legacySupport }
-						: false
+					? { es6 : !legacySupport }
+					: false
 				),
 
 				// Generate a manifest.json file containing bundles list if no index.html is built
@@ -323,7 +323,7 @@ Sparky.task('config:bundles', () =>
 
 		// Globals exports
 		// @see : http://fuse-box.org/page/configuration#global-variables
-		.globals({ })
+		//.globals({ })
 	);
 
 
@@ -347,7 +347,7 @@ Sparky.task('config:bundles', () =>
 		// Relative path from main bundle to load code splitted bundles
 		browser: `assets/bundles/`,
 
-		// Where to put bundle.
+		// Where to put async bundles. Default is same directory than regular bundles.
 		//dest: `assets/bundles/`
 	});
 
@@ -434,7 +434,7 @@ Sparky.task('config:typeChecking', () =>
 		basePath: srcPath,
 		shortenFilenames: true,
 
-		// BETTER : Tslint ?
+		// Tslint file ?
 		//tsLint:'./tslint.json'
 	});
 
@@ -594,18 +594,18 @@ Sparky.task('default', () =>
 Sparky.task('clean', () =>
 {
 	// Clear cache before each command
-	cleanPath('.fusebox');
+	Folder('.fusebox').delete();
 
 	// Remove every compiled bundles
-	cleanPath(`${distPath}${bundlesPath}`);
+	Folder(`${distPath}${bundlesPath}`).delete();
 
 	// Remove compiled html if we have one
 	generateWebIndex
 	&&
-	cleanPath(`${distPath}index.html`);
+	Files(`${distPath}index.html`).delete();
 
 	// Remove resources
-	cleanPath( resourcesPath );
+	Folder( resourcesPath ).delete();
 });
 
 /**
@@ -634,9 +634,14 @@ Sparky.task('production', ['clean', 'config:production'].concat( configTasks ), 
 
 
 
-Sparky.task('testFile', () =>
+
+// ----------------------------------------------------------------------------- /!\ TESTING ZONE /!\
+
+
+/*
+Sparky.task('testSparky', () =>
 {
-	console.log('TEST');
+	console.log('TEST SPARKY');
 
 	Sparky.src("testfile.json").file("*", file =>
 	{
@@ -644,4 +649,34 @@ Sparky.task('testFile', () =>
 	}).exec();
 
 	console.log('after');
+});
+*/
+
+
+Sparky.task('testFile', () =>
+{
+	/*
+	console.log('TEST FILE 1');
+	Files('dist/assets/bundles/**').all( file => console.log( '> ' + file ) );
+	*/
+
+	/*
+	console.log('TEST FOLDER 1');
+	Folder('dist/assets/bundles/').all( file => console.log( '> ' + file ) );
+	*/
+
+	/*
+	console.log('TEST FOLDER 2');
+	Folder('dist/assets/bundles/').delete();
+	*/
+
+	/*
+	console.log('TEST FILES MOVE');
+	Files('dist/assets/bundles/**').moveTo('dist/test/');
+	*/
+
+	/*
+	console.log('TEST FILES COPY');
+	Files('dist/assets/bundles/**').copyTo('dist/test/');
+	*/
 });

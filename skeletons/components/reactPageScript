@@ -1,0 +1,61 @@
+import "%%capitalComponentName%%.less";
+import * as React from "react";
+import {ReactPage, ReactPageProps} from "solidify-lib/react/ReactPage";
+
+// ----------------------------------------------------------------------------- STRUCT
+
+interface States
+{
+
+}
+
+
+export class %%capitalComponentName%% extends ReactPage<ReactPageProps, States>
+{
+	// ------------------------------------------------------------------------- INIT
+
+	prepare ()
+	{
+
+	}
+
+
+	// ------------------------------------------------------------------------- RENDERING
+
+	render ()
+	{
+		return <div className="%%capitalComponentName%%" ref="root">
+		  %%capitalComponentName%%
+    </div>
+	}
+
+
+	// ------------------------------------------------------------------------- PAGE
+
+	/**
+	 * Action on this page.
+	 * Check props.action and props.parameters to show proper content.
+	 */
+	action ()
+	{
+	    // Remove if not used
+	}
+
+	/**
+	 * Play in animation.
+	 * Have to return a promise when animation is ended.
+	 */
+	playIn ():Promise
+	{
+		return null;
+	}
+
+	/**
+	 * Play out animation.
+	 * Have to return a promise when animation is ended.
+	 */
+	playOut ():Promise
+	{
+		return null;
+	}
+}

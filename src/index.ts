@@ -27,6 +27,12 @@ require('gsap/ScrollToPlugin.js');
 //require('gsap/TextPlugin.js');
 
 
+// ----------------------------------------------------------------------------- INJECT PACKAGE DATA
+
+
+//console.log('VERSION', process.env['VERSION'] );
+console.log('env', process.env);
+
 // ----------------------------------------------------------------------------- GLOBAL SCOPE MAPPING
 
 // Map green sock globals into gsap so this is compatible with GSAP typings

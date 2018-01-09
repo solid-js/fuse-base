@@ -1,0 +1,4 @@
+{
+	"version": "%%version%%",
+	"env" : "%%env%%"
+}

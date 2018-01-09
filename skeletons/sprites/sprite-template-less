@@ -1,0 +1,78 @@
+/**
+ * Sprite name : {{spriteName}}
+ * Sprite prefix : {{spritePrefix}}
+ * Sprite seed : {{spriteSeed}}
+ * File created with Solid LESS mixins exporter
+ */
+
+// ----------------------------------------------------------------------------- SPRITE
+
+// This mixin contains all properties about this sprite.
+// Insert it in your declaration to get access to those vars
+.{{spritePrefix}}-vars()
+{
+	// Sprite size
+	@spriteWidth: {{spriteWidth}}px;
+	@spriteHeight: {{spriteHeight}}px;
+
+	// Full texture path
+	@spritePath: '{{spritePath}}';
+
+	// The build seed to use with this sprite.
+	// Usefull to clear cache
+	@spriteSeed: '{{spriteSeed}}';
+}
+
+// Target the sprite as background with build seed
+.{{spritePrefix}}-seed
+{
+	.{{spritePrefix}}-vars();
+	background-repeat: no-repeat;
+	background-image: url(~'@{spritePath}?@{spriteSeed}');
+}
+
+// Target the sprite as background without the build seed
+.{{spritePrefix}}-noSeed
+{
+	.{{spritePrefix}}-vars();
+	background-repeat: no-repeat;
+	background-image: url(~'@{spritePath}');
+}
+
+
+{{#each textures}}
+// ----------------------------------------------------------------------------- {{name}}
+
+// Size and position as variables
+.{{../spritePrefix}}-{{name}}-vars ()
+{
+	@textureX       : -{{x}}px;
+	@textureY       : -{{y}}px;
+	@textureWidth   : {{width}}px;
+	@textureHeight  : {{height}}px;
+}
+
+// Scale mixin
+.{{../spritePrefix}}-{{name}}-scale (@ratio : 1)
+{
+	.{{../spritePrefix}}-{{name}}-vars();
+	.{{../spritePrefix}}-vars();
+	width   : @textureWidth * @ratio;
+	height  : @textureHeight * @ratio;
+	background-position : @textureX * @ratio @textureY * @ratio;
+	background-size     : @spriteWidth * @ratio @spriteHeight * @ratio;
+}
+
+// CSS Injected declaration
+// Regular (ratio 1)
+.{{../spritePrefix}}-{{name}}
+{
+	.{{../spritePrefix}}-{{name}}-scale(1);
+}
+// Retina (ratio 0.5)
+.{{../spritePrefix}}-{{name}}-retina
+{
+	.{{../spritePrefix}}-{{name}}-scale(.5);
+}
+
+{{/each}}
