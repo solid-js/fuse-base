@@ -3,8 +3,11 @@
 /**
  * Add your custom properties here
  */
-export class ConfigProperties
+export class GlobalConfigProperties
 {
+	// Compiled version of the app, from package.json
+	version		:string;
+
 	// Root node where the app DOM will be append
 	root		:Element;
 
@@ -23,26 +26,26 @@ export class ConfigProperties
  * Singleton Config class.
  * Do not touch.
  */
-export class Config extends ConfigProperties
+export class GlobalConfig extends GlobalConfigProperties
 {
 	// ------------------------------------------------------------------------- SINGLETON
 
 	// Singleton
-	protected static __instance:Config;
+	protected static __instance:GlobalConfig;
 
 	/**
-	 * Get Config singleton instance.
+	 * Get GlobalConfig singleton instance.
 	 */
 	static get instance ()
 	{
 		// Create instance
-		if (Config.__instance == null)
+		if (GlobalConfig.__instance == null)
 		{
-			Config.__instance = new Config();
+			GlobalConfig.__instance = new GlobalConfig();
 		}
 
 		// Return singleton instance
-		return Config.__instance;
+		return GlobalConfig.__instance;
 	}
 
 

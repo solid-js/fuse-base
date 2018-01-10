@@ -265,7 +265,7 @@ Sparky.task('config:bundles', () =>
 			// Filter shims for quantum compiling
 			// We use this special filter because some libs like Zepto or jQuery
 			// does not work as shimmed library when quantum is enabled.
-			filterShimsForQuantum( switches.vendorShims )
+			filterShimsForQuantum( switches.vendorShims, options.quantum )
 		)
 
 		// Globals exports

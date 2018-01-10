@@ -1,6 +1,6 @@
 {
   "name": "test-1",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "description": "",
   "main": "fuse.js",
   "dependencies": {
@@ -8,7 +8,7 @@
     "normalize.css": "^7.0.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "solidify-lib": "^1.0.7",
+    "solidify-lib": "^1.0.12",
     "zepto": "^1.2.0"
   },
   "devDependencies": {
@@ -32,7 +32,8 @@
     "uglify-js": "^3.3.5"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "please": "rm -rf node_modules package-lock.json && npm i"
   },
   "author": "",
   "license": "ISC"
