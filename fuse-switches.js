@@ -57,12 +57,16 @@ exports.extensions = ['ts', 'tsx', 'less'];
 exports.cssBundleFile = false; // `${bundlesPath}styles.css`;
 
 /**
- * Shimmed libs like jQuery
+ * Shimmed libs like jQuery.
+ * Added removeForQuantum option to remove this shim when quantum compiling.
  * @see : http://fuse-box.org/page/configuration#shimming
  */
 exports.vendorShims = {
 	zepto: {
 		source: "node_modules/zepto/dist/zepto.js",
 		exports: "$",
-	},
+
+		// Special case : Zepto does not work with quantum
+		removeForQuantum: true
+	}
 };

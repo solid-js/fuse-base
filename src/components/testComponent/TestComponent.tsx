@@ -49,6 +49,8 @@ export class TestComponent extends React.Component<Props, States>
 	{
 		this.startCounter();
 
+		console.log('ZEPTO TEST');
+
 		let $zeptest = $('.TestComponent');
 
 		console.log($zeptest);

@@ -256,6 +256,21 @@ Sparky.task('config:bundles', () =>
 	 * VENDOR BUNDLE
 	 */
 
+	// Filter shims for quantum compiling
+	let filteredShimsForQuantum = {};
+	for (let i in switches.vendorShims)
+	{
+		let currentShim = switches.vendorShims[i];
+		if (
+				!options.quantum
+				||
+				(options.quantum && !('removeForQuantum' in currentShim) && !currentShim.removeForQuantum)
+			)
+		{
+			filteredShimsForQuantum[i] = currentShim;
+		}
+	}
+
 	// Configure vendors bundle, add it to app bundles
 	appBundles.push(
 
@@ -266,7 +281,7 @@ Sparky.task('config:bundles', () =>
 
 		// Include shimmed libs
 		// @see : http://fuse-box.org/page/configuration#shimming
-		.shim( switches.vendorShims )
+		.shim( filteredShimsForQuantum )
 
 		// Globals exports
 		// @see : http://fuse-box.org/page/configuration#global-variables
@@ -648,3 +663,32 @@ Sparky.task('testSparky', () =>
 	console.log('after');
 });
 */
+
+
+Sparky.task('testFile', () =>
+{
+	/*
+	console.log('TEST FILE 1');
+	Files('dist/assets/bundles/**').all( file => console.log( '> ' + file ) );
+	*/
+
+	/*
+	console.log('TEST FOLDER 1');
+	Folders('dist/assets/bundles/').all( file => console.log( '> ' + file ) );
+	*/
+
+	/*
+	console.log('TEST FOLDER 2');
+	Folders('dist/assets/bundles/').delete();
+	*/
+
+	/*
+	console.log('TEST FILES MOVE');
+	Files('dist/assets/bundles/**').moveTo('dist/test/');
+	*/
+
+	/*
+	console.log('TEST FILES COPY');
+	Files('dist/assets/bundles/**').copyTo('dist/test/');
+	*/
+});

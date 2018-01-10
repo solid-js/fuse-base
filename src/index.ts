@@ -27,6 +27,10 @@ require('gsap/ScrollToPlugin.js');
 //require('gsap/TextPlugin.js');
 
 
+// Load zepto in quantum mode, zepto shimming is incompatible with quantum
+if (!('Zepto' in window)) require('zepto/dist/zepto.js');
+
+
 // ----------------------------------------------------------------------------- GLOBAL SCOPE MAPPING
 
 // Map green sock globals into gsap so this is compatible with GSAP typings
