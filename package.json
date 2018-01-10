@@ -8,12 +8,14 @@
     "normalize.css": "^7.0.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "solidify-lib": "^1.0.7"
+    "solidify-lib": "^1.0.7",
+    "zepto": "^1.2.0"
   },
   "devDependencies": {
     "@types/gsap": "^1.19.1",
     "@types/react": "^16.0.34",
     "@types/react-dom": "^16.0.3",
+    "@types/zepto": "^1.0.29",
     "autoprefixer": "^7.2.4",
     "colors": "^1.1.2",
     "fuse-box": "^3.0.2",

@@ -60,4 +60,9 @@ exports.cssBundleFile = false; // `${bundlesPath}styles.css`;
  * Shimmed libs like jQuery
  * @see : http://fuse-box.org/page/configuration#shimming
  */
-exports.vendorShims = {};
+exports.vendorShims = {
+	zepto: {
+		source: "node_modules/zepto/dist/zepto.js",
+		exports: "$",
+	},
+};

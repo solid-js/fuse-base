@@ -48,6 +48,40 @@ export class TestComponent extends React.Component<Props, States>
 	componentDidMount ()
 	{
 		this.startCounter();
+
+		let $zeptest = $('.TestComponent');
+
+		console.log($zeptest);
+
+		$zeptest.on('click', (event:Event) =>
+		{
+			console.log('Zepto click', event);
+			return true;
+		});
+
+		$zeptest.parents('*').each((i, el) =>
+		{
+			console.log('Zepto parent', i, el);
+			return true;
+		});
+
+		$zeptest.data('test', JSON.stringify({key: 'value'}));
+
+		console.log('Zepto data', $zeptest.data('test'));
+
+		$.ajax({
+			url: '?',
+			xhrFields: {
+				withCredentials: true
+			},
+			//crossDomain: true,
+			success: (data) =>
+			{
+				console.log('Zepto ajax', data.length);
+			}
+		});
+
+		console.log('Zepto find : ', $zeptest.find('.TestComponent_element')[0]);
 	}
 
 	componentWillUnmount ()
@@ -69,6 +103,7 @@ export class TestComponent extends React.Component<Props, States>
 
 	componentDidUpdate ()
 	{
+		/*
 		TweenLite.to(this._root, 1 / 2, {
 			x: 10,
 			ease: Power3.easeInOut
@@ -78,6 +113,7 @@ export class TestComponent extends React.Component<Props, States>
 			delay: 1 / 2,
 			ease: Power3.easeInOut
 		});
+		*/
 	}
 
 	render ()
