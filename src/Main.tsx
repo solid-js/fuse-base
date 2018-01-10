@@ -5,6 +5,7 @@ import * as ReactDOM from "react-dom";
 import {TestComponent} from "./components/testComponent/TestComponent";
 import {StringUtils} from "solidify-lib/utils/StringUtils";
 
+
 //import {setStatefulModules} from 'fuse-box/modules/fuse-hmr';
 
 interface IAppConfig
@@ -17,8 +18,19 @@ declare let __appConfig:IAppConfig;
 
 export class Main
 {
+	protected static __instance:Main;
+
+	static get instance ():Main
+	{
+		return Main.__instance;
+	}
+
+
+
 	constructor ()
 	{
+		Main.__instance = this;
+
 		//this.prout = 'ok';
 		console.log( __appConfig );
 
@@ -47,13 +59,26 @@ export class Main
 		);
 	}
 
-	async testAsyncImport ()
+	testAsyncImport ()
 	{
 		console.log('Loading splitted code ... ');
 
-		let target = await import('./async/customerArea/pages/testPage/TestPage');
+		//let target = await import('./async/customerArea/pages/testPage/TestPage');
 
-		console.log( 'Loaded ! ', target );
+		let pPageName = './async/customerArea/pages/testPage/TestPage';
+
+
+		import(pPageName)
+		.catch( (error) =>
+		{
+			console.log('CATCH', error);
+
+		}).then( (success) =>
+		{
+			console.log('THEN', success);
+		});
+
+		//console.log( 'Loaded ! ', target );
 	}
 
 	protected testStateful ()

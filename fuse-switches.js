@@ -14,11 +14,20 @@ exports.bundlesPath = 'assets/bundles/';
 // Compiled resources folder (inside dist)
 exports.resourcesPath = 'assets/resources/';
 
+// Compiler sprites
+exports.spritesPath = 'assets/sprites/';
+
 // Default apps entry point
 exports.entryPoint = 'index.ts';
 
 // Async bundle folders (inside src)
 exports.asyncPath = 'async/';
+
+// Path to sprites folder from src
+exports.spritesFolder = 'sprites/';
+
+// Relative path from web-page to png sprite
+exports.relativeSpritePath = 'assets/sprites/';
 
 // Vendors bundle name
 exports.vendorsBundleName = 'vendors';
@@ -32,6 +41,11 @@ exports.vendorsBundleName = 'vendors';
  * If enabled, dist/index.html will be removed when cleaning.
  */
 exports.generateWebIndex = true;
+
+/**
+ * Use NodeJS express server and launch on dev.
+ */
+exports.useEmbeddedServer = false;
 
 /**
  * Support old browsers like IE 11 or iOS 7

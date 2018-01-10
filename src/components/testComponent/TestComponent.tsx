@@ -84,6 +84,13 @@ export class TestComponent extends React.Component<Props, States>
 		});
 
 		console.log('Zepto find : ', $zeptest.find('.TestComponent_element')[0]);
+
+		$( () =>
+		{
+			console.log('Zepto document ready');
+		});
+
+		let $test:ZeptoCollection = $('.test');
 	}
 
 	componentWillUnmount ()

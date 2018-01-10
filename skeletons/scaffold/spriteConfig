@@ -1,0 +1,29 @@
+
+module.exports = {
+
+	// Packing layout ('horizontal' / 'vertical' / 'diagonal' / 'packed')
+	layout: 'packed',
+
+	// Sprite device ratio. Default is 1.
+	pixelRatio: 1,
+
+	layoutOptions: {
+
+		// Minimum space in pixel between each image
+		// Can avoid bleeding between images if the sprite is scaled
+		// Advised to use a multiple of 2
+		padding: 2,
+
+		// Sprite scaling. Default is 1
+		scaling: 1
+	},
+
+	compositorOptions: {
+
+		// PNG output compression level (from 0 to 9)
+		compressionLevel	: 6,
+
+		// Filter applied at composition ('all', 'none', 'sub', 'up', 'average', 'paeth')
+		filter          	: 'none'
+	}
+}

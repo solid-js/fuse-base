@@ -45,7 +45,7 @@ const path = require("path");
 const { TypeHelper } = require('fuse-box-typechecker');
 
 // Get fuse helpers
-const { getAsyncBundlesFromFileSystem } = require("./helpers/fuse-helpers");
+const { getAsyncBundlesFromFileSystem, filterShimsForQuantum } = require("./helpers/fuse-helpers");
 
 // Get Files helper for easy Files/Folder manipulating
 const { Files } = require("./helpers/files");
@@ -120,16 +120,11 @@ Sparky.task('config:fuse', () =>
 			[
 				// @see : http://fuse-box.org/plugins/less-plugin
 				LESSPlugin({
-					// FIXME : Not working now... See also PostCSS sourceMap config if enabled.
+					// Disable sourcemaps because css are included into JS bundles
 					sourceMap: false,
 
 					// Disable IE-compat so data-uri can be huge
-					ieCompat: false,
-
-					// Add root folder as base path for less so we can @import files from node_modules
-					paths: [
-						//path.resolve( __dirname )
-					]
+					ieCompat: false
 				}),
 
 				// @see : http://fuse-box.org/plugins/post-css-plugin
@@ -173,7 +168,7 @@ Sparky.task('config:fuse', () =>
 					dist: `${switches.distPath}${switches.resourcesPath}`,
 
 					// Rewriting resources paths
-					resolve: (f) => `${switches.resourcesPath}switches.${f}`,
+					resolve: (f) => `${switches.resourcesPath}${f}`,
 
 					// Include images as Base64 into bundle
 					// Please use Less data-uri instead @see http://lesscss.org/functions/#misc-functions-data-uri
@@ -209,7 +204,7 @@ Sparky.task('config:fuse', () =>
 				//resolve : output => 'assets/'+output.lastPrimaryOutput.filename
 
 				// Index file name, relative to bundle path, cheap trick
-				target: '../../index.html',
+				target: '../../index.html'
 			}),
 
 			// Compress and optimize bundle with Quantum on production
@@ -256,21 +251,6 @@ Sparky.task('config:bundles', () =>
 	 * VENDOR BUNDLE
 	 */
 
-	// Filter shims for quantum compiling
-	let filteredShimsForQuantum = {};
-	for (let i in switches.vendorShims)
-	{
-		let currentShim = switches.vendorShims[i];
-		if (
-				!options.quantum
-				||
-				(options.quantum && !('removeForQuantum' in currentShim) && !currentShim.removeForQuantum)
-			)
-		{
-			filteredShimsForQuantum[i] = currentShim;
-		}
-	}
-
 	// Configure vendors bundle, add it to app bundles
 	appBundles.push(
 
@@ -281,7 +261,12 @@ Sparky.task('config:bundles', () =>
 
 		// Include shimmed libs
 		// @see : http://fuse-box.org/page/configuration#shimming
-		.shim( filteredShimsForQuantum )
+		.shim(
+			// Filter shims for quantum compiling
+			// We use this special filter because some libs like Zepto or jQuery
+			// does not work as shimmed library when quantum is enabled.
+			filterShimsForQuantum( switches.vendorShims )
+		)
 
 		// Globals exports
 		// @see : http://fuse-box.org/page/configuration#global-variables
@@ -354,7 +339,9 @@ Sparky.task('config:bundles', () =>
 		// Enable embedded server for HMR reloading
 		fuse.dev({
 			port: options.port,
-			httpServer: false
+			httpServer: switches.useEmbeddedServer,
+			open: switches.useEmbeddedServer,
+			root: switches.distPath
 		});
 
 		// Enable watch / HMR on bundles
@@ -462,13 +449,9 @@ Sparky.task('config:options', () =>
  */
 Sparky.task('config:production', () =>
 {
-	options = {
-		quantum: true,
-		uglify: true,
-		reload: false,
-		verbose: false,
-		noTypeCheck: false
-	};
+	options.quantum = true;
+	options.uglify = true;
+	options.reload = false;
 });
 
 /**
@@ -497,6 +480,10 @@ const cli = CLI({
 			default: false
 		},
 		'noTypeCheck' : {
+			type: 'boolean',
+			default: false
+		},
+		'noLessCheck' : {
 			type: 'boolean',
 			default: false
 		},
@@ -532,9 +519,21 @@ const cli = CLI({
 		`,
 		'production' : `
 			Run fuse and compile all bundles for production (Quantum + Uglify enabled).
+
+			${'@param --verbose'.bold}
+				- Enable debug and verbose mode on fuse
+
+			${'@param --noLessCheck'.bold}
+				- Disable less checking in production
+
+			${'@param --noTypeCheck'.bold}
+				- Disable type checking, only for quick tests !
 		`,
 		'clean' : `
 			Clean fuse cache. Automatically done before dev and production tasks. 
+		`,
+		'cleanSprites' : `
+			Clean generated sprites.
 		`,
 		'scaffold' : `
 			Create a new component interactively. 
@@ -577,10 +576,29 @@ Sparky.task('clean', () =>
 });
 
 /**
+ * Clean generated sprites
+ */
+Sparky.task('cleanSprites', () =>
+{
+	// Remove generated PNG sprites
+	Files.getFolders(`${switches.distPath}${switches.spritesPath}`).delete();
+
+	// Remove generated JSON and LESS files ?
+	//Files.getFiles()
+});
+
+/**
  * Check every less file because fuse will silently fail if there is a less error.
  */
-Sparky.task('lessLint', () =>
+Sparky.task('lessCheck', () =>
 {
+	// Disabled less checking from options
+	if (options.noLessCheck)
+	{
+		console.log(`\n > Warning, less checking disabled.`.red.bold);
+		return;
+	}
+
 	// Spawn less compiler as a new process
 	let spawn = require('child_process').spawnSync;
 
@@ -624,7 +642,7 @@ Sparky.task('dev', ['clean', 'config:options'].concat( configTasks ), () =>
  * Load configs and run fuse !
  * Will force options for production.
  */
-Sparky.task('production', ['clean', 'config:production', 'lessLint'].concat( configTasks ), () =>
+Sparky.task('production', ['clean', 'config:options', 'config:production', 'lessCheck'].concat( configTasks ), () =>
 {
 	fuse.run();
 });

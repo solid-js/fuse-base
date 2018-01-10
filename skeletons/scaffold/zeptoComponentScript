@@ -1,4 +1,4 @@
-import {JView} from "solidify-lib/core/JView";
+import {JView} from "solidify-lib/core/ZeptoView";
 
 // ----------------------------------------------------------------------------- STRUCT
 
@@ -9,7 +9,7 @@ import {JView} from "solidify-lib/core/JView";
 /**
  * This is a simple JQuery based view.
  */
-export class %%capitalComponentName%% extends JView
+export class %%capitalComponentName%% extends ZeptoView
 {
 	// ------------------------------------------------------------------------- DOM NODES
 

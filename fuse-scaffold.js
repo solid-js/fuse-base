@@ -124,10 +124,10 @@ const scaffolders = [
 	 * Scaffold a jQuery based component
 	 */
 	{
-		name: 'jQuery based component',
+		name: 'Zepto based component',
 		exec: async () =>
 		{
-			await scaffoldComponent('jqueryComponentScript');
+			await scaffoldComponent('zeptoComponentScript');
 		}
 	},
 
@@ -201,6 +201,41 @@ const scaffolders = [
 				Files.new(`${asyncRoot}${lowerBundleName}/main.less`).write(
 					Files.getFiles('skeletons/scaffold/asyncBundleStyle').read()
 				);
+			});
+		}
+	},
+
+	/**
+	 * Scaffold a new sprite
+	 */
+	{
+		name: 'Sprite',
+		exec: () =>
+		{
+			Inquirer.prompt({
+				type: 'input',
+				message: 'Sprite name ? (avoid using word "sprite", and use snake-case !)',
+				name: 'spriteName'
+			}).then( answer =>
+			{
+				// Destination sprite config file name
+				const destinationSpriteConfigFileName = '_sprite-config.js';
+
+				// Get sprite name from answer
+				const spriteName = answer.spriteName;
+
+				// Compute folder path with trailing slash
+				const folderPath = `${switches.srcPath}${switches.spritesFolder}${spriteName}/`;
+
+				// Create sprite config and folder
+				Files.new(`${folderPath}${destinationSpriteConfigFileName}`).write(
+					Files.getFiles(`skeletons/scaffold/spriteConfig`).read()
+				);
+
+				// Log instructions
+				console.log('');
+				console.log(`Sprite created. Add images into ${folderPath} folder, named with snake-case convention.`);
+				console.log(`Sprite can be configured by editing ${destinationSpriteConfigFileName} file.`);
 			});
 		}
 	},

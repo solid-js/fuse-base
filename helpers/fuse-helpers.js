@@ -25,5 +25,28 @@ module.exports = {
 				entryPoint : filePath[ filePath.length - 1 ]
 			};
 		});
+	},
+
+	/**
+	 * TODO : DOC
+	 */
+	filterShimsForQuantum : (pShims, pIsQuantumEnabled) =>
+	{
+		let filteredShimsForQuantum = {};
+
+		for (let i in pShims)
+		{
+			let currentShim = pShims[i];
+			if (
+				!pIsQuantumEnabled
+				||
+				(pIsQuantumEnabled && !('removeForQuantum' in currentShim) && !currentShim.removeForQuantum)
+			)
+			{
+				filteredShimsForQuantum[i] = currentShim;
+			}
+		}
+
+		return filteredShimsForQuantum;
 	}
 };
