@@ -9,10 +9,10 @@ require('gsap/TimelineLite.js');
 require('gsap/EasePack.js');
 
 // Plugins
-//require('gsap/AttrPlugin.js');
+require('gsap/AttrPlugin.js');
 require('gsap/BezierPlugin.js');
 require('gsap/ColorPropsPlugin.js');
-//require('gsap/CSSPlugin.js');
+require('gsap/CSSPlugin.js');
 //require('gsap/CSSRulePlugin.js');
 require('gsap/DirectionalRotationPlugin.js');
 //require('gsap/Draggable.js');
@@ -26,12 +26,6 @@ require('gsap/RoundPropsPlugin.js');
 require('gsap/ScrollToPlugin.js');
 //require('gsap/TextPlugin.js');
 
-
-// ----------------------------------------------------------------------------- INJECT PACKAGE DATA
-
-
-//console.log('VERSION', process.env['VERSION'] );
-console.log('env', process.env);
 
 // ----------------------------------------------------------------------------- GLOBAL SCOPE MAPPING
 

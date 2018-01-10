@@ -34,6 +34,9 @@ export class Main
 		this.testAsyncImport();
 
 		this.testStateful();
+
+		// TODO
+		console.log('VERSION', process.env['VERSION'] );
 	}
 
 	testReact ()

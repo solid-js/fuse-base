@@ -47,8 +47,8 @@ const { TypeHelper } = require('fuse-box-typechecker');
 // Get fuse helpers
 const { getAsyncBundlesFromFileSystem } = require("./helpers/fuse-helpers");
 
-// Get FileList helper for easy Files/Folder manipulating
-const { Files, Folders } = require("./helpers/file-list");
+// Get Files helper for easy Files/Folder manipulating
+const { Files } = require("./helpers/files");
 
 // Get fuse switches
 const switches = require('./fuse-switches');
@@ -128,7 +128,7 @@ Sparky.task('config:fuse', () =>
 
 					// Add root folder as base path for less so we can @import files from node_modules
 					paths: [
-						path.resolve( __dirname )
+						//path.resolve( __dirname )
 					]
 				}),
 
@@ -547,18 +547,47 @@ Sparky.task('default', () =>
 Sparky.task('clean', () =>
 {
 	// Clear cache before each command
-	Folders('.fusebox').delete();
+	Files.getFolders('.fusebox').delete();
 
 	// Remove every compiled bundles
-	Folders(`${switches.distPath}${switches.bundlesPath}`).delete();
+	Files.getFolders(`${switches.distPath}${switches.bundlesPath}`).delete();
 
 	// Remove compiled html if we have one
 	switches.generateWebIndex
 	&&
-	Files(`${switches.distPath}index.html`).delete();
+	Files.getFiles(`${switches.distPath}index.html`).delete();
 
 	// Remove resources
-	Folders( switches.resourcesPath ).delete();
+	Files.getFolders( switches.resourcesPath ).delete();
+});
+
+/**
+ * Check every less file because fuse will silently fail if there is a less error.
+ */
+Sparky.task('lessLint', () =>
+{
+	// Spawn less compiler as a new process
+	let spawn = require('child_process').spawnSync;
+
+	// Browser every files.
+	// BETTER : Only check not already check files.
+	Files.getFiles(`${switches.srcPath}**/*.less`).all( file =>
+	{
+		console.log(`Checking ${file} ...`.grey);
+
+		// Lint with lessc, do not compile anything
+		let lessLint = spawn('./node_modules/less/bin/lessc', ['--no-ie-compat', '--lint', '--no-color', file]);
+
+		// Get error
+		let stderr = lessLint.stderr.toString();
+
+		// Exit with error code if there is anything wrong
+		if (stderr !== '')
+		{
+			console.log( stderr.red.bold );
+			process.exit(1);
+		}
+	});
 });
 
 /**
@@ -580,7 +609,7 @@ Sparky.task('dev', ['clean', 'config:options'].concat( configTasks ), () =>
  * Load configs and run fuse !
  * Will force options for production.
  */
-Sparky.task('production', ['clean', 'config:production'].concat( configTasks ), () =>
+Sparky.task('production', ['clean', 'config:production', 'lessLint'].concat( configTasks ), () =>
 {
 	fuse.run();
 });
@@ -619,32 +648,3 @@ Sparky.task('testSparky', () =>
 	console.log('after');
 });
 */
-
-
-Sparky.task('testFile', () =>
-{
-	/*
-	console.log('TEST FILE 1');
-	Files('dist/assets/bundles/**').all( file => console.log( '> ' + file ) );
-	*/
-
-	/*
-	console.log('TEST FOLDER 1');
-	Folders('dist/assets/bundles/').all( file => console.log( '> ' + file ) );
-	*/
-
-	/*
-	console.log('TEST FOLDER 2');
-	Folders('dist/assets/bundles/').delete();
-	*/
-
-	/*
-	console.log('TEST FILES MOVE');
-	Files('dist/assets/bundles/**').moveTo('dist/test/');
-	*/
-
-	/*
-	console.log('TEST FILES COPY');
-	Files('dist/assets/bundles/**').copyTo('dist/test/');
-	*/
-});

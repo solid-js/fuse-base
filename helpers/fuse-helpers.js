@@ -1,6 +1,6 @@
 
 const path = require('path');
-const { Files, Folder } = require('./file-list');
+const { Files } = require('./files');
 
 module.exports = {
 
@@ -11,7 +11,7 @@ module.exports = {
 	getAsyncBundlesFromFileSystem : (pBundlesGlob) =>
 	{
 		// Get async bundles entry points to automate code splitting.
-		return Files( pBundlesGlob ).all( file =>
+		return Files.getFiles( pBundlesGlob ).all( file =>
 		{
 			// Split file path components
 			let filePath = file.split('/');

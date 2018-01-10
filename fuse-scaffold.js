@@ -2,11 +2,11 @@
 const Inquirer = require('inquirer');
 const path = require('path');
 const switches = require('./fuse-switches');
-const { Files, Folders, NewFile } = require('./helpers/file-list');
-const { QuickTemplate } = require('./helpers/quick-mustache');
+const { Files } = require('./helpers/files');
+const { QuickTemplate } = require('./helpers/quick-template');
 const { CapitalizeFirst } = require('./helpers/capitalize');
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------- COMMON TASKS
 
 /**
  * Ask for the bundle
@@ -18,7 +18,7 @@ const askWhichBundle = () =>
 		name: 'bundleName',
 		message : 'Which bundle ?',
 		choices: [ switches.srcPath ].concat(
-			Folders(`${switches.srcPath}${switches.asyncPath}/*`).files.map( file => file + '/')
+			Files.getFolders(`${switches.srcPath}${switches.asyncPath}/*`).files.map( file => file + '/')
 		)
 	});
 }
@@ -55,24 +55,24 @@ const askComponentName = () =>
  */
 const scaffoldComponent = async ( scriptTemplate ) =>
 {
-	return new Promise( async (resolve, reject) =>
+	return new Promise( async ( resolve ) =>
 	{
 		// Get bundle path
-		let bundlePath;
+		let bundlePath = '';
 		await askWhichBundle().then( answer =>
 		{
 			bundlePath = answer.bundleName;
 		});
 
 		// Get sub-folder (like component / pages ...)
-		let subFolder;
+		let subFolder = '';
 		await askWhichSubFolder().then( answer =>
 		{
 			subFolder = answer.subFolder;
 		})
 
 		// Get component name
-		let componentName;
+		let componentName = '';
 		await askComponentName().then( answer =>
 		{
 			componentName = answer.componentName;
@@ -86,16 +86,16 @@ const scaffoldComponent = async ( scriptTemplate ) =>
 		let componentPath = `${bundlePath}${subFolder}/${lowerComponentName}/${upperComponentName}`;
 
 		// Check if component already exists
-		if (Files(`${componentPath}.tsx`).files.length > 0)
+		if (Files.getFiles(`${componentPath}.tsx`).files.length > 0)
 		{
 			console.log(`This component already exists. Aborting.`.red.bold);
 			return;
 		}
 
 		// Scaffold the script
-		NewFile(`${componentPath}.tsx`).write(
+		Files.new(`${componentPath}.tsx`).write(
 			QuickTemplate(
-				Files('skeletons/scaffold/' + scriptTemplate).read(),
+				Files.getFiles('skeletons/scaffold/' + scriptTemplate).read(),
 				{
 					capitalComponentName: upperComponentName
 				}
@@ -103,9 +103,9 @@ const scaffoldComponent = async ( scriptTemplate ) =>
 		);
 
 		// Scaffold the style
-		NewFile(`${componentPath}.less`).write(
+		Files.new(`${componentPath}.less`).write(
 			QuickTemplate(
-				Files('skeletons/scaffold/componentStyle').read(),
+				Files.getFiles('skeletons/scaffold/componentStyle').read(),
 				{
 					capitalComponentName: upperComponentName
 				}
@@ -117,7 +117,7 @@ const scaffoldComponent = async ( scriptTemplate ) =>
 	});
 }
 
-
+// ----------------------------------------------------------------------------- SCAFFOLDERS
 
 const scaffolders = [
 	/**
@@ -175,7 +175,7 @@ const scaffolders = [
 				const asyncRoot = switches.srcPath + switches.asyncPath;
 
 				// Check if component already exists
-				if (Folders(`${asyncRoot}${lowerBundleName}`).files.length > 0)
+				if (Files.getFolders(`${asyncRoot}${lowerBundleName}`).files.length > 0)
 				{
 					console.log(`This async bundle already exists. Aborting.`.red.bold);
 					return;
@@ -184,13 +184,13 @@ const scaffolders = [
 				// Create default folders
 				switches.includedFoldersWithoutImports.map( folderName =>
 				{
-					NewFile(`${asyncRoot}${lowerBundleName}/${folderName}`).createFolders();
+					Files.new(`${asyncRoot}${lowerBundleName}/${folderName}/.gitkeep`).write('');
 				});
 
 				// Create entry point
-				NewFile(`${asyncRoot}${lowerBundleName}/${upperBundleName}.tsx`).write(
+				Files.new(`${asyncRoot}${lowerBundleName}/${upperBundleName}.tsx`).write(
 					QuickTemplate(
-						Files('skeletons/scaffold/asyncBundleEntryPoint').read(),
+						Files.getFiles('skeletons/scaffold/asyncBundleEntryPoint').read(),
 						{
 							capitalBundleName: upperBundleName
 						}
@@ -198,8 +198,8 @@ const scaffolders = [
 				);
 
 				// Create style gateway so relative imports will work
-				Files(`${asyncRoot}${lowerBundleName}/main.less`).write(
-					Files('skeletons/scaffold/asyncBundleStyle').read()
+				Files.new(`${asyncRoot}${lowerBundleName}/main.less`).write(
+					Files.getFiles('skeletons/scaffold/asyncBundleStyle').read()
 				);
 			});
 		}
@@ -215,7 +215,7 @@ const scaffolders = [
  */
 module.exports = new Promise(
 
-	(resolve, reject) =>
+	( resolve ) =>
 	{
 		// Get scaffolder to present listing to user
 		let scaffolderTypes = scaffolders.map( scaffolder => scaffolder.name );

@@ -8,14 +8,39 @@ const colors = require('colors'); // @see : https://github.com/marak/colors.js/
 
 
 /**
- * FileList class.
+ * Files class.
  * Can represent a list of files or folders.
  * Can't represent both files and folders.
  * Target files from a glob.
  * @see https://github.com/isaacs/node-glob
  */
-class FileList
+class Files
 {
+	/**
+	 * Shortcut to target existing files from a glob.
+	 */
+	static getFiles (pGlob)
+	{
+		return new Files(pGlob, true, false);
+	}
+
+	/**
+	 * Shortcut to target existing folders from a glob.
+	 */
+	static getFolders (pGlob)
+	{
+		return new Files(pGlob, false, true);
+	}
+
+	/**
+	 * Shortcut to target a non existing file or folder.
+	 */
+	static new (pPath)
+	{
+		return new Files(pPath, false, false);
+	}
+
+
 	/**
 	 * Target files list or folder from a glog.
 	 * Can target files and folder if not filtered.
@@ -36,6 +61,9 @@ class FileList
 		pOnlyFolders && this.onlyExistingFolders();
 	}
 
+	/**
+	 * Filter glob to target only existing files.
+	 */
 	onlyExistingFiles ()
 	{
 		// Filter files or folder
@@ -44,6 +72,9 @@ class FileList
 		);
 	}
 
+	/**
+	 * Filter glob to target only existing folders.
+	 */
 	onlyExistingFolders ()
 	{
 		// Filter files or folder
@@ -77,7 +108,7 @@ class FileList
 	 */
 	delete ()
 	{
-		console.log(`FileList.delete ${this.glob} ...`.yellow);
+		console.log(`Files.delete ${this.glob} ...`.yellow);
 
 		// Browse files or folders
 		this.files.map( file =>
@@ -94,7 +125,7 @@ class FileList
 	 */
 	moveTo ( pDest )
 	{
-		console.log(`FileList.moveTo ${this.glob} ...`.yellow);
+		console.log(`Files.moveTo ${this.glob} ...`.yellow);
 
 		// Browse files or folders
 		this.files.map( file =>
@@ -115,7 +146,7 @@ class FileList
 	 */
 	copyTo ( pDest )
 	{
-		console.log(`FileList.copyTo ${this.glob} ...`.yellow);
+		console.log(`Files.copyTo ${this.glob} ...`.yellow);
 
 		// Browse files or folders
 		this.files.map( file =>
@@ -130,12 +161,24 @@ class FileList
 		});
 	}
 
+	/**
+	 * Read file content.
+	 * Only work if glob is pointing to an existing file.
+	 * @param pEncoding default is utf-8
+	 * @returns {Buffer}
+	 */
 	read (pEncoding = 'utf-8')
 	{
 		// Read file from disk
 		return fs.readFileSync( this.glob, { encoding: pEncoding } );
 	}
 
+	/**
+	 * Write file content.
+	 * Will use glob to create a unique file.
+	 * @param pContent Content of the file to write, as a string
+	 * @param pEncoding default is utf-8
+	 */
 	write (pContent = '', pEncoding = 'utf-8')
 	{
 		// Create parent folders recursively
@@ -145,11 +188,21 @@ class FileList
 		fs.writeFileSync( this.glob, pContent, { encoding: pEncoding } );
 	}
 
+	/**
+	 * Create parent folders if they do not exists.
+	 * Will use glob.
+	 */
 	createFolders ()
 	{
 		fse.ensureDirSync( this.glob );
 	}
 
+	/**
+	 * Update a file with an handler.
+	 * Will read file content and pass it as first argument of the handler.
+	 * Will write file content from handler return.
+	 * @param pHandler Will have file content as first argument. Return new file content to be written.
+	 */
 	alter ( pHandler )
 	{
 		this.write(
@@ -161,21 +214,6 @@ class FileList
 }
 
 /**
- * Shortcut to create a FileList of existing files from a glob.
- */
-const Files = pGlob => new FileList(pGlob, true, false);
-
-/**
- * Shortcut to create a FileList of one not yet existing file.
- */
-const NewFile = pGlob => new FileList(pGlob, false, false);
-
-/**
- * Shortcut to create a FileList of existing folders from a glob.
- */
-const Folders = pGlob => new FileList(pGlob, false, true);
-
-/**
  * Exports public API
  */
-module.exports = { FileList, Files, Folders, NewFile };
+module.exports = { Files };
