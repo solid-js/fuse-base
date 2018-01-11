@@ -1,25 +1,14 @@
-
-import * as React from "react";
-import * as ReactDOM from "react-dom";
-
-import {TestComponent} from "./components/testComponent/TestComponent";
-import {StringUtils} from "solidify-lib/utils/StringUtils";
+import './Main.less';
 import {App} from "solidify-lib/core/App";
 import {Router} from "solidify-lib/navigation/Router";
-import {GlobalConfig} from "./data/GlobalConfig";
-
-//import {setStatefulModules} from 'fuse-box/modules/fuse-hmr';
-
-// TODO : Sûr ?
-declare let __appConfig:any;
-
+import {GlobalConfig} from "../_common/data/GlobalConfig";
 
 export class Main extends App
 {
 	// ------------------------------------------------------------------------- SINGLETON
 
 	// Main app instance reference
-	protected static __instance:Main;
+	protected static __instance	:Main;
 
 	/**
 	 * Get Main app instance
@@ -46,15 +35,9 @@ export class Main extends App
 	 */
 	protected initConfig ()
 	{
-		// TODO : DOC
-		GlobalConfig.instance.inject( __appConfig );
-
-		// TODO : DOC
-		GlobalConfig.instance.inject({
-			version: process.env['VERSION']
-		});
+		// Init specific GlobalConfig here
+		//GlobalConfig.instance.inject( ... );
 	}
-
 
 
 	// ------------------------------------------------------------------------- ROUTES
@@ -67,14 +50,12 @@ export class Main extends App
 		// Init router
 		// Google analytics is automatically called when page is chaning
 		Router.init(
-
-			// TODO : PROPER BASE
-			//this._parameters.base,
-			'',
+			GlobalConfig.instance.base,
 			[
 				// -- Home page
 				{
 					url		: '/',
+					// TODO : Full path here
 					page	: 'HomePage'
 				},
 
@@ -94,10 +75,6 @@ export class Main extends App
 
 		// Enable auto link listening
 		Router.listenLinks();
-
-		// Register mainStack
-		// This stack will receive NotFoundPage if no matching route is found
-		//router.registerStack('main', stackInstance);
 	}
 
 
@@ -119,6 +96,11 @@ export class Main extends App
 		// ZEPTO
 		// TODO : ROOT
 		//this._appView = new AppView( this._parameters.root );
+
+		// Register mainStack
+		// TODO : STACK IN REACT
+		// This stack will receive NotFoundPage if no matching route is found
+		//Router.registerStack('main', stackInstance);
 	}
 
 
@@ -131,54 +113,5 @@ export class Main extends App
 	{
 		// Start router when ready
 		Router.start();
-
-		// TODO REMOVE
-		this.testReact();
-		this.testAsyncImport();
-		this.testStateful();
-
-		// FIXME : remove this on your app
-		//this.bitmapUtilsTest();
-		//this.responsiveManagerTest();
-		//this.easeTest();
-		//this.scrollLockTest();
-	}
-
-
-
-
-
-	// ------------------------------------------------------------------------- TODO REMOVE
-
-
-	testReact ()
-	{
-		ReactDOM.render(
-			<TestComponent />,
-			document.getElementById('AppContainer')
-		);
-	}
-
-	async testAsyncImport ()
-	{
-		console.log('Loading splitted code ... ');
-
-		let target = await import('./async/customerArea/pages/testPage/TestPage');
-
-		console.log( 'Loaded ! ', target );
-	}
-
-	protected testStateful ()
-	{
-		// TODO
-		// https://medium.com/@basarat/rethinking-hot-module-reloading-58ce15b5f496
-		/*
-		console.log('setStatefulModules');
-		setStatefulModules(name =>
-		{
-			console.log('> '+name);
-			return true;//!/TestComponent/.test(name);
-		});
-		*/
 	}
 }

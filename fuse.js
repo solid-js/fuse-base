@@ -38,14 +38,14 @@ const Sparky = require("fuse-box/sparky");
 // Some colors in the terminal
 const colors = require('colors'); // @see : https://github.com/marak/colors.js/
 
-// Path management utils
-const path = require("path");
+// Node path utils
+const path = require('path');
 
 // Get Typescript checking helper
 const { TypeHelper } = require('fuse-box-typechecker');
 
 // Get fuse helpers
-const { getAsyncBundlesFromFileSystem, filterShimsForQuantum } = require("./helpers/fuse-helpers");
+const { getAsyncBundlesFromGlob, filterShimsForQuantum } = require("./helpers/fuse-helpers");
 
 // Get Files helper for easy Files/Folder manipulating
 const { Files } = require("./helpers/files");
@@ -57,7 +57,7 @@ const switches = require('./fuse-switches');
 // ----------------------------------------------------------------------------- FUSE BOX CONFIG
 
 // List of app bundles
-let appBundles = [];
+let allBundles = [];
 
 // Fuse and options on global scope
 let fuse;
@@ -247,17 +247,34 @@ Sparky.task('config:fuse', () =>
 
 Sparky.task('config:bundles', () =>
 {
+	// Get app bundles list from file system
+	const appBundlesNames = Files.getFolders(`${switches.srcPath}*`).all( folder => path.basename( folder ) );
+
+	// Glob string to target all included extensions files
+	const extensionsGlob = `+(${ switches.extensions.join('|') })`;
+
+	// Glog string to target included folders
+	const includedFoldersGlob = `+(${ switches.includedFoldersWithoutImports.join('|') })`;
+
+
 	/**
 	 * VENDOR BUNDLE
 	 */
 
-	// Configure vendors bundle, add it to app bundles
-	appBundles.push(
+	// Configure vendors bundle, add it to bundles list
+	allBundles.push(
 
+		// Create vendor bundle
 		fuse.bundle( switches.vendorsBundleName )
 
-		// Contains everything but the app files
-		.instructions(`~ ${switches.entryPoint}`)
+		// Contains everything but app bundles dependencies
+		.instructions(
+			appBundlesNames.map(
+				appBundleName => `~ ${appBundleName}/${switches.entryPoint}`
+			)
+			.join(' ')
+		)
+
 
 		// Include shimmed libs
 		// @see : http://fuse-box.org/page/configuration#shimming
@@ -275,59 +292,84 @@ Sparky.task('config:bundles', () =>
 
 
 	/**
-	 * MAIN APP BUNDLE
+	 * APP BUNDLES
 	 */
 
-	// Glob string to target all included extensions files
-	const extensionsGlob = `+(${ switches.extensions.join('|') })`;
-
-	// Glog string to target included folders
-	const includedFoldersGlob = `+(${ switches.includedFoldersWithoutImports.join('|') })`;
-
-	// Init main app bundle and add it to app bundles
-	const mainBundle = fuse.bundle('main');
-	appBundles.push(mainBundle);
-
-	// Configure code splitting
-	mainBundle.splitConfig({
-
-		// Relative path from main bundle to load code splitted bundles
-		browser: switches.bundlesPath,
-
-		// Where to put async bundles. Default is same directory than regular bundles.
-		//dest: switches.bundlesPath
-	});
-
-	// We use this helper to get async modules list from file system using this glob
-	getAsyncBundlesFromFileSystem( `${switches.srcPath}${switches.asyncPath}*/*.+(ts|tsx)` ).map( (asyncEntry) =>
+	// Browser app bundles
+	appBundlesNames.map( appBundleName =>
 	{
-		// Here we define code splitting instructions.
-		// @see : http://fuse-box.org/page/code-splitting#instructions
-		mainBundle.split(
+		// Bundles instructions to know which file to include or exclude from the bundle
+		const bundleInstructions = [
+			// Setup and auto-start application entry point
+			`!> [${ appBundleName }/${ switches.entryPoint }]`,
+		];
 
-			// Match every file inside bundle directory
-			`${ switches.asyncPath }${ asyncEntry.bundleName }/**`,
+		// If this is the common bundle
+		if ( appBundleName === switches.commonBundleName )
+		{
+			// We include every file, even if they are not included
+			bundleInstructions.push(`+ [${ appBundleName }/**/*.${ extensionsGlob }]`);
+		}
+		else
+		{
+			// Include non imported folders like pages/ and components/
+			bundleInstructions.push(`+ [${ appBundleName }/${ includedFoldersGlob }/*/*.${ extensionsGlob }]`);
 
-			// Name of the bundle > Entry point of the bundle
-			`${ asyncEntry.bundleName } > ${ switches.asyncPath }${ asyncEntry.bundleName }/${ asyncEntry.entryPoint }`
+			// Include non imported async files, Quantum will split the bundle
+			bundleInstructions.push(`+ [${ appBundleName }/${ switches.asyncPath }*/${ includedFoldersGlob }/*/*.${ extensionsGlob }]`);
+		}
+
+		// Brower other bundles
+		appBundlesNames.map( otherAppBundleName =>
+		{
+			// Remove other app bundles dependencies
+			// so shared files are only included into their own bundle
+			if (otherAppBundleName !== appBundleName)
+			{
+				bundleInstructions.push(`- [${ otherAppBundleName }/**/*.${ extensionsGlob }]`);
+			}
+		});
+
+		// Create bundle from its name and instructions
+		const currentAppBundle = fuse.bundle( appBundleName );
+		currentAppBundle.instructions(
+			bundleInstructions.join(' ')
 		);
+
+		// If this is not the common bundle
+		// We add code splitting options
+		if ( appBundleName !== switches.commonBundleName )
+		{
+			// Configure code splitting
+			currentAppBundle.splitConfig({
+
+				// Relative path from main bundle to load code splitted bundles
+				browser: switches.bundlesPath,
+
+				// Where to put async bundles. Default is same directory than regular bundles.
+				//dest: switches.bundlesPath
+			})
+
+			// We use this helper to get async modules list from file system using this glob
+			getAsyncBundlesFromGlob( `${ switches.srcPath }${ appBundleName }/${ switches.asyncPath }*/*.+(ts|tsx)` ).map( asyncEntry =>
+			{
+				// Here we define code splitting instructions.
+				// @see : http://fuse-box.org/page/code-splitting#instructions
+				currentAppBundle.split(
+
+					// Match every file inside bundle directory
+					`${ appBundleName }/${ switches.asyncPath }${ asyncEntry.bundleName }/**`,
+
+					// Name of the bundle > Entry point of the bundle
+					`${ asyncEntry.bundleName } > ${ appBundleName }/${ switches.asyncPath }${ asyncEntry.bundleName }/${ asyncEntry.entryPoint }`
+				);
+			});
+		}
+
+		// Add this new bundle to bundle list
+		allBundles.push( currentAppBundle );
 	});
 
-	// Main app compilation instruction
-	mainBundle.instructions([
-
-		// Setup and auto-start application entry point
-		`!> [${ switches.entryPoint }]`,
-
-		// FIXME : Does not work ???
-
-		// Include non imported folders like pages/ and components/
-		`+ [${includedFoldersGlob}/*/*.${extensionsGlob}]`,
-
-		// Include non imported async files, Quantum will split the bundle
-		`+ [${ switches.asyncPath }*/${includedFoldersGlob}/*/*.${extensionsGlob}]`,
-
-	].join(' '));
 
 	/**
 	 * WATCH AND DEV MODE
@@ -345,7 +387,7 @@ Sparky.task('config:bundles', () =>
 		});
 
 		// Enable watch / HMR on bundles
-		appBundles.map( (app) =>
+		allBundles.map( (app) =>
 		{
 			// Watch all bundles
 			app.watch();
@@ -355,7 +397,10 @@ Sparky.task('config:bundles', () =>
 			if ( app.name === switches.vendorsBundleName ) return;
 
 			// Launch HMR and watch
-			app.hmr({ reload: options.reload });
+			app.hmr({
+				port: options.port,
+				reload: options.reload
+			});
 		});
 	}
 });
@@ -387,6 +432,26 @@ Sparky.task('config:typeChecking', () =>
 		//tsLint:'./tslint.json'
 	});
 
+	// Type checking can be long, so we show this to know what is going on
+	console.log(`\nTypechecking app bundles ...`.cyan);
+
+	// Run type checker
+	const totalErrors = typeHelper.runSync();
+
+	// If we have errors
+	// Play a sound from the terminal if there is an error
+	(totalErrors > 0)
+	? console.log("\007")
+	: console.log(`App bundles checked !`.green);
+
+	// Quit with an error if we are in quantum mode
+	if (options.quantum && totalErrors > 0)
+	{
+		process.exit(1);
+	}
+
+	/*
+
 	// Shortcut method to run Type Checking with alerts if anything failed
 	const runTypeCheck = ( bundleName ) =>
 	{
@@ -410,7 +475,7 @@ Sparky.task('config:typeChecking', () =>
 	}
 
 	// Browser every bundles
-	appBundles.map( app =>
+	allBundles.map( app =>
 	{
 		// Do not listen vendors app to type check
 		if (app.name === switches.vendorsBundleName) return;
@@ -431,6 +496,7 @@ Sparky.task('config:typeChecking', () =>
 			runTypeCheck( proc.bundle.name );
 		});
 	});
+	*/
 });
 
 

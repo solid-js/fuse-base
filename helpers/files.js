@@ -141,19 +141,30 @@ class Files
 	}
 
 	/**
-	 * Copy all targeted files or folders inside a directory
+	 * Copy all targeted files or folders inside a directory.
+	 * Add a trailing slash to force directory creation.
 	 * @param pDest Directory path where all files / folders will be copied into. No glob.
 	 */
 	copyTo ( pDest )
 	{
 		console.log(`Files.copyTo ${this.glob} ...`.yellow);
 
+		const destIsADirectory = (
+			/*fs.lstatSync( pDest ).isDirectory()
+			||*/
+			(pDest.lastIndexOf('/') === pDest.length - 1)
+		);
+
 		// Browse files or folders
 		this.files.map( file =>
 		{
 			// Get file name and compute destination file name
 			const fileName = path.basename( file );
-			const destination = path.join(pDest, fileName);
+			const destination = (
+				destIsADirectory
+				? path.join(pDest, fileName)
+				: pDest
+			)
 
 			// Copy
 			fse.copySync( file, destination );

@@ -1,10 +1,7 @@
 
+// Async bundle entry point
 
-
-export class %%capitalBundleName%%
+export class Main
 {
-	static isEntryPoint ()
-	{
-		return true;
-	}
+
 }

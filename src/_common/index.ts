@@ -40,12 +40,30 @@ window['gsap'] = window['GreenSockGlobals'];
 // ----------------------------------------------------------------------------- BOOTSTRAP CSS
 
 // Load main Less file. Needs to be before Main.tsx
-require('./Main.less');
+//require('./Main.less');
 
-// ----------------------------------------------------------------------------- BOOTSTRAP JS
 
-// Load main file
-const { Main } = require('./Main');
+// ----------------------------------------------------------------------------- GLOBAL CONFIG
 
-// Startup application
-new Main();
+// Import global config helper
+import {GlobalConfig} from "./data/GlobalConfig";
+
+// Load config data
+const embeddedConfig = require('./data/config.js');
+
+// We inject in order to have priority of window config over embedded config.
+// Version is in last so it can't be overridden.
+
+// 1. Inject embedded config data into global config
+GlobalConfig.instance.inject( embeddedConfig );
+
+// 2. Inject global config from window scope
+if ( '__globalConfig' in window )
+{
+	GlobalConfig.instance.inject( window['__globalConfig'] );
+}
+
+// 3. Inject version from package.json
+GlobalConfig.instance.inject({
+	version: process.env['VERSION']
+});

@@ -8,7 +8,7 @@ module.exports = {
 	 * TODO : DOC
 	 * @param pBundlesGlob
 	 */
-	getAsyncBundlesFromFileSystem : (pBundlesGlob) =>
+	getAsyncBundlesFromGlob : (pBundlesGlob) =>
 	{
 		// Get async bundles entry points to automate code splitting.
 		return Files.getFiles( pBundlesGlob ).all( file =>

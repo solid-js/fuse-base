@@ -32,6 +32,9 @@ exports.relativeSpritePath = 'assets/sprites/';
 // Vendors bundle name
 exports.vendorsBundleName = 'vendors';
 
+// Common bundle name
+exports.commonBundleName = '_common';
+
 
 // ----------------------------------------------------------------------------- CONFIG
 

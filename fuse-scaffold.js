@@ -11,15 +11,40 @@ const { CapitalizeFirst } = require('./helpers/capitalize');
 /**
  * Ask for the bundle
  */
-const askWhichBundle = () =>
+const askWhichBundle = (pNoCommon, pNoAsync) =>
 {
+	// All app and async bundles
+	const bundlesList = [];
+
+	// Get app bundles
+	const appBundlesPaths = Files.getFolders(`${switches.srcPath}*`).files;
+
+	// Browser app bundles
+	appBundlesPaths.map( appBundlePath =>
+	{
+		// Skip common bundle if asked
+		if (pNoCommon && path.basename(appBundlePath) === switches.commonBundleName) return;
+
+		// Add this app bundle into bundles list
+		appBundlePath = `${appBundlePath}/`;
+		bundlesList.push( appBundlePath );
+
+		// Skip async bundles if asked
+		if (pNoAsync) return;
+
+		// Get async bundles into this bundle
+		Files.getFolders(`${ appBundlePath }${ switches.asyncPath }/*`).all( file =>
+		{
+			// Add this async bundle to bundles list
+			bundlesList.push(`${file}/`);
+		})
+	});
+
 	return Inquirer.prompt({
 		type: 'list',
 		name: 'bundleName',
 		message : 'Which bundle ?',
-		choices: [ switches.srcPath ].concat(
-			Files.getFolders(`${switches.srcPath}${switches.asyncPath}/*`).files.map( file => file + '/')
-		)
+		choices: bundlesList
 	});
 }
 
@@ -120,11 +145,128 @@ const scaffoldComponent = async ( scriptTemplate ) =>
 // ----------------------------------------------------------------------------- SCAFFOLDERS
 
 const scaffolders = [
+
+	// Separator
+	{ name: new Inquirer.Separator() },
+
 	/**
-	 * Scaffold a jQuery based component
+	 * Scaffold an app bundle
 	 */
 	{
-		name: 'Zepto based component',
+		name: 'App bundle',
+		exec: async () =>
+		{
+			// Ask for bundle name
+			Inquirer.prompt({
+				type: 'input',
+				message: 'App bundle name ? (snake-case !)',
+				name: 'bundleName'
+			}).then( answer =>
+			{
+				// Get bundle name from answer
+				const bundleName = answer.bundleName;
+
+				// Check if bundle already exists
+				if (Files.getFolders(`${ switches.srcPath }${ bundleName }`).files.length > 0)
+				{
+					console.log(`This bundle already exists. Aborting.`.red.bold);
+					return;
+				}
+
+				// Create default folders with .gitkeep files
+				switches.includedFoldersWithoutImports.concat('models', 'async')
+				.map( folderName =>
+				{
+					Files.new(`${ switches.srcPath }${ bundleName }/${ folderName }/.gitkeep`).write('');
+				});
+
+				// Create index
+				Files.getFiles('skeletons/scaffold/appBundleIndex')
+				.copyTo( `${ switches.srcPath }${ bundleName }/${ switches.entryPoint }` );
+
+				// Create main script
+				Files.getFiles('skeletons/scaffold/appBundleMainScript')
+				.copyTo( `${ switches.srcPath }${ bundleName }/Main.tsx`);
+
+				// Create style gateway so relative imports will work
+				Files.new(`${ switches.srcPath }${ bundleName }/Main.less`).write(
+					QuickTemplate(
+						Files.getFiles('skeletons/scaffold/appBundleStyle').read(),
+						{
+							commonPath: switches.commonBundleName
+						}
+					)
+				);
+
+				// TODO : ASK ZEPTO / REACT INIT ?
+				// TODO : INIT APP VIEW
+			});
+		}
+	},
+
+	/**
+	 * Scaffold an async bundle
+	 */
+	{
+		name: 'Async bundle',
+		exec: async () =>
+		{
+			// Get bundle path
+			// Disallow common and async bundles
+			let bundlePath = '';
+			await askWhichBundle(true, true).then( answer =>
+			{
+				bundlePath = answer.bundleName;
+			});
+
+			// Ask for bundle name
+			Inquirer.prompt({
+				type: 'input',
+				message: 'Async bundle name ? (snake-case !)',
+				name: 'bundleName'
+			}).then( answer =>
+			{
+				// Get bundle name from answer
+				const bundleName = answer.bundleName;
+
+				// Root path of async bundles
+				const asyncRoot = `${ bundlePath }${ switches.asyncPath }`;
+
+				// Check if bundle already exists
+				if (Files.getFolders(`${ asyncRoot }${ bundleName }`).files.length > 0)
+				{
+					console.log(`This bundle already exists. Aborting.`.red.bold);
+					return;
+				}
+
+				// Create default folders
+				switches.includedFoldersWithoutImports
+				.map( folderName =>
+				{
+					Files.new(`${ asyncRoot }${ bundleName }/${ folderName }/.gitkeep`).write('');
+				});
+
+				// Create entry point
+				Files.getFiles('skeletons/scaffold/asyncBundleEntryPoint')
+				.copyTo( `${ asyncRoot }${ bundleName }/Main.tsx` )
+
+				// Create style gateway so relative imports will work
+				Files.getFiles('skeletons/scaffold/asyncBundleStyle')
+				.copyTo(`${ asyncRoot }${ bundleName }/main.less`);
+			});
+		}
+	},
+
+
+	// Separator
+	{ name: new Inquirer.Separator() },
+
+
+	/**
+	 * Scaffold a Zepto based component
+	 */
+	{
+		name: 'Zepto component',
 		exec: async () =>
 		{
 			await scaffoldComponent('zeptoComponentScript');
@@ -153,57 +295,10 @@ const scaffolders = [
 		}
 	},
 
-	/**
-	 * Scaffold an async bundle
-	 */
-	{
-		name: 'Async bundle',
-		exec: () =>
-		{
-			// Ask for bundle name
-			Inquirer.prompt({
-				type: 'input',
-				message: 'Async bundle name ? (camel case)',
-				name: 'bundleName'
-			}).then( answer =>
-			{
-				// Lower and capital bundle name
-				let lowerBundleName = CapitalizeFirst( answer.bundleName, false);
-				let upperBundleName = CapitalizeFirst( answer.bundleName, true);
 
-				// Root path of async bundles
-				const asyncRoot = switches.srcPath + switches.asyncPath;
+	// Separator
+	{ name: new Inquirer.Separator() },
 
-				// Check if component already exists
-				if (Files.getFolders(`${asyncRoot}${lowerBundleName}`).files.length > 0)
-				{
-					console.log(`This async bundle already exists. Aborting.`.red.bold);
-					return;
-				}
-
-				// Create default folders
-				switches.includedFoldersWithoutImports.map( folderName =>
-				{
-					Files.new(`${asyncRoot}${lowerBundleName}/${folderName}/.gitkeep`).write('');
-				});
-
-				// Create entry point
-				Files.new(`${asyncRoot}${lowerBundleName}/${upperBundleName}.tsx`).write(
-					QuickTemplate(
-						Files.getFiles('skeletons/scaffold/asyncBundleEntryPoint').read(),
-						{
-							capitalBundleName: upperBundleName
-						}
-					)
-				);
-
-				// Create style gateway so relative imports will work
-				Files.new(`${asyncRoot}${lowerBundleName}/main.less`).write(
-					Files.getFiles('skeletons/scaffold/asyncBundleStyle').read()
-				);
-			});
-		}
-	},
 
 	/**
 	 * Scaffold a new sprite
@@ -225,7 +320,7 @@ const scaffolders = [
 				const spriteName = answer.spriteName;
 
 				// Compute folder path with trailing slash
-				const folderPath = `${switches.srcPath}${switches.spritesFolder}${spriteName}/`;
+				const folderPath = `${ switches.srcPath }${ switches.commonBundleName }/${ switches.spritesFolder }${ spriteName }/`;
 
 				// Create sprite config and folder
 				Files.new(`${folderPath}${destinationSpriteConfigFileName}`).write(
@@ -240,6 +335,8 @@ const scaffolders = [
 		}
 	},
 
+	// Separator
+	{ name: new Inquirer.Separator() },
 
 ]
 
@@ -260,7 +357,8 @@ module.exports = new Promise(
 			type: 'list',
 			name: 'type',
 			message: 'What kind of component to create ?',
-			choices: scaffolderTypes
+			choices: scaffolderTypes,
+			pageSize: 10
 		}).then( answer =>
 		{
 			// Get scaffolder index

@@ -114,7 +114,7 @@ module.exports = new Promise( (resolve) =>
 	let totalSprites = 0;
 
 	// Browser sprites folders
-	Files.getFolders(`${switches.srcPath}${switches.spritesFolder}*/`).all( folder =>
+	Files.getFolders(`${ switches.srcPath }${ switches.commonBundleName }/${ switches.spritesFolder }*/`).all( folder =>
 	{
 		console.log(`Generating sprite ${folder} ...`.grey);
 
