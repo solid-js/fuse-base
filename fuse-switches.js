@@ -32,8 +32,11 @@ exports.relativeSpritePath = 'assets/sprites/';
 // Vendors bundle name
 exports.vendorsBundleName = 'vendors';
 
-// Common bundle name
+// Common bundle name in src
 exports.commonBundleName = '_common';
+
+// Common js bundle file name
+exports.commonFileName = 'common';
 
 
 // ----------------------------------------------------------------------------- CONFIG
@@ -83,7 +86,7 @@ exports.vendorShims = {
 		source: "node_modules/zepto/dist/zepto.js",
 		exports: "$",
 
-		// Special case : Zepto does not work with quantum
+		// Special case : Zepto and jQuery does not work with quantum and shimming
 		removeForQuantum: true
 	}
 };

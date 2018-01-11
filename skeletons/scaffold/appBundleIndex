@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------------------- BOOTSTRAP CSS
 
 // Load main Less file. Needs to be before Main.tsx
-require('./Main.less');
+//require('./Main.less');
 
 // ----------------------------------------------------------------------------- BOOTSTRAP JS
 

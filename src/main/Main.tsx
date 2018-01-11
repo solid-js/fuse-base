@@ -1,4 +1,3 @@
-import './Main.less';
 import {App} from "solidify-lib/core/App";
 import {Router} from "solidify-lib/navigation/Router";
 import {GlobalConfig} from "../_common/data/GlobalConfig";
@@ -113,5 +112,7 @@ export class Main extends App
 	{
 		// Start router when ready
 		Router.start();
+
+		console.log('MAIN APP READY');
 	}
 }

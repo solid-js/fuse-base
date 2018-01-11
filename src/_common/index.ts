@@ -28,7 +28,7 @@ require('gsap/ScrollToPlugin.js');
 
 
 // Load zepto in quantum mode, zepto shimming is incompatible with quantum
-if (!('Zepto' in window)) require('zepto/dist/zepto.js');
+if (!('Zepto' in window)) require('zepto/dist/zepto.min.js');
 
 
 // ----------------------------------------------------------------------------- GLOBAL SCOPE MAPPING
@@ -39,8 +39,8 @@ window['gsap'] = window['GreenSockGlobals'];
 
 // ----------------------------------------------------------------------------- BOOTSTRAP CSS
 
-// Load main Less file. Needs to be before Main.tsx
-//require('./Main.less');
+// Load main Less file
+require('./Main.less');
 
 
 // ----------------------------------------------------------------------------- GLOBAL CONFIG
@@ -67,3 +67,41 @@ if ( '__globalConfig' in window )
 GlobalConfig.instance.inject({
 	version: process.env['VERSION']
 });
+
+
+// ----------------------------------------------------------------------------- BOOTSTRAP APPS
+
+// Get static compiled app bundles requires
+const bundlesRequireList = require('./bundles');
+
+// We check if an app bundle has loaded at each frame
+let checkInterval = window.setInterval(() =>
+{
+	// Get bundle through require
+	let bundles = bundlesRequireList();
+
+	// Browse bundles
+	bundles.map( bundle =>
+	{
+		// If this bundle is loaded and was never required
+		if (bundle != null && !('required' in bundle))
+		{
+			// Set it as required
+			bundle.required = true;
+
+			// Expose its name and main bundle
+			window['_solidAppLoaded']( bundle.name, bundle.main, bundles.length );
+		}
+	});
+
+	// Filter required bundles
+	let bundlesToRequire = bundles.filter( bundle => !('required' in bundle) );
+
+	// If we don't have bundle to require anymore
+	if (bundlesToRequire.length == 0)
+	{
+		// Kill the loop
+		clearInterval( checkInterval );
+	}
+
+}, 1000 / 60);

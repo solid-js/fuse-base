@@ -1,13 +1,7 @@
 
-// ----------------------------------------------------------------------------- BOOTSTRAP CSS
+module.exports = {
+	name: 'main',
+	main: require('./Main').Main
+};
 
-// Load main Less file. Needs to be before Main.tsx
-require('./Main.less');
-
-// ----------------------------------------------------------------------------- BOOTSTRAP JS
-
-// Load main file
-const { Main } = require('./Main');
-
-// Startup application
-new Main();
+//window['_solidAppLoaded']('main', require('./Main').Main);

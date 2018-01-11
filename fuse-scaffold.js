@@ -159,7 +159,7 @@ const scaffolders = [
 			// Ask for bundle name
 			Inquirer.prompt({
 				type: 'input',
-				message: 'App bundle name ? (snake-case !)',
+				message: 'App bundle name ? (snake-case)',
 				name: 'bundleName'
 			}).then( answer =>
 			{
@@ -222,7 +222,7 @@ const scaffolders = [
 			// Ask for bundle name
 			Inquirer.prompt({
 				type: 'input',
-				message: 'Async bundle name ? (snake-case !)',
+				message: 'Async bundle name ? (snake-case)',
 				name: 'bundleName'
 			}).then( answer =>
 			{
@@ -309,7 +309,7 @@ const scaffolders = [
 		{
 			Inquirer.prompt({
 				type: 'input',
-				message: 'Sprite name ? (avoid using word "sprite", and use snake-case !)',
+				message: 'Sprite name ? (avoid using word "sprite" and use snake-case)',
 				name: 'spriteName'
 			}).then( answer =>
 			{

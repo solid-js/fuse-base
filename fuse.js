@@ -5,16 +5,13 @@
  * TODO :
  * - Refacto du framework avec nouvelle API
  * - Deployer
- * - Sprite generator
- * - SVG plugin ?
- * - IMG ?
+ *
+ * A TESTER :
  * - IMG base 64 ?
  * - React en production mode ?
- * - http://fuse-box.org/plugins/banner-plugin ?
  *
  * BETTER :
- * - Test inferno à la place de react
- * - If possible : assets folder, this is cleaner !
+ * - Test inferno à la place de react ?
  * - tsconfig JSON5 ?
  */
 
@@ -43,6 +40,9 @@ const path = require('path');
 
 // Get Typescript checking helper
 const { TypeHelper } = require('fuse-box-typechecker');
+
+// Quick template utils
+const { QuickTemplate } = require('./helpers/quick-template');
 
 // Get fuse helpers
 const { getAsyncBundlesFromGlob, filterShimsForQuantum } = require("./helpers/fuse-helpers");
@@ -215,12 +215,19 @@ Sparky.task('config:fuse', () =>
 				// Inject Quantum API into vendors bundle
 				bakeApiIntoBundle: switches.vendorsBundleName,
 
-				// Enable tree-shaking capability
-				treeshake: true,
+				// Tree-shaking capability
+				treeshake: {
 
-				// ??
-				//target : 'browser',
-				//replaceTypeOf: true
+					// Prevent file to be removed
+					shouldRemove: (file) =>
+					{
+						// Never remove an entry point
+						if ( path.basename(file.fuseBoxPath) === switches.entryPoint )
+						{
+							return false
+						}
+					}
+				},
 
 				// Uglify output on production
 				// Will use uglify-es on non legacy mode
@@ -275,7 +282,6 @@ Sparky.task('config:bundles', () =>
 			.join(' ')
 		)
 
-
 		// Include shimmed libs
 		// @see : http://fuse-box.org/page/configuration#shimming
 		.shim(
@@ -300,8 +306,11 @@ Sparky.task('config:bundles', () =>
 	{
 		// Bundles instructions to know which file to include or exclude from the bundle
 		const bundleInstructions = [
-			// Setup and auto-start application entry point
-			`!> [${ appBundleName }/${ switches.entryPoint }]`,
+			// Auto start only common bundle
+			`!${ appBundleName === switches.commonBundleName ? '>' : '+'}`,
+
+			// Add entry point
+			`[${ appBundleName }/${ switches.entryPoint }]`,
 		];
 
 		// If this is the common bundle
@@ -331,7 +340,10 @@ Sparky.task('config:bundles', () =>
 		});
 
 		// Create bundle from its name and instructions
-		const currentAppBundle = fuse.bundle( appBundleName );
+		const currentAppBundle = fuse.bundle(
+			// Patch common bundle name
+			appBundleName === switches.commonBundleName ? switches.commonFileName : appBundleName
+		);
 		currentAppBundle.instructions(
 			bundleInstructions.join(' ')
 		);
@@ -371,6 +383,7 @@ Sparky.task('config:bundles', () =>
 	});
 
 
+
 	/**
 	 * WATCH AND DEV MODE
 	 */
@@ -403,6 +416,27 @@ Sparky.task('config:bundles', () =>
 			});
 		});
 	}
+
+	/**
+	 * BUNDLES TO REQUIRE INTO COMMON
+	 */
+
+	/**
+	 * TODO : DOC
+	 */
+
+	// Get all app bundles but common
+	let appsToRequire = appBundlesNames.filter( bundleName => bundleName !== switches.commonBundleName )
+
+	// Create a file that requires those app bundles so common can bootstrap them
+	Files.new(`${switches.srcPath}${switches.commonBundleName}/bundles.ts`).write(
+		QuickTemplate(
+			Files.getFiles('skeletons/scaffold/commonBundleRequire').read(),
+			{
+				appsToRequire: appsToRequire.map( bundleNameToRequire => `		require('../${ bundleNameToRequire }/index')` ).join(",\n")
+			}
+		)
+	)
 });
 
 
@@ -426,37 +460,14 @@ Sparky.task('config:typeChecking', () =>
 		name: 'TypeChecker',
 		tsConfig: '../tsconfig.json',
 		basePath: switches.srcPath,
-		shortenFilenames: true,
-
-		// Tslint file ?
-		//tsLint:'./tslint.json'
+		shortenFilenames: true
 	});
 
-	// Type checking can be long, so we show this to know what is going on
-	console.log(`\nTypechecking app bundles ...`.cyan);
-
-	// Run type checker
-	const totalErrors = typeHelper.runSync();
-
-	// If we have errors
-	// Play a sound from the terminal if there is an error
-	(totalErrors > 0)
-	? console.log("\007")
-	: console.log(`App bundles checked !`.green);
-
-	// Quit with an error if we are in quantum mode
-	if (options.quantum && totalErrors > 0)
-	{
-		process.exit(1);
-	}
-
-	/*
-
 	// Shortcut method to run Type Checking with alerts if anything failed
-	const runTypeCheck = ( bundleName ) =>
+	const runTypeCheck = () =>
 	{
 		// Type checking can be long, so we show this to know what is going on
-		console.log(`\nTypechecking ${bundleName} ...`.cyan);
+		console.log(`\nType checking bundles ...`.cyan);
 
 		// Run type checker
 		const totalErrors = typeHelper.runSync();
@@ -465,7 +476,7 @@ Sparky.task('config:typeChecking', () =>
 		// Play a sound from the terminal if there is an error
 		(totalErrors > 0)
 		? console.log("\007")
-		: console.log(`Bundle ${bundleName} checked !`.green);
+		: console.log(`Bundles checked !`.green);
 
 		// Quit with an error if we are in quantum mode
 		if (options.quantum && totalErrors > 0)
@@ -474,29 +485,29 @@ Sparky.task('config:typeChecking', () =>
 		}
 	}
 
+	// Bundle completion counter to type check only when every bundles are compiled
+	let completedBundles = 0;
+
 	// Browser every bundles
 	allBundles.map( app =>
 	{
-		// Do not listen vendors app to type check
-		if (app.name === switches.vendorsBundleName) return;
-
-		// Do not watch to TypeCheck if we are Quantum is enabled
-		if ( options.quantum )
-		{
-			// We TypeCheck directly
-			runTypeCheck( app.name );
-			return;
-		}
-
 		// When an app complete compilation
-		app.completed( (proc) =>
+		app.completed( proc =>
 		{
-			// Do not type check vendors
-			if (proc.bundle.name === switches.vendorsBundleName) return;
-			runTypeCheck( proc.bundle.name );
+			if (completedBundles === 0) console.log('');
+			console.log(`Bundle ${proc.bundle.name} compiled.`.green);
+
+			// Count until every bundle are compiled
+			if (++completedBundles >= allBundles.length)
+			{
+				// Reset counter
+				completedBundles = 0;
+
+				// Run typecheck on all bundle at once
+				runTypeCheck( proc.bundle.name );
+			}
 		});
 	});
-	*/
 });
 
 
@@ -684,6 +695,7 @@ Sparky.task('lessCheck', () =>
 		if (stderr !== '')
 		{
 			console.log( stderr.red.bold );
+			console.log("\007");
 			process.exit(1);
 		}
 	});
@@ -732,8 +744,6 @@ Sparky.task('sprites', async () =>
 
 // ----------------------------------------------------------------------------- /!\ TESTING ZONE /!\
 
-
-
 /*
 Sparky.task('testSparky', () =>
 {
@@ -747,32 +757,3 @@ Sparky.task('testSparky', () =>
 	console.log('after');
 });
 */
-
-
-Sparky.task('testFile', () =>
-{
-	/*
-	console.log('TEST FILE 1');
-	Files('dist/assets/bundles/**').all( file => console.log( '> ' + file ) );
-	*/
-
-	/*
-	console.log('TEST FOLDER 1');
-	Folders('dist/assets/bundles/').all( file => console.log( '> ' + file ) );
-	*/
-
-	/*
-	console.log('TEST FOLDER 2');
-	Folders('dist/assets/bundles/').delete();
-	*/
-
-	/*
-	console.log('TEST FILES MOVE');
-	Files('dist/assets/bundles/**').moveTo('dist/test/');
-	*/
-
-	/*
-	console.log('TEST FILES COPY');
-	Files('dist/assets/bundles/**').copyTo('dist/test/');
-	*/
-});
