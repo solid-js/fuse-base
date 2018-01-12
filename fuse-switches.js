@@ -42,6 +42,14 @@ exports.commonFileName = 'common';
 // ----------------------------------------------------------------------------- CONFIG
 
 /**
+ * Set a name if you want to create only one bundle.
+ * Each app bundle will be in this bundle.
+ * Code splitting will still work in Quantum mode.
+ * Set to false if you want to split each app bundle into a different compiled JS bundle.
+ */
+exports.monoBundle = false; //'bundle';
+
+/**
  * Generate an index.html from template.
  * If false, and quantum is enabled, will generate a quantum.json manifest file.
  * If enabled, dist/index.html will be removed when cleaning.

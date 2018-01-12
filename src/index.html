@@ -6,13 +6,15 @@
 <body>
   <div id="AppContainer"></div>
   <script>
-	  window['_solidAppLoaded'] = function (appName, App)
+	  function SolidBundleLoaded (appName, App)
     {
-    	console.log( 'loaded', appName );
+    	console.log('SolidBundleLoaded', appName );
 
     	if (appName === 'main')
 			{
-				new App({});
+				new App({
+						root: document.getElementById('AppContainer')
+				});
 			}
     }
   </script>

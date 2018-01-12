@@ -1,13 +1,10 @@
 
-// ----------------------------------------------------------------------------- BOOTSTRAP CSS
+// App bundle infos for bundles loader.
+module.exports = {
 
-// Load main Less file. Needs to be before Main.tsx
-//require('./Main.less');
+	// App bundle name
+	name: '%%bundleName%%',
 
-// ----------------------------------------------------------------------------- BOOTSTRAP JS
-
-// Load main file
-const { Main } = require('./Main');
-
-// Startup application
-new Main();
+	// Entry point
+	main: require('./Main').Main
+};

@@ -25,8 +25,8 @@ export class %%capitalComponentName%% extends ReactPage<ReactPageProps, States>
 	render ()
 	{
 		return <div className="%%capitalComponentName%%" ref="root">
-		  %%capitalComponentName%%
-    </div>
+			%%capitalComponentName%%
+		</div>
 	}
 
 

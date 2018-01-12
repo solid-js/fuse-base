@@ -1,41 +1,5 @@
-
-// ----------------------------------------------------------------------------- INCLUDED LIBRARIES
-
-// GSAP core
-require('gsap/TweenLite');
-require('gsap/TimelineLite.js');
-
-// Easings
-require('gsap/EasePack.js');
-
-// Plugins
-require('gsap/AttrPlugin.js');
-require('gsap/BezierPlugin.js');
-require('gsap/ColorPropsPlugin.js');
-require('gsap/CSSPlugin.js');
-//require('gsap/CSSRulePlugin.js');
-require('gsap/DirectionalRotationPlugin.js');
-//require('gsap/Draggable.js');
-//require('gsap/EaselPlugin.js');
-//require('gsap/EndArrayPlugin.js');
-//require('gsap/jquery.gsap.js');
-require('gsap/ModifiersPlugin.js');
-//require('gsap/PixiPlugin.js');
-//require('gsap/RaphaelPlugin.js');
-require('gsap/RoundPropsPlugin.js');
-require('gsap/ScrollToPlugin.js');
-//require('gsap/TextPlugin.js');
-
-
-// Load zepto in quantum mode, zepto shimming is incompatible with quantum
-if (!('Zepto' in window)) require('zepto/dist/zepto.min.js');
-
-
-// ----------------------------------------------------------------------------- GLOBAL SCOPE MAPPING
-
-// Map green sock globals into gsap so this is compatible with GSAP typings
-window['gsap'] = window['GreenSockGlobals'];
-
+import {SolidBundles} from "solidify-lib/helpers/SolidBundles";
+import {GlobalConfig} from "./data/GlobalConfig";
 
 // ----------------------------------------------------------------------------- BOOTSTRAP CSS
 
@@ -43,65 +7,75 @@ window['gsap'] = window['GreenSockGlobals'];
 require('./Main.less');
 
 
-// ----------------------------------------------------------------------------- GLOBAL CONFIG
+// ----------------------------------------------------------------------------- BUNDLE INFOS
 
-// Import global config helper
-import {GlobalConfig} from "./data/GlobalConfig";
+// App bundle infos for bundles loader.
+module.exports = {
+	// App bundle name, no startup point
+	name: 'common'
+};
 
-// Load config data
-const embeddedConfig = require('./data/config.js');
 
-// We inject in order to have priority of window config over embedded config.
-// Version is in last so it can't be overridden.
+// ----------------------------------------------------------------------------- INCLUDED LIBRARIES
 
-// 1. Inject embedded config data into global config
-GlobalConfig.instance.inject( embeddedConfig );
-
-// 2. Inject global config from window scope
-if ( '__globalConfig' in window )
+// Do not require libraries if this is an HMR trigger
+if ( !SolidBundles.isHMRTrigger )
 {
-	GlobalConfig.instance.inject( window['__globalConfig'] );
+	// GSAP core
+	require('gsap/TweenLite');
+	require('gsap/TimelineLite.js');
+
+	// Easings
+	require('gsap/EasePack.js');
+
+	// Plugins
+	require('gsap/AttrPlugin.js');
+	require('gsap/BezierPlugin.js');
+	require('gsap/ColorPropsPlugin.js');
+	require('gsap/CSSPlugin.js');
+	//require('gsap/CSSRulePlugin.js');
+	require('gsap/DirectionalRotationPlugin.js');
+	//require('gsap/Draggable.js');
+	//require('gsap/EaselPlugin.js');
+	//require('gsap/EndArrayPlugin.js');
+	//require('gsap/jquery.gsap.js');
+	require('gsap/ModifiersPlugin.js');
+	//require('gsap/PixiPlugin.js');
+	//require('gsap/RaphaelPlugin.js');
+	require('gsap/RoundPropsPlugin.js');
+	require('gsap/ScrollToPlugin.js');
+	//require('gsap/TextPlugin.js');
+
+	// Load zepto in quantum mode, zepto shimming is incompatible with quantum
+	if (!('Zepto' in window)) require('zepto/dist/zepto.min.js');
 }
 
-// 3. Inject version from package.json
-GlobalConfig.instance.inject({
-	version: process.env['VERSION']
-});
 
+// ----------------------------------------------------------------------------- GLOBAL SCOPE MAPPING
 
-// ----------------------------------------------------------------------------- BOOTSTRAP APPS
-
-// Get static compiled app bundles requires
-const bundlesRequireList = require('./bundles');
-
-// We check if an app bundle has loaded at each frame
-let checkInterval = window.setInterval(() =>
+// Do not require libraries if this is an HMR trigger
+if ( !SolidBundles.isHMRTrigger )
 {
-	// Get bundle through require
-	let bundles = bundlesRequireList();
+	// Map green sock globals into gsap so this is compatible with GSAP typings
+	window['gsap'] = window['GreenSockGlobals'];
+}
 
-	// Browse bundles
-	bundles.map( bundle =>
-	{
-		// If this bundle is loaded and was never required
-		if (bundle != null && !('required' in bundle))
-		{
-			// Set it as required
-			bundle.required = true;
 
-			// Expose its name and main bundle
-			window['_solidAppLoaded']( bundle.name, bundle.main, bundles.length );
-		}
+// ----------------------------------------------------------------------------- GLOBAL CONFIG
+
+// Do not prepare GlobalConfig if this is an HMR trigger
+if ( !SolidBundles.isHMRTrigger )
+{
+	console.log('COMMON');
+
+	// Load config data
+	const embeddedConfig = require('./data/config');
+
+	// 1. Inject embedded config data into global config
+	GlobalConfig.instance.inject( embeddedConfig );
+
+	// 2. Inject version from package.json
+	GlobalConfig.instance.inject({
+		version: process.env['VERSION']
 	});
-
-	// Filter required bundles
-	let bundlesToRequire = bundles.filter( bundle => !('required' in bundle) );
-
-	// If we don't have bundle to require anymore
-	if (bundlesToRequire.length == 0)
-	{
-		// Kill the loop
-		clearInterval( checkInterval );
-	}
-
-}, 1000 / 60);
+}

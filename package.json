@@ -1,6 +1,6 @@
 {
   "name": "test-1",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "",
   "main": "fuse.js",
   "dependencies": {
@@ -8,7 +8,7 @@
     "normalize.css": "^7.0.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "solidify-lib": "^1.0.12",
+    "solidify-lib": "^1.0.14",
     "zepto": "^1.2.0"
   },
   "devDependencies": {
@@ -16,7 +16,7 @@
     "@types/react": "^16.0.34",
     "@types/react-dom": "^16.0.3",
     "@types/zepto": "^1.0.29",
-    "autoprefixer": "^7.2.4",
+    "autoprefixer": "^7.2.5",
     "colors": "^1.1.2",
     "fuse-box": "^3.0.2",
     "fuse-box-typechecker": "^2.7.0",
@@ -26,7 +26,7 @@
     "node-sprite-generator": "^0.10.2",
     "postcss-clean": "^1.1.0",
     "tslib": "^1.8.1",
-    "tslint": "^5.8.0",
+    "tslint": "^5.9.1",
     "typescript": "^2.6.2",
     "uglify-es": "^3.3.5",
     "uglify-js": "^3.3.5"

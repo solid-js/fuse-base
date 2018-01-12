@@ -37,7 +37,7 @@ const askWhichBundle = (pNoCommon, pNoAsync) =>
 		{
 			// Add this async bundle to bundles list
 			bundlesList.push(`${file}/`);
-		})
+		});
 	});
 
 	return Inquirer.prompt({
@@ -156,6 +156,18 @@ const scaffolders = [
 		name: 'App bundle',
 		exec: async () =>
 		{
+			// Ask for component system
+			let componentSystem = '';
+			await Inquirer.prompt({
+				type: 'list',
+				message: 'Which component system ?',
+				name: 'componentSystem',
+				choices : ['React', 'Zepto']
+			}).then( anwser =>
+			{
+				componentSystem = anwser.componentSystem;
+			});
+
 			// Ask for bundle name
 			Inquirer.prompt({
 				type: 'input',
@@ -181,11 +193,17 @@ const scaffolders = [
 				});
 
 				// Create index
-				Files.getFiles('skeletons/scaffold/appBundleIndex')
-				.copyTo( `${ switches.srcPath }${ bundleName }/${ switches.entryPoint }` );
+				Files.new( `${ switches.srcPath }${ bundleName }/${ switches.entryPoint }` ).write(
+					QuickTemplate(
+						Files.getFiles('skeletons/scaffold/appBundleIndex').read(),
+						{
+							bundleName: bundleName
+						}
+					)
+				);
 
 				// Create main script
-				Files.getFiles('skeletons/scaffold/appBundleMainScript')
+				Files.getFiles(`skeletons/scaffold/appBundle${componentSystem}MainScript`)
 				.copyTo( `${ switches.srcPath }${ bundleName }/Main.tsx`);
 
 				// Create style gateway so relative imports will work
@@ -198,8 +216,7 @@ const scaffolders = [
 					)
 				);
 
-				// TODO : ASK ZEPTO / REACT INIT ?
-				// TODO : INIT APP VIEW
+				// TODO : INIT APP VIEW WITH VIEW STACK
 			});
 		}
 	},

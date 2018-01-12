@@ -1,6 +1,10 @@
 import {App} from "solidify-lib/core/App";
 import {Router} from "solidify-lib/navigation/Router";
 import {GlobalConfig} from "../_common/data/GlobalConfig";
+import {AppView} from "./components/appView/AppView";
+import {SolidBundles} from "solidify-lib/helpers/SolidBundles";
+import * as React from "react";
+import * as ReactDOM from "react-dom";
 
 export class Main extends App
 {
@@ -19,6 +23,19 @@ export class Main extends App
 
 
 	// ------------------------------------------------------------------------- INIT
+
+	/**
+	 * App constructor
+	 */
+	constructor ( pParams )
+	{
+		// Inject params into config
+		GlobalConfig.instance.inject( pParams );
+
+		// Relay construction
+		// Do not launch init sequence if this is an HMR trigger
+		super( !SolidBundles.isHMRTrigger );
+	}
 
 	/**
 	 * Prepare app
@@ -77,20 +94,22 @@ export class Main extends App
 	}
 
 
-	// ------------------------------------------------------------------------- APP VIEW
+	// ------------------------------------------------------------------------- READY
 
 	// App view instance
-	//protected _appView		:AppView;
-	//get appView ():AppView { return this._appView; }
+	protected _appView		:AppView;
+	get appView ():AppView { return this._appView; }
 
 	/**
-	 * Init app view.
+	 * When everything is ready
 	 */
-	protected initAppView ():void
+	protected ready ()
 	{
-		// REACT
-		// TODO : ROOT
-		//this._appView = ReactDom.render( <AppView />, this._parameters.root[0] ) as AppView;
+		// React app view
+		this._appView = ReactDOM.render(
+			<AppView />,
+			GlobalConfig.instance.root
+		) as AppView;
 
 		// ZEPTO
 		// TODO : ROOT
@@ -100,19 +119,8 @@ export class Main extends App
 		// TODO : STACK IN REACT
 		// This stack will receive NotFoundPage if no matching route is found
 		//Router.registerStack('main', stackInstance);
-	}
 
-
-	// ------------------------------------------------------------------------- READY
-
-	/**
-	 * When everything is ready
-	 */
-	protected ready ()
-	{
-		// Start router when ready
+		// Start router
 		Router.start();
-
-		console.log('MAIN APP READY');
 	}
 }

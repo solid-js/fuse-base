@@ -1,4 +1,4 @@
-import "%%capitalComponentName%%.less";
+import "AppView.less";
 import * as React from "react";
 import {ReactView} from "solidify-lib/react/ReactView";
 
@@ -15,7 +15,7 @@ export interface States
 }
 
 
-export class %%capitalComponentName%% extends ReactView<Props, States>
+export class AppView extends ReactView<Props, States>
 {
 	// ------------------------------------------------------------------------- INIT
 
@@ -29,8 +29,8 @@ export class %%capitalComponentName%% extends ReactView<Props, States>
 
 	render ()
 	{
-		return <div className="%%capitalComponentName%%" ref="root">
-			%%capitalComponentName%%
+		return <div className="AppView" ref="root">
+			AppView
 		</div>
 	}
 
@@ -39,7 +39,7 @@ export class %%capitalComponentName%% extends ReactView<Props, States>
 
 	componentDidMount ()
 	{
-
+		console.log('MOUNT 17');
 	}
 
 	componentDidUpdate (pPrevProps:Props, pPrevState:States)

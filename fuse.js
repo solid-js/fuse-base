@@ -189,7 +189,10 @@ Sparky.task('config:fuse', () =>
 				NODE_ENV: ( options.quantum ? 'production' : 'development' ),
 
 				// Inject package.json version
-				VERSION: require('./package.json').version
+				VERSION: require('./package.json').version,
+
+				// Inject bundle path for SolidBundles
+				BUNDLE_PATH : switches.bundlesPath
 			}),
 
 			// Generate index.html from template
@@ -216,8 +219,8 @@ Sparky.task('config:fuse', () =>
 				bakeApiIntoBundle: switches.vendorsBundleName,
 
 				// Tree-shaking capability
-				treeshake: {
-
+				treeshake: true,
+				/*{
 					// Prevent file to be removed
 					shouldRemove: (file) =>
 					{
@@ -227,7 +230,7 @@ Sparky.task('config:fuse', () =>
 							return false
 						}
 					}
-				},
+				};*/
 
 				// Uglify output on production
 				// Will use uglify-es on non legacy mode
@@ -276,10 +279,7 @@ Sparky.task('config:bundles', () =>
 
 		// Contains everything but app bundles dependencies
 		.instructions(
-			appBundlesNames.map(
-				appBundleName => `~ ${appBundleName}/${switches.entryPoint}`
-			)
-			.join(' ')
+			`~ ${switches.entryPoint}`
 		)
 
 		// Include shimmed libs
@@ -301,26 +301,52 @@ Sparky.task('config:bundles', () =>
 	 * APP BUNDLES
 	 */
 
+	// Bundle instructions for mono bundle or each bundle
+	let bundleInstructions;
+
+	// Our mono fuse bundle, if we are in mono bundle mode
+	let monoBundle;
+
+	// if we are in mono bundle mode
+	if ( switches.monoBundle !== false )
+	{
+		// Create our mono fuse bundle and name it
+		monoBundle = fuse.bundle( switches.monoBundle );
+
+		// Start set of instructions for this bundle
+		bundleInstructions = [];
+	}
+
 	// Browser app bundles
 	appBundlesNames.map( appBundleName =>
 	{
-		// Bundles instructions to know which file to include or exclude from the bundle
-		const bundleInstructions = [
-			// Auto start only common bundle
-			`!${ appBundleName === switches.commonBundleName ? '>' : '+'}`,
-
-			// Add entry point
-			`[${ appBundleName }/${ switches.entryPoint }]`,
-		];
+		// If we are not in mono bundle mode
+		// We need to create a new set of instruction for each bundle
+		if ( monoBundle == null )
+		{
+			// Bundles instructions to know which file to include or exclude from the bundle
+			bundleInstructions = [];
+		}
 
 		// If this is the common bundle
 		if ( appBundleName === switches.commonBundleName )
 		{
+			// Add global entry point, auto-started
+			bundleInstructions.push(`!> [${switches.entryPoint}]`);
+
 			// We include every file, even if they are not included
 			bundleInstructions.push(`+ [${ appBundleName }/**/*.${ extensionsGlob }]`);
 		}
 		else
 		{
+			// If we are not in mono bundle mode
+			// We need to add entry point for each bundle
+			if ( monoBundle == null )
+			{
+				// Add bundle entry point, not auto started
+				bundleInstructions.push(`!+ [${ appBundleName }/${ switches.entryPoint }]`);
+			}
+
 			// Include non imported folders like pages/ and components/
 			bundleInstructions.push(`+ [${ appBundleName }/${ includedFoldersGlob }/*/*.${ extensionsGlob }]`);
 
@@ -328,25 +354,39 @@ Sparky.task('config:bundles', () =>
 			bundleInstructions.push(`+ [${ appBundleName }/${ switches.asyncPath }*/${ includedFoldersGlob }/*/*.${ extensionsGlob }]`);
 		}
 
-		// Brower other bundles
-		appBundlesNames.map( otherAppBundleName =>
+		// If we are not in mono bundle mode
+		// We need to remove other bundle dependencies from this bundle
+		if ( monoBundle == null )
 		{
-			// Remove other app bundles dependencies
-			// so shared files are only included into their own bundle
-			if (otherAppBundleName !== appBundleName)
+			// Brower other bundles
+			appBundlesNames.map( otherAppBundleName =>
 			{
-				bundleInstructions.push(`- [${ otherAppBundleName }/**/*.${ extensionsGlob }]`);
-			}
-		});
+				// Remove other app bundles dependencies
+				// so shared files are only included into their own bundle
+				if (otherAppBundleName !== appBundleName)
+				{
+					bundleInstructions.push(`- [${ otherAppBundleName }/**/*.${ extensionsGlob }]`);
+				}
+			});
+		}
 
-		// Create bundle from its name and instructions
-		const currentAppBundle = fuse.bundle(
-			// Patch common bundle name
-			appBundleName === switches.commonBundleName ? switches.commonFileName : appBundleName
-		);
-		currentAppBundle.instructions(
-			bundleInstructions.join(' ')
-		);
+		// Our fuse bundle.
+		// Target mono bundle by default
+		let currentAppBundle = monoBundle;
+
+		// If we are not in mono bundle mode
+		// We need to create several bundles
+		if ( monoBundle == null )
+		{
+			// Create bundle from its name and instructions
+			currentAppBundle = fuse.bundle(
+				// Patch common bundle name
+				appBundleName === switches.commonBundleName ? switches.commonFileName : appBundleName
+			);
+
+			// Set instructions
+			currentAppBundle.instructions( bundleInstructions.join(' ') );
+		}
 
 		// If this is not the common bundle
 		// We add code splitting options
@@ -378,10 +418,24 @@ Sparky.task('config:bundles', () =>
 			});
 		}
 
+		// If we are not in mono bundle mode
 		// Add this new bundle to bundle list
-		allBundles.push( currentAppBundle );
+		if ( monoBundle == null )
+		{
+			allBundles.push( currentAppBundle );
+		}
 	});
 
+	// If we in mono bundle mode
+	// We need to setup or only bundle from previously crafted instructions
+	if ( monoBundle != null)
+	{
+		// Set instructions
+		monoBundle.instructions( bundleInstructions.join(' ') );
+
+		// Add it to bundles list
+		allBundles.push( monoBundle );
+	}
 
 
 	/**
@@ -419,21 +473,16 @@ Sparky.task('config:bundles', () =>
 
 	/**
 	 * BUNDLES TO REQUIRE INTO COMMON
+	 * TODO : HUGE DOC
 	 */
-
-	/**
-	 * TODO : DOC
-	 */
-
-	// Get all app bundles but common
-	let appsToRequire = appBundlesNames.filter( bundleName => bundleName !== switches.commonBundleName )
 
 	// Create a file that requires those app bundles so common can bootstrap them
-	Files.new(`${switches.srcPath}${switches.commonBundleName}/bundles.ts`).write(
+	Files.new(`${switches.srcPath}bundles.ts`).write(
 		QuickTemplate(
-			Files.getFiles('skeletons/scaffold/commonBundleRequire').read(),
+			Files.getFiles('skeletons/scaffold/entryPointBundleRequire').read(),
 			{
-				appsToRequire: appsToRequire.map( bundleNameToRequire => `		require('../${ bundleNameToRequire }/index')` ).join(",\n")
+				appsPaths: appBundlesNames.map( bundleNameToRequire => `		'default/${ bundleNameToRequire }/index'` ).join(",\n"),
+				appsToRequire: appBundlesNames.map( bundleNameToRequire => `		require('./${ bundleNameToRequire }/index')` ).join(",\n")
 			}
 		)
 	)
