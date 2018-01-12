@@ -1,4 +1,4 @@
-import "%%capitalComponentName%%.less";
+import "./%%capitalComponentName%%.less";
 import * as React from "react";
 import {ReactView} from "solidify-lib/react/ReactView";
 

@@ -70,21 +70,21 @@ export class Main extends App
 			[
 				// -- Home page
 				{
-					url		: '/',
-					// TODO : Full path here
-					page	: 'HomePage'
+					url			: '/',
+					page		: 'HomePage',
+					importer 	: () => import('./pages/homePage/HomePage')
 				},
 
 				// -- Product pages
 				{
-					url		: '/products/',
-					page	: 'ProductPage',
-					action	: 'overview'
+					url			: '/products.html',
+					page		: 'ProductOverviewPage',
+					importer 	: () => import('./pages/productOverviewPage/ProductOverviewPage')
 				},
 				{
-					url		: '/products/{id}.html',
-					page	: 'ProductPage',
-					action	: 'product'
+					url			: '/product-{#id}-{slug}.html',
+					page		: 'ProductDetailPage',
+					importer 	: () => import('./pages/productDetailPage/ProductDetailPage')
 				}
 			]
 		);
@@ -110,15 +110,6 @@ export class Main extends App
 			<AppView />,
 			GlobalConfig.instance.root
 		) as AppView;
-
-		// ZEPTO
-		// TODO : ROOT
-		//this._appView = new AppView( this._parameters.root );
-
-		// Register mainStack
-		// TODO : STACK IN REACT
-		// This stack will receive NotFoundPage if no matching route is found
-		//Router.registerStack('main', stackInstance);
 
 		// Start router
 		Router.start();

@@ -1,4 +1,4 @@
 
 module.exports = {
-	base: 'test-base'
+	base: '/_frameworks/solid-js/fuse-base/dist/'
 };

@@ -1,4 +1,4 @@
-import "./%%capitalComponentName%%.less";
+import "./ProductDetailPage.less";
 import * as React from "react";
 import {ReactPage, ReactPageProps} from "solidify-lib/react/ReactPage";
 
@@ -10,7 +10,7 @@ interface States
 }
 
 
-export class %%capitalComponentName%% extends ReactPage<ReactPageProps, States>
+export class ProductDetailPage extends ReactPage<ReactPageProps, States>
 {
 	// ------------------------------------------------------------------------- INIT
 
@@ -24,8 +24,9 @@ export class %%capitalComponentName%% extends ReactPage<ReactPageProps, States>
 
 	render ()
 	{
-		return <div className="%%capitalComponentName%%" ref="root">
-			%%capitalComponentName%%
+		return <div className="ProductDetailPage" ref="root">
+			<h1>Product slug "{this.props.parameters.slug}"</h1>
+			<h5>Product id "{this.props.parameters.id}"</h5>
 		</div>
 	}
 
@@ -39,6 +40,8 @@ export class %%capitalComponentName%% extends ReactPage<ReactPageProps, States>
 	action ()
 	{
 	    // Remove if not used
+
+		console.log(this.props.parameters);
 	}
 
 	/**
@@ -67,4 +70,4 @@ export class %%capitalComponentName%% extends ReactPage<ReactPageProps, States>
 }
 
 // Also export as default
-export default %%capitalComponentName%%;
+export default ProductDetailPage;

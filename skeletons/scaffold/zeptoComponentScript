@@ -1,3 +1,4 @@
+import "./%%capitalComponentName%%.less";
 import {JView} from "solidify-lib/core/ZeptoView";
 
 // ----------------------------------------------------------------------------- STRUCT
