@@ -328,25 +328,17 @@ Sparky.task('config:bundles', () =>
 			bundleInstructions = [];
 		}
 
+		// Add global entry point, auto-started
+		bundleInstructions.push(`!> [${switches.entryPoint}]`);
+
 		// If this is the common bundle
 		if ( appBundleName === switches.commonBundleName )
 		{
-			// Add global entry point, auto-started
-			bundleInstructions.push(`!> [${switches.entryPoint}]`);
-
 			// We include every file, even if they are not included
 			bundleInstructions.push(`+ [${ appBundleName }/**/*.${ extensionsGlob }]`);
 		}
 		else
 		{
-			// If we are not in mono bundle mode
-			// We need to add entry point for each bundle
-			if ( monoBundle == null )
-			{
-				// Add bundle entry point, not auto started
-				bundleInstructions.push(`!+ [${ appBundleName }/${ switches.entryPoint }]`);
-			}
-
 			// Include non imported folders like pages/ and components/
 			bundleInstructions.push(`+ [${ appBundleName }/${ includedFoldersGlob }/*/*.${ extensionsGlob }]`);
 
@@ -392,6 +384,7 @@ Sparky.task('config:bundles', () =>
 		// We add code splitting options
 		if ( appBundleName !== switches.commonBundleName )
 		{
+
 			// Configure code splitting
 			currentAppBundle.splitConfig({
 
@@ -400,7 +393,7 @@ Sparky.task('config:bundles', () =>
 
 				// Where to put async bundles. Default is same directory than regular bundles.
 				//dest: switches.bundlesPath
-			})
+			});
 
 			// We use this helper to get async modules list from file system using this glob
 			getAsyncBundlesFromGlob( `${ switches.srcPath }${ appBundleName }/${ switches.asyncPath }*/*.+(ts|tsx)` ).map( asyncEntry =>
@@ -532,7 +525,7 @@ Sparky.task('config:typeChecking', () =>
 		{
 			process.exit(1);
 		}
-	}
+	};
 
 	// Bundle completion counter to type check only when every bundles are compiled
 	let completedBundles = 0;

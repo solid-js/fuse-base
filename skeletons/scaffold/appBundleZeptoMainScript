@@ -30,9 +30,12 @@ export class Main extends App
 		// Inject params into config
 		GlobalConfig.instance.inject( pParams );
 
+		// Register init of this app bundle and get init count to avoid HMR
+		const initCount = SolidBundles.registerAppBundleInit( require('./index').name );
+
 		// Relay construction
 		// Do not launch init sequence if this is an HMR trigger
-		super( !SolidBundles.isHMRTrigger );
+		super( initCount == 0 );
 	}
 
 	/**

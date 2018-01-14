@@ -5,12 +5,14 @@
 module.exports = {
   paths : [
   		'default/_common/index',
-		'default/main/index'
+		'default/main/index',
+		'default/test-bundle/index'
   ],
   requires : () => {
     return [
   		require('./_common/index'),
-		require('./main/index')
+		require('./main/index'),
+		require('./test-bundle/index')
     ]
   }
 };

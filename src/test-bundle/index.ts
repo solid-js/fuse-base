@@ -3,7 +3,7 @@
 module.exports = {
 
 	// App bundle name
-	name: 'main',
+	name: 'test-bundle',
 
 	// Entry point is app bundle main
 	main: require('./Main').Main

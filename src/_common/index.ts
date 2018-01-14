@@ -9,17 +9,25 @@ require('./Main.less');
 
 // ----------------------------------------------------------------------------- BUNDLE INFOS
 
-// App bundle infos for bundles loader.
+// App bundle info for bundles loader.
 module.exports = {
-	// App bundle name, no startup point
-	name: 'common'
+	// App bundle name
+	name: 'common',
+
+	// No startup point for common app bundle
+	main: false
 };
 
 
 // ----------------------------------------------------------------------------- INCLUDED LIBRARIES
 
+// Register init of this app bundle and get init count to avoid HMR
+const initCount = SolidBundles.registerAppBundleInit( module.exports.name );
+
+// ----------------------------------------------------------------------------- INCLUDED LIBRARIES
+
 // Do not require libraries if this is an HMR trigger
-if ( !SolidBundles.isHMRTrigger )
+if ( initCount == 0 )
 {
 	// GSAP core
 	require('gsap/TweenLite');
@@ -54,7 +62,7 @@ if ( !SolidBundles.isHMRTrigger )
 // ----------------------------------------------------------------------------- GLOBAL SCOPE MAPPING
 
 // Do not require libraries if this is an HMR trigger
-if ( !SolidBundles.isHMRTrigger )
+if ( initCount == 0 )
 {
 	// Map green sock globals into gsap so this is compatible with GSAP typings
 	window['gsap'] = window['GreenSockGlobals'];
@@ -64,10 +72,8 @@ if ( !SolidBundles.isHMRTrigger )
 // ----------------------------------------------------------------------------- GLOBAL CONFIG
 
 // Do not prepare GlobalConfig if this is an HMR trigger
-if ( !SolidBundles.isHMRTrigger )
+if ( initCount == 0 )
 {
-	console.log('COMMON');
-
 	// Load config data
 	const embeddedConfig = require('./data/config');
 

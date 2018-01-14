@@ -1,10 +1,11 @@
 import {App} from "solidify-lib/core/App";
 import {Router} from "solidify-lib/navigation/Router";
 import {GlobalConfig} from "../_common/data/GlobalConfig";
-import {AppView} from "./components/appView/AppView";
+//import {AppView} from "./components/appView/AppView";
 import {SolidBundles} from "solidify-lib/helpers/SolidBundles";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import {AppView} from "../main/components/appView/AppView";
 
 export class Main extends App
 {
@@ -68,61 +69,66 @@ export class Main extends App
 	{
 		// Init router
 		// Google analytics is automatically called when page is chaning
+		/*
 		Router.init(
 			GlobalConfig.instance.base,
 			[
 				// -- Home page
 				{
-					url			: '/',
-
-					// Page name (usually name of exported class)
-					page		: 'HomePage',
-
-					// Use require to load synchronously
-					importer 	: () => require('./pages/homePage/HomePage')
-
-					// Use import to load asynchronously
-					//importer 	: () => import('./pages/homePage/HomePage')
+					url		: '/',
+					// TODO : Full path here
+					page	: 'HomePage'
 				},
 
-				// -- PARAMETERS EXAMPLE
+				// -- Product pages
 				{
-					// Prepend parameter with a # to force it as a numeric value
-					url			: '/product-{#id}-{slug}.html',
-					page		: 'ProductDetailPage',
-
-					// Use require to load synchronously
-					importer 	: () => require('./pages/productDetailPage/ProductDetailPage')
-
-					// Use import to load asynchronously
-					//importer 	: () => import('./pages/homePage/HomePage')
+					url		: '/products/',
+					page	: 'ProductPage',
+					action	: 'overview'
+				},
+				{
+					url		: '/products/{id}.html',
+					page	: 'ProductPage',
+					action	: 'product'
 				}
 			]
 		);
 
 		// Enable auto link listening
 		Router.listenLinks();
+		*/
 	}
 
 
 	// ------------------------------------------------------------------------- READY
 
 	// App view instance
-	protected _appView		:AppView;
-	get appView ():AppView { return this._appView; }
+	//protected _appView		:AppView;
+	//get appView ():AppView { return this._appView; }
 
 	/**
 	 * When everything is ready
 	 */
-	protected ready ()
+	protected async ready ()
 	{
+		/*
 		// React app view
 		this._appView = ReactDOM.render(
 			<AppView />,
 			GlobalConfig.instance.root
 		) as AppView;
+		*/
+
+		//let AppView = await import("../main/components/appView/AppView");
+
+		console.log('MAIN APP VIEW FROM TEST BUNDLE', AppView);
+
+		// Register mainStack
+		// TODO : STACK IN REACT
+		// This stack will receive NotFoundPage if no matching route is found
+		//Router.registerStack('main', stackInstance);
 
 		// Start router
-		Router.start();
+		//Router.start();
 	}
 }

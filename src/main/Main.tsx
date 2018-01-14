@@ -32,9 +32,12 @@ export class Main extends App
 		// Inject params into config
 		GlobalConfig.instance.inject( pParams );
 
+		// Register init of this app bundle and get init count to avoid HMR
+		const initCount = SolidBundles.registerAppBundleInit( require('./index').name );
+
 		// Relay construction
 		// Do not launch init sequence if this is an HMR trigger
-		super( !SolidBundles.isHMRTrigger );
+		super( initCount == 0 );
 	}
 
 	/**
@@ -72,19 +75,35 @@ export class Main extends App
 				{
 					url			: '/',
 					page		: 'HomePage',
-					importer 	: () => import('./pages/homePage/HomePage')
+
+					// Use require to load synchronously
+					importer 	: () => require('./pages/homePage/HomePage')
+
+					// Use import to load asynchronously
+					//importer 	: () => import('./pages/homePage/HomePage')
 				},
 
 				// -- Product pages
 				{
 					url			: '/products.html',
 					page		: 'ProductOverviewPage',
-					importer 	: () => import('./pages/productOverviewPage/ProductOverviewPage')
+
+					// Use require to load synchronously
+					importer 	: () => require('./pages/productOverviewPage/ProductOverviewPage')
+
+					// Use import to load asynchronously
+					//importer 	: () => import('./pages/homePage/HomePage')
 				},
 				{
+					// Prepend parameter with a # to force it as a numeric value
 					url			: '/product-{#id}-{slug}.html',
 					page		: 'ProductDetailPage',
-					importer 	: () => import('./pages/productDetailPage/ProductDetailPage')
+
+					// Use require to load synchronously
+					importer 	: () => require('./pages/productDetailPage/ProductDetailPage')
+
+					// Use import to load asynchronously
+					//importer 	: () => import('./pages/homePage/HomePage')
 				}
 			]
 		);
