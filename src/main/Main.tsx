@@ -89,10 +89,10 @@ export class Main extends App
 					page		: 'ProductOverviewPage',
 
 					// Use require to load synchronously
-					importer 	: () => require('./pages/productOverviewPage/ProductOverviewPage')
+					//importer 	: () => require('./pages/productOverviewPage/ProductOverviewPage')
 
 					// Use import to load asynchronously
-					//importer 	: () => import('./pages/homePage/HomePage')
+					importer 	: () => import('./pages/productOverviewPage/ProductOverviewPage')
 				},
 				{
 					// Prepend parameter with a # to force it as a numeric value
@@ -100,10 +100,10 @@ export class Main extends App
 					page		: 'ProductDetailPage',
 
 					// Use require to load synchronously
-					importer 	: () => require('./pages/productDetailPage/ProductDetailPage')
+					//importer 	: () => require('./pages/productDetailPage/ProductDetailPage')
 
 					// Use import to load asynchronously
-					//importer 	: () => import('./pages/homePage/HomePage')
+					importer 	: () => import('./pages/productDetailPage/ProductDetailPage')
 				}
 			]
 		);
