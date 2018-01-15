@@ -1,13 +1,8 @@
 import {SolidBundles} from "solidify-lib/helpers/SolidBundles";
 import {GlobalConfig} from "./data/GlobalConfig";
 
-// ----------------------------------------------------------------------------- BOOTSTRAP CSS
 
-// Load main Less file
-require('./Main.less');
-
-
-// ----------------------------------------------------------------------------- BUNDLE INFOS
+// ----------------------------------------------------------------------------- BUNDLE INFO
 
 // App bundle info for bundles loader.
 module.exports = {
@@ -19,10 +14,17 @@ module.exports = {
 };
 
 
-// ----------------------------------------------------------------------------- INCLUDED LIBRARIES
+// ----------------------------------------------------------------------------- BOOTSTRAP CSS
+
+// Load main Less file
+require('./Main.less');
+
+
+// ----------------------------------------------------------------------------- INIT COUNT AND HMR TRIGGERS
 
 // Register init of this app bundle and get init count to avoid HMR
 const initCount = SolidBundles.registerAppBundleInit( module.exports.name );
+
 
 // ----------------------------------------------------------------------------- INCLUDED LIBRARIES
 
@@ -85,3 +87,8 @@ if ( initCount == 0 )
 		version: process.env['VERSION']
 	});
 }
+
+// Inject atoms into config every time
+GlobalConfig.instance.inject({
+	atoms: require('./atoms/atoms.json')
+});

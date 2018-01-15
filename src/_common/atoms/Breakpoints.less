@@ -1,0 +1,50 @@
+
+// ----------------------------------------------------------------------------- BREAKPOINTS
+
+/**
+ * Breakpoints are pre-named like so.
+ * You can use them or comment them as you want, but you can't add a new breakpoint.
+ *
+ * Consider a breakpoint value as the minimum to trigger the breakpoint.
+ * For ex : tablet = 768px will consider tablets starting at 768px
+ *
+ * Those breakpoints are compiled to JSON file which is included inside Typescript app,
+ * so ResponsiveManager have access to those values.
+ * @important : Please use only max-width or min-width in your app.
+ *
+ * You can use either abstract or concrete naming paradigm.
+ * Here are some default values you can change :
+ */
+
+// Horizontal - abstract
+@breakpoint-horizontal-tiny					: 0px;
+//@breakpoint-horizontal-extraSmall		: 0px;
+//@breakpoint-horizontal-small				: 0px;
+//@breakpoint-horizontal-medium				: 0px;
+//@breakpoint-horizontal-large				: 0px;
+//@breakpoint-horizontal-extraLarge		: 0px;
+//@breakpoint-horizontal-gigantic			: 0px;
+
+// Horizontal - concrete
+@breakpoint-horizontal-mobile				: 320px;
+@breakpoint-horizontal-phablet			: 600px;
+@breakpoint-horizontal-tablet				: 768px;
+@breakpoint-horizontal-laptop				: 1366px;
+@breakpoint-horizontal-desktop			: 1680px;
+
+// Vertical - abstract
+@breakpoint-vertical-tiny					: 0px;
+@breakpoint-vertical-extraSmall		: 320px;
+//@breakpoint-vertical-small				: 400px;
+@breakpoint-vertical-medium				: 375px;
+@breakpoint-vertical-large				: 420px;
+@breakpoint-vertical-extraLarge		: 600px;
+//@breakpoint-vertical-gigantic			: 0px;
+
+// Vertical - concrete
+//@breakpoint-vertical-mobile				: 0px;
+//@breakpoint-vertical-phablet			: 0px;
+//@breakpoint-vertical-tablet				: 0px;
+//@breakpoint-vertical-laptop				: 0px;
+//@breakpoint-vertical-desktop			: 0px;
+

@@ -2,9 +2,23 @@
 // ----------------------------------------------------------------------------- TODO ZONE
 
 /**
- * TODO :
- * - Refacto du framework avec nouvelle API
- * - Deployer
+ * TODO Fuse :
+ * - IMPORTANT Patch double compile atoms.json !
+ * - IMPORTANT Tester toutes les possibilités de Base et couvrir tous les problèmes
+ * - Files to NPM
+ * - Fuse installer
+ * 		- package.json -> reset version + set name
+ *
+ * TODO Doc :
+ * - IMPORTANT bundles.ts
+ * - deployer
+ * - scaffold
+ * - dev / production
+ *
+ * TODO Refacto du framework avec nouvelle API :
+ * - MouseWheel FF
+ * - Scaffold AppView
+ * - new ScrollDispatcher implementation !
  *
  * A TESTER :
  * - IMG base 64 ?
@@ -28,7 +42,8 @@ const {
 	LESSPlugin,
 	PostCSSPlugin,
 	CSSPlugin,
-	CSSResourcePlugin
+	CSSResourcePlugin,
+	JSONPlugin
 } = require("fuse-box");
 const Sparky = require("fuse-box/sparky");
 
@@ -52,6 +67,9 @@ const { Files } = require("./helpers/files");
 
 // Get fuse switches
 const switches = require('./fuse-switches');
+
+// Less to JSON plugin
+const VariablesOutputLessPlugin = require('less-plugin-variables-output');
 
 
 // ----------------------------------------------------------------------------- FUSE BOX CONFIG
@@ -94,8 +112,10 @@ Sparky.task('config:fuse', () =>
 		// Output format, we support es5 if legacy mode is enabled
 		target: 'browser@' + (switches.legacySupport ? 'es5' : 'es6'),
 
-		// Use hashes and disable cache when building with Quantum
-		hash: options.uglify,
+		// Use hashes only when generating web index and with uglify
+		hash: ( switches.generateWebIndex && options.uglify ),
+
+		// Disable cache when building with Quantum
 		cache: !options.quantum,
 
 		// Enable sourcemaps if we don't uglify output
@@ -124,7 +144,18 @@ Sparky.task('config:fuse', () =>
 					sourceMap: false,
 
 					// Disable IE-compat so data-uri can be huge
-					ieCompat: false
+					ieCompat: false,
+
+					// Use relative URLs so url path don't get lost
+					relativeUrls: true,
+
+					// Less plugins
+					plugins: [
+						// Convert top level variables to json file
+						new VariablesOutputLessPlugin({
+							filename: `${ switches.srcPath }${ switches.commonBundleName }/${ switches.atomsPath }atoms.json`
+						})
+					]
 				}),
 
 				// @see : http://fuse-box.org/plugins/post-css-plugin
@@ -196,6 +227,9 @@ Sparky.task('config:fuse', () =>
 				BUNDLE_PATH : switches.bundlesPath
 			}),
 
+			// JSON Plugin for atoms
+			JSONPlugin(),
+
 			// Generate index.html from template
 			switches.generateWebIndex
 			&&
@@ -220,19 +254,8 @@ Sparky.task('config:fuse', () =>
 				// Inject Quantum API into vendors bundle
 				bakeApiIntoBundle: switches.vendorsBundleName,
 
-				// Tree-shaking capability
+				// Enable tree-shaking capability
 				treeshake: true,
-				/*{
-					// Prevent file to be removed
-					shouldRemove: (file) =>
-					{
-						// Never remove an entry point
-						if ( path.basename(file.fuseBoxPath) === switches.entryPoint )
-						{
-							return false
-						}
-					}
-				};*/
 
 				// Uglify output on production
 				// Will use uglify-es on non legacy mode
@@ -243,7 +266,7 @@ Sparky.task('config:fuse', () =>
 				),
 
 				// Generate a manifest.json file containing bundles list if no index.html is built
-				manifest: (switches.generateWebIndex ? false : 'quantum.json'),
+				//manifest: ( switches.generateWebIndex ? 'quantum.json' : false ),
 
 				// Promise API support for legacy browsers
 				polyfills: switches.legacySupport ? ['Promise'] : [],
@@ -454,11 +477,12 @@ Sparky.task('config:bundles', () =>
 		// Enable watch / HMR on bundles
 		allBundles.map( (app) =>
 		{
+			// FIXME : atoms.json force dev to build twice
 			// Watch all bundles
+			//app.watch(`!atoms.json`);
 			app.watch();
 
-			// Do not HMR vendor bundle
-			// FIXME ? Otherwise TypeChecking will dispatch 2 page reload
+			// Do not HMR vendor bundle otherwise TypeChecking will dispatch 2 page reload
 			if ( app.name === switches.vendorsBundleName ) return;
 
 			// Launch HMR and watch
@@ -479,8 +503,8 @@ Sparky.task('config:bundles', () =>
 		QuickTemplate(
 			Files.getFiles('skeletons/scaffold/entryPointBundleRequire').read(),
 			{
-				appsPaths: appBundlesNames.map( bundleNameToRequire => `		'default/${ bundleNameToRequire }/index'` ).join(",\n"),
-				appsToRequire: appBundlesNames.map( bundleNameToRequire => `		require('./${ bundleNameToRequire }/index')` ).join(",\n")
+				appsPaths		: appBundlesNames.map( bundleNameToRequire => `		'default/${ bundleNameToRequire }/index'` ).join(",\n"),
+				appsToRequire	: appBundlesNames.map( bundleNameToRequire => `		require('./${ bundleNameToRequire }/index')` ).join(",\n")
 			}
 		)
 	)
@@ -612,11 +636,10 @@ const cli = CLI({
 			default: false
 		},
 	},
-
-	// TODO : DOES NOT WORK ANYMORE ?
-
 	taskDescriptions: {
-		'default' : 'Show this message',
+		'default' : `
+			Show this message
+		`,
 		'dev' : `
 			Run fuse, compile all bundles and watch.
 
@@ -667,6 +690,9 @@ const cli = CLI({
 		`,
 		'selectEnv' : `
 			Select env for deployer. 
+
+			${'@param %envName%'.bold}
+				- Deploy env without showing env list through CLI.
 		`
 	}
 });
@@ -676,6 +702,18 @@ const cli = CLI({
  */
 Sparky.task('default', () =>
 {
+	// Browse tasks
+	Object.keys(cli.tasks).map( taskName =>
+	{
+		// Show task name
+		console.log(`node fuse ${taskName}`.yellow.bold);
+
+		// Show description
+		console.log(
+			cli.tasks[ taskName ].desc.split("\n\t\t").join("\n")
+		);
+	});
+
 	cli.showHelp( true );
 });
 
@@ -806,20 +844,3 @@ Sparky.task('selectEnv', async () =>
 {
 	return require('./fuse-deploy').selectEnv();
 });
-
-
-// ----------------------------------------------------------------------------- /!\ TESTING ZONE /!\
-
-/*
-Sparky.task('testSparky', () =>
-{
-	console.log('TEST SPARKY');
-
-	Sparky.src("testfile.json").file("*", file =>
-	{
-		console.log( file );
-	}).exec();
-
-	console.log('after');
-});
-*/

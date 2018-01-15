@@ -2,8 +2,19 @@
 FuseBox pre-configured project with Typescript / Less and Solidify-lib
 
 
+# Install a new project
 
-#### Install errors
+##### MacOS or Linux :
+- `curl http://zouloux.cher-ami.tv/_frameworks/solid-js/fuse-base/install.sh | sh`
+
+##### Windows :
+- [Download](https://github.com/solid-js/fuse-base/archive/master.zip) and unzip this repository.
+- `npm i`
+- `node setup`
+- Then delete setup.js 
+
+
+### Install errors
 
 
 ##### Remove node_modules and force reinstall 

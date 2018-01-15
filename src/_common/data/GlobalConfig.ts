@@ -17,6 +17,9 @@ export class GlobalConfigProperties
 	// Locale translation code
 	locale		:string;
 
+	// Compiled atoms from LESS
+	atoms		:{[index:string] : string};
+
 	/**
 	 * YOUR PROPERTIES HERE
 	 */

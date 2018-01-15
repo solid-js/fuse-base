@@ -3,6 +3,8 @@ import {Router} from "solidify-lib/navigation/Router";
 import {GlobalConfig} from "../_common/data/GlobalConfig";
 import {AppView} from "./components/appView/AppView";
 import {SolidBundles} from "solidify-lib/helpers/SolidBundles";
+import {EnvUtils} from "solidify-lib/utils/EnvUtils";
+import {ResponsiveManager} from "solidify-lib/helpers/ResponsiveManager";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
@@ -47,6 +49,11 @@ export class Main extends App
 	{
 		// Register app instance as singleton
 		Main.__instance = this;
+
+		// Inject atoms into ResponsiveManager
+		ResponsiveManager.instance.autoSetBreakpointsFromLess(
+			GlobalConfig.instance.atoms
+		);
 	}
 
 	/**
@@ -56,6 +63,15 @@ export class Main extends App
 	{
 		// Init specific GlobalConfig here
 		//GlobalConfig.instance.inject( ... );
+	}
+
+	/**
+	 * Init env dependent stuff.
+	 */
+	protected initEnv ():void
+	{
+		// Will add env detection classes helpers to the body.
+		EnvUtils.addClasses();
 	}
 
 
