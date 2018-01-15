@@ -44,6 +44,9 @@ exports.deployedConfigPath = 'data/config.ts';
 // Atoms folder path into common bundle
 exports.atomsPath = 'atoms/';
 
+// Atoms typescript file path inside common bundle
+exports.atomsTypescriptFile = 'atoms.ts';
+
 
 // ----------------------------------------------------------------------------- CONFIG
 

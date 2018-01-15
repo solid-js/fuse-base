@@ -1,6 +1,6 @@
 {
   "name": "solid-fuse-base",
-  "version": "1.0.22",
+  "version": "1.0.23",
   "description": "",
   "main": "fuse.js",
   "dependencies": {
@@ -23,7 +23,6 @@
     "handlebars": "^4.0.11",
     "inquirer": "^5.0.0",
     "less": "^2.7.3",
-    "less-plugin-variables-output": "^1.2.0",
     "node-sprite-generator": "^0.10.2",
     "postcss-clean": "^1.1.0",
     "tslib": "^1.8.1",

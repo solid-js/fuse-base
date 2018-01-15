@@ -1,0 +1,10 @@
+
+/**
+ * This is a generated file. Do not edit.
+ * Only updated when node fuse is launched.
+ * Data are extracted from less files inside atoms/ directory.
+ */
+export const Atoms =
+{
+%%atoms%%
+};
