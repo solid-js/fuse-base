@@ -168,6 +168,7 @@ Sparky.task('config:fuse', () =>
 					dist: `${switches.distPath}${switches.resourcesPath}`,
 
 					// Rewriting resources paths
+					// TODO : ADD BASE ?
 					resolve: (f) => `${switches.resourcesPath}${f}`,
 
 					// Include images as Base64 into bundle
@@ -203,6 +204,7 @@ Sparky.task('config:fuse', () =>
 				template: `${switches.srcPath}index.html`,
 
 				// Relative path to bundles
+				// TODO : ADD BASE ?
 				path: switches.bundlesPath,
 				//resolve : output => 'assets/'+output.lastPrimaryOutput.filename
 
@@ -394,6 +396,9 @@ Sparky.task('config:bundles', () =>
 				// Where to put async bundles. Default is same directory than regular bundles.
 				//dest: switches.bundlesPath
 			});
+
+			// TODO : REMOVE ASYNC BUNDLES ?
+			// TODO : FuseBox seems to auto-split when using async imports !
 
 			// We use this helper to get async modules list from file system using this glob
 			getAsyncBundlesFromGlob( `${ switches.srcPath }${ appBundleName }/${ switches.asyncPath }*/*.+(ts|tsx)` ).map( asyncEntry =>
@@ -659,6 +664,9 @@ const cli = CLI({
 		`,
 		'sprites' : `
 			Process and compile sprites. 
+		`,
+		'selectEnv' : `
+			Select env for deployer. 
 		`
 	}
 });
@@ -744,6 +752,14 @@ Sparky.task('lessCheck', () =>
 });
 
 /**
+ * Deploy before compiling
+ */
+Sparky.task('deploy', async () =>
+{
+	return require('./fuse-deploy').deploy();
+});
+
+/**
  * Config tasks to be able to build.
  * Needs options before.
  */
@@ -753,7 +769,7 @@ let configTasks = ['config:fuse', 'config:bundles', 'config:typeChecking'];
  * Load configs and run fuse !
  * Will read options from CLI.
  */
-Sparky.task('dev', ['clean', 'config:options'].concat( configTasks ), () =>
+Sparky.task('dev', ['clean', 'deploy', 'config:options'].concat( configTasks ), () =>
 {
 	fuse.run();
 });
@@ -762,7 +778,7 @@ Sparky.task('dev', ['clean', 'config:options'].concat( configTasks ), () =>
  * Load configs and run fuse !
  * Will force options for production.
  */
-Sparky.task('production', ['clean', 'config:options', 'config:production', 'lessCheck'].concat( configTasks ), () =>
+Sparky.task('production', ['clean', 'deploy', 'config:options', 'config:production', 'lessCheck'].concat( configTasks ), () =>
 {
 	fuse.run();
 });
@@ -772,7 +788,7 @@ Sparky.task('production', ['clean', 'config:options', 'config:production', 'less
  */
 Sparky.task('scaffold', async () =>
 {
-	return require('./fuse-scaffold');
+	return require('./fuse-scaffold').startScaffolder();
 });
 
 /**
@@ -780,7 +796,15 @@ Sparky.task('scaffold', async () =>
  */
 Sparky.task('sprites', async () =>
 {
-	return require('./fuse-sprites');
+	return require('./fuse-sprites').generateSprites();
+});
+
+/**
+ * Select env.
+ */
+Sparky.task('selectEnv', async () =>
+{
+	return require('./fuse-deploy').selectEnv();
 });
 
 

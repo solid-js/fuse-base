@@ -355,37 +355,41 @@ const scaffolders = [
 	// Separator
 	{ name: new Inquirer.Separator() },
 
-]
+];
 
 // ----------------------------------------------------------------------------- PUBLIC API
 
-/**
- * Only export scaffolder promise
- */
-module.exports = new Promise(
+module.exports = {
 
-	( resolve ) =>
-	{
-		// Get scaffolder to present listing to user
-		let scaffolderTypes = scaffolders.map( scaffolder => scaffolder.name );
+	/**
+	 * Start scaffolder
+	 */
+	startScaffolder: () => new Promise(
 
-		// List available scaffolders to user
-		Inquirer.prompt({
-			type: 'list',
-			name: 'type',
-			message: 'What kind of component to create ?',
-			choices: scaffolderTypes,
-			pageSize: 10
-		}).then( answer =>
+		( resolve ) =>
 		{
-			// Get scaffolder index
-			const scaffolderIndex = scaffolderTypes.indexOf( answer.type );
+			// Get scaffolder to present listing to user
+			let scaffolderTypes = scaffolders.map( scaffolder => scaffolder.name );
 
-			// Start this scaffolder
-			scaffolders[ scaffolderIndex ].exec();
-		});
-	}
-);
+			// List available scaffolders to user
+			Inquirer.prompt({
+				type: 'list',
+				name: 'type',
+				message: 'What kind of component to create ?',
+				choices: scaffolderTypes,
+				pageSize: 10
+			}).then( answer =>
+			{
+				// Get scaffolder index
+				const scaffolderIndex = scaffolderTypes.indexOf( answer.type );
+
+				// Start this scaffolder
+				scaffolders[ scaffolderIndex ].exec();
+			});
+		}
+	)
+
+}
 
 
 

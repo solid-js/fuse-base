@@ -7,6 +7,12 @@ dist/assets/bundles/*
 dist/assets/sprites/*
 dist/assets/resources/*
 
+# Deployer env
+deployer/env
+
+# Deployed config
+src/_common/data/config.ts
+
 
 # ------------------------------------------------------------------------------ LOGS FILES
 

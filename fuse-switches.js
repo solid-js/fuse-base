@@ -38,6 +38,9 @@ exports.commonBundleName = '_common';
 // Common js bundle file name
 exports.commonFileName = 'common';
 
+// Deployed config path inside common bundle
+exports.deployedConfigPath = 'data/config.ts';
+
 
 // ----------------------------------------------------------------------------- CONFIG
 
