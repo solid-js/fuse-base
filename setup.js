@@ -8,7 +8,7 @@ const setup = async () =>
 	let projectName = '';
 	await Inquirer.prompt({
 		type: 'input',
-		message: 'Project name ? (no spaces)',
+		message: 'Project name for package.json ? (snake-case)',
 		name: 'projectName'
 	}).then( answer =>
 	{
@@ -16,14 +16,11 @@ const setup = async () =>
 	});
 
 	// Set name and version into package.json
-	Files.getFiles('package.json').alter( content =>
+	Files.getFiles('package.json').alterJSON( packageObject =>
 	{
-		let packageObject = JSON.parse(content);
-
 		packageObject.version = '0.1.0';
 		packageObject.name = projectName;
-
-		return JSON.stringify(packageObject, null, 2);
+		return packageObject
 	});
 
 	// Setup default env

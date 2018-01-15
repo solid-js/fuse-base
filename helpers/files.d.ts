@@ -104,4 +104,11 @@ declare export class Files
 	 * @param pHandler Will have file content as first argument. Return new file content to be written.
 	 */
 	alter ( pHandler );
+
+	/**
+	 * Update a JSON file with an handler.
+	 * @param pHandler Will have JSON content as first argument. Return new JSON content to be written.
+	 * @param pSpaces Spaces size. Null to uglify.
+	 */
+	alterJSON ( pHandler, pSpaces = 2 );
 }

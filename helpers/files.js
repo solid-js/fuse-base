@@ -222,6 +222,26 @@ class Files
 			)
 		);
 	}
+
+	/**
+	 * Update a JSON file with an handler.
+	 * @param pHandler Will have JSON content as first argument. Return new JSON content to be written.
+	 * @param pSpaces Spaces size. Null to uglify.
+	 */
+	alterJSON ( pHandler, pSpaces = 2 )
+	{
+		this.write(
+			JSON.stringify(
+				pHandler(
+					JSON.parse(
+						this.read().toString()
+					)
+				),
+				null,
+				pSpaces
+			)
+		);
+	}
 }
 
 /**
