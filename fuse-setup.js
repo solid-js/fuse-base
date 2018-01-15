@@ -35,7 +35,7 @@ const setup = async () =>
 	console.log('');
 
 	// Delete this very file
-	Files.getFiles('setup.js').delete();
+	Files.getFiles('fuse-setup.js').delete();
 }
 
 // Launch setup
