@@ -5,7 +5,7 @@ FuseBox pre-configured project with Typescript / Less and Solidify-lib
 # Install a new project
 
 ##### MacOS or Linux :
-- `curl http://zouloux.cher-ami.tv/_frameworks/solid-js/fuse-base/install.sh | sh`
+- `curl https://raw.githubusercontent.com/solid-js/fuse-base/master/install.sh | sh`
 
 ##### Windows :
 - [Download](https://github.com/solid-js/fuse-base/archive/master.zip) and unzip this repository.
