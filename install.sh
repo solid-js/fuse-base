@@ -20,4 +20,4 @@ echo "Done !"
 echo ""
 
 echo "Project installed"
-echo -e "\033[Run 'node setup' to continue setup."
+echo "Run 'node setup' to continue setup."
