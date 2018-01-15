@@ -15,9 +15,9 @@ echo "Done !"
 echo ""
 
 echo "Installing node dependencies..."
-npm install > npm-install.log
+npm install >> install.log 2>&1
 echo "Done !"
 echo ""
 
 echo "Project installed"
-echo "Run 'node setup' to continue setup."
+echo -e "\033[Run 'node setup' to continue setup."
