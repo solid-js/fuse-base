@@ -132,6 +132,9 @@ module.exports = {
 			// Selected config from env
 			const currentEnvProperties = filteredConfigs[0].read();
 
+			// Get version from package.json
+			currentEnvProperties.version = require('./package').version;
+
 			// Load deployer config and browse files
 			require('./deployer/deployer.config').map( fileConfig =>
 			{

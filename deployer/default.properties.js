@@ -1,4 +1,6 @@
-
+/**
+ * Note : property "version" is injected from package.json
+ */
 
 module.exports = {
 
