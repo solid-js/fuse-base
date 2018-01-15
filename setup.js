@@ -20,7 +20,7 @@ const setup = async () =>
 	{
 		let packageObject = JSON.parse(content);
 
-		packageObject.version = '1.0.0';
+		packageObject.version = '0.1.0';
 		packageObject.name = projectName;
 
 		return JSON.stringify(packageObject, null, 2);
@@ -33,8 +33,10 @@ const setup = async () =>
 	console.log('');
 	console.log(`Project ${projectName} created ! Type ${'node fuse'.bold} for more to start.`.green);
 	console.log('');
+
+	// Delete this very file
+	Files.getFiles('setup.js').delete();
 }
 
 // Launch setup
 setup();
-

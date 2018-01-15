@@ -1,6 +1,6 @@
 {
   "name": "solid-fuse-base",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "description": "",
   "main": "fuse.js",
   "dependencies": {

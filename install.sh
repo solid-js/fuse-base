@@ -10,6 +10,5 @@ rm -r fuse-base-master/
 
 npm install
 
-node setup
-
-rm setup.js
+echo "Project installed !"
+echo "Run 'node setup' to continue setup."
