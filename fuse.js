@@ -8,6 +8,7 @@
  * - Files to NPM
  * - Fuse installer
  * 		- package.json -> reset version + set name
+ * - Fonts scaffolder !
  *
  * TODO Doc :
  * - IMPORTANT bundles.ts
