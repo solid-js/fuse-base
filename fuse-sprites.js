@@ -49,9 +49,9 @@ module.exports = {
 
 			// JSON Template
 			{
-				extension: 'json',
+				extension: 'ts',
 				template: Handlebars.compile(
-					Files.getFiles(`skeletons/sprites/spriteTemplateJson`).read()
+					Files.getFiles(`skeletons/sprites/spriteTemplateTypescript`).read()
 				)
 			},
 		];
@@ -119,9 +119,9 @@ module.exports = {
 		let totalSprites = 0;
 
 		// Browser sprites folders
-		Files.getFolders(`${ switches.srcPath }${ switches.commonBundleName }/${ switches.spritesFolder }*/`).all( folder =>
+		Files.getFolders(`${ switches.srcPath }${ switches.commonBundleName }/${ switches.spritesPath }*/`).all(folder =>
 		{
-			console.log(`Generating sprite ${folder} ...`.grey);
+			console.log(`Generating sprite ${folder} ...`.yellow);
 
 			++totalSprites;
 
@@ -129,12 +129,13 @@ module.exports = {
 			let spriteConfig;
 			try
 			{
-				spriteConfig = require(`./${ path.join(folder, '_sprite-config2.js') }`);
+				spriteConfig = require(`./${ path.join(folder, 'sprite-config.js') }`);
 			}
 
 			// Default sprite config
 			catch (error)
 			{
+				console.log('Config file not found. Using default config'.yellow);
 				spriteConfig = defaultSpriteConfig;
 			}
 
@@ -144,6 +145,9 @@ module.exports = {
 			// Get sprite name from folder name
 			const spriteName = path.basename( folder );
 
+			// Output path for styles / typescript and PNG file
+			const outputPath = `${switches.srcPath}${switches.commonBundleName}/${switches.spritesPath}${spritePrefix}${separator}${spriteName}`;
+
 			// Compute nsg options
 			const nsgOptions = {
 
@@ -151,10 +155,10 @@ module.exports = {
 				src: images,
 
 				// Compiled PNG sprite file path
-				spritePath: `${switches.distPath}${switches.spritesPath}${spriteName}.png`,
+				spritePath: `${outputPath}.png`,
 
 				// Compiled stylesheet path, without extension
-				stylesheetPath: `${switches.srcPath}${switches.spritesFolder}${spritePrefix}${separator}${spriteName}`,
+				stylesheetPath: outputPath,
 
 				// Stylesheet options
 				stylesheetOptions: {
@@ -162,7 +166,7 @@ module.exports = {
 					prefix		: `${spritePrefix}${separator}${spriteName}`,
 
 					// Relative path from web page to get PNG file
-					spritePath  : `${switches.relativeSpritePath}${spriteName}${outputSpriteExtension}`,
+					spritePath  : `./${spritePrefix}${separator}${spriteName}.png`,
 
 					// Pixel ratio from sprite config
 					pixelRatio  : spriteConfig.pixelRatio

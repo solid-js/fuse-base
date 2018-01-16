@@ -2,7 +2,6 @@
  * Sprite name : {{spriteName}}
  * Sprite prefix : {{spritePrefix}}
  * Sprite seed : {{spriteSeed}}
- * File created with Solid LESS mixins exporter
  */
 
 // ----------------------------------------------------------------------------- SPRITE
@@ -23,20 +22,10 @@
 	@spriteSeed: '{{spriteSeed}}';
 }
 
-// Target the sprite as background with build seed
-.{{spritePrefix}}-seed
+// Target the sprite as background
+.{{spritePrefix}}
 {
-	.{{spritePrefix}}-vars();
-	background-repeat: no-repeat;
-	background-image: url(~'@{spritePath}?@{spriteSeed}');
-}
-
-// Target the sprite as background without the build seed
-.{{spritePrefix}}-noSeed
-{
-	.{{spritePrefix}}-vars();
-	background-repeat: no-repeat;
-	background-image: url(~'@{spritePath}');
+	background: no-repeat url('{{spritePath}}');
 }
 
 

@@ -14,9 +14,6 @@ exports.bundlesPath = 'assets/bundles/';
 // Compiled resources folder (inside dist)
 exports.resourcesPath = 'assets/resources/';
 
-// Compiler sprites
-exports.spritesPath = 'assets/sprites/';
-
 // Default apps entry point
 exports.entryPoint = 'index.ts';
 
@@ -24,10 +21,7 @@ exports.entryPoint = 'index.ts';
 exports.asyncPath = 'async/';
 
 // Path to sprites folder from src
-exports.spritesFolder = 'sprites/';
-
-// Relative path from web-page to png sprite
-exports.relativeSpritePath = 'assets/sprites/';
+exports.spritesPath = 'sprites/';
 
 // Vendors bundle name
 exports.vendorsBundleName = 'vendors';
@@ -79,7 +73,7 @@ exports.legacySupport = true;
  * Folders to include in every bundles, even if they are not implicitly imported.
  * Useful for async import.
  */
-exports.includedFoldersWithoutImports = ['elements', 'components', 'pages'];
+exports.includedFoldersWithoutImports = ['molecules', 'components', 'pages'];
 
 /**
  * Default included extensions for not implicit imports.

@@ -68,7 +68,7 @@ const askComponentName = () =>
 {
 	return Inquirer.prompt({
 		type: 'input',
-		message: 'Component name ? (camel case)',
+		message: 'Component name ? (camelCase)',
 		name: 'componentName'
 	});
 }
@@ -163,10 +163,7 @@ const scaffolders = [
 				message: 'Which component system ?',
 				name: 'componentSystem',
 				choices : ['React', 'Zepto']
-			}).then( anwser =>
-			{
-				componentSystem = anwser.componentSystem;
-			});
+			}).then( anwser => componentSystem = anwser.componentSystem );
 
 			// Ask for bundle name
 			Inquirer.prompt({
@@ -331,13 +328,13 @@ const scaffolders = [
 			}).then( answer =>
 			{
 				// Destination sprite config file name
-				const destinationSpriteConfigFileName = '_sprite-config.js';
+				const destinationSpriteConfigFileName = 'sprite-config.js';
 
 				// Get sprite name from answer
 				const spriteName = answer.spriteName;
 
 				// Compute folder path with trailing slash
-				const folderPath = `${ switches.srcPath }${ switches.commonBundleName }/${ switches.spritesFolder }${ spriteName }/`;
+				const folderPath = `${ switches.srcPath }${ switches.commonBundleName }/${ switches.spritesPath }${ spriteName }/`;
 
 				// Create sprite config and folder
 				Files.new(`${folderPath}${destinationSpriteConfigFileName}`).write(
@@ -346,8 +343,11 @@ const scaffolders = [
 
 				// Log instructions
 				console.log('');
-				console.log(`Sprite created. Add images into ${folderPath} folder, named with snake-case convention.`);
-				console.log(`Sprite can be configured by editing ${destinationSpriteConfigFileName} file.`);
+				console.log('Sprite created.'.green);
+				console.log(`Add images into ${ folderPath.bold } folder, named with snake-case convention.`.yellow);
+				console.log(`Sprite can be configured by editing ${ destinationSpriteConfigFileName.bold } file.`.yellow);
+				console.log(`Import your sprite in ${ `${switches.srcPath}${switches.commonBundleName}/Main.less`.bold } after a first ${ `node fuse sprites`.bold }. `.yellow);
+				console.log('');
 			});
 		}
 	},
@@ -366,12 +366,12 @@ const scaffolders = [
 			console.log('');
 			console.log('--- CONVERT YOUR FONT ---'.yellow.bold);
 			console.log('1. Go to http://www.font2web.com/ and convert your font.'.yellow);
-			console.log('2. Only keep .eot .ttf .woff files'.yellow);
-			console.log('3. Rename them with the same filename, as snake-case'.yellow);
-			console.log('4. Put then into a folder named with the same name'.yellow);
-			console.log(`5. Put this folder into ${ fontsFolder.bold } directory.`.yellow);
+			console.log('2. Only keep .eot .ttf .woff files.'.yellow);
+			console.log('3. Rename them with the same filename, as snake-case.'.yellow);
+			console.log('4. Put them into a folder named with the same name.'.yellow);
+			console.log(`5. Move this folder into ${ fontsFolder.bold } directory.`.yellow);
 			console.log('');
-			console.log(`Ex : ${ fontsFolder }helvetica-neue-bold/helvetica-neue-bold.eot,.ttf,.woff`);
+			console.log(`Ex : ${ fontsFolder }helvetica-neue-bold/helvetica-neue-bold.{eot,ttf,woff}`);
 			console.log('');
 
 			// Get file name
@@ -386,9 +386,9 @@ const scaffolders = [
 			let mixinName = '';
 			await Inquirer.prompt({
 				type: 'input',
-				message: 'What camelCase mixin name do you want, without font variant ? (ex : HelveticaNeue)',
+				message: 'What CamelCase mixin name do you want, without font variant ? (ex : HelveticaNeue)',
 				name: 'mixinName'
-			}).then( answer => mixinName = answer.mixinName );
+			}).then( answer => mixinName = CapitalizeFirst(answer.mixinName, true) );
 
 			// Get font variant
 			let fontVariant = '';
@@ -396,7 +396,7 @@ const scaffolders = [
 				type: 'input',
 				message: 'What is the camelCase font variant ? (ex : bold or regular)',
 				name: 'fontVariant'
-			}).then( answer => fontVariant = answer.fontVariant );
+			}).then( answer => fontVariant = CapitalizeFirst(answer.fontVariant, false) );
 
 			// Scaffold file
 			Files.new(`${fontsFolder}${mixinName}-${fontVariant}.less`).write(
@@ -412,8 +412,8 @@ const scaffolders = [
 
 			// Show import instructions
 			console.log('');
-			const mainPath = `${switches.srcPath}${switches.commonBundleName}/Main.less`;
-			console.log(`Import your font in ${ mainPath.bold }`.yellow);
+			console.log('Font face created.'.green);
+			console.log(`Import your font as (reference) in ${ `${switches.srcPath}${switches.commonBundleName}/Main.less`.bold }`.yellow);
 			console.log('');
 		}
 	},

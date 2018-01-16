@@ -4,10 +4,7 @@
 /**
  * TODO Fuse :
  * - IMPORTANT Tester toutes les possibilités de Base et couvrir tous les problèmes
- * - Files to NPM
- * - Fuse installer
- * 		- package.json -> reset version + set name
- * - Fonts scaffolder !
+ * - Files.js + .d.ts to NPM
  *
  * TODO Doc :
  * - IMPORTANT bundles.ts
@@ -663,14 +660,14 @@ const cli = CLI({
 		'clean' : `
 			Clean fuse cache. Automatically done before dev and production tasks. 
 		`,
-		'cleanSprites' : `
-			Clean generated sprites.
-		`,
 		'scaffold' : `
 			Create a new component interactively. 
 		`,
+		'cleanSprites' : `
+			Clean generated sprites.
+		`,
 		'sprites' : `
-			Process and compile sprites. 
+			Clean and compile sprites. 
 		`,
 		'selectEnv' : `
 			Select env for deployer. 
@@ -698,6 +695,7 @@ Sparky.task('default', () =>
 		);
 	});
 
+	// Show help
 	cli.showHelp( true );
 });
 
@@ -729,11 +727,8 @@ Sparky.task('clean', () =>
  */
 Sparky.task('cleanSprites', () =>
 {
-	// Remove generated PNG sprites
-	Files.getFolders(`${switches.distPath}${switches.spritesPath}`).delete();
-
-	// Remove generated JSON and LESS files ?
-	//Files.getFiles()
+	// Remove generated LESS / Typescript and PNG
+	Files.getFiles(`${ switches.srcPath }${ switches.commonBundleName }/${ switches.spritesPath }*.+(less|ts|png)`).delete();
 });
 
 /**
@@ -824,7 +819,7 @@ Sparky.task('scaffold', async () =>
 /**
  * Process and compile sprites.
  */
-Sparky.task('sprites', async () =>
+Sparky.task('sprites', ['cleanSprites'], async () =>
 {
 	return require('./fuse-sprites').generateSprites();
 });
