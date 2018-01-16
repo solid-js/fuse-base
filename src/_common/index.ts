@@ -31,6 +31,10 @@ const initCount = SolidBundles.registerAppBundleInit( module.exports.name );
 // Do not require libraries if this is an HMR trigger
 if ( initCount == 0 )
 {
+	/**
+	 * GSAP
+	 */
+
 	// GSAP core
 	require('gsap/TweenLite');
 	require('gsap/TimelineLite.js');
@@ -56,8 +60,16 @@ if ( initCount == 0 )
 	require('gsap/ScrollToPlugin.js');
 	//require('gsap/TextPlugin.js');
 
-	// Load zepto in quantum mode, zepto shimming is incompatible with quantum
-	if (!('Zepto' in window)) require('zepto/dist/zepto.min.js');
+	/**
+	 * ZEPTO
+	 */
+
+	require('zepto/src/zepto.js');
+	require('zepto/src/event.js');
+	require('zepto/src/form.js');
+	require('zepto/src/ie.js');
+	require('zepto/src/selector.js');
+	require('zepto/src/ajax.js');
 }
 
 

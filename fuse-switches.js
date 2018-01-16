@@ -93,6 +93,7 @@ exports.cssBundleFile = false; // `${bundlesPath}styles.css`;
  * @see : http://fuse-box.org/page/configuration#shimming
  */
 exports.vendorShims = {
+	/*
 	zepto: {
 		source: "node_modules/zepto/dist/zepto.js",
 		exports: "$",
@@ -100,4 +101,5 @@ exports.vendorShims = {
 		// Special case : Zepto and jQuery does not work with quantum and shimming
 		removeForQuantum: true
 	}
+	*/
 };
