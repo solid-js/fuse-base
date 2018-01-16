@@ -50,8 +50,6 @@ export class Main extends App
 		// Register app instance as singleton
 		Main.__instance = this;
 
-		console.log(GlobalConfig.instance.atoms);
-
 		// Inject atoms into ResponsiveManager
 		ResponsiveManager.instance.autoSetBreakpointsFromLess(
 			GlobalConfig.instance.atoms

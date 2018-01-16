@@ -352,6 +352,72 @@ const scaffolders = [
 		}
 	},
 
+	/**
+	 * Scaffold a new font face
+	 */
+	{
+		name: 'Font face',
+		exec: async () =>
+		{
+			// Where fonts are stored
+			const fontsFolder = `${switches.srcPath}${switches.commonBundleName}/fonts/`;
+
+			// Convertion instructions
+			console.log('');
+			console.log('--- CONVERT YOUR FONT ---'.yellow.bold);
+			console.log('1. Go to http://www.font2web.com/ and convert your font.'.yellow);
+			console.log('2. Only keep .eot .ttf .woff files'.yellow);
+			console.log('3. Rename them with the same filename, as snake-case'.yellow);
+			console.log('4. Put then into a folder named with the same name'.yellow);
+			console.log(`5. Put this folder into ${ fontsFolder.bold } directory.`.yellow);
+			console.log('');
+			console.log(`Ex : ${ fontsFolder }helvetica-neue-bold/helvetica-neue-bold.eot,.ttf,.woff`);
+			console.log('');
+
+			// Get file name
+			let filename = '';
+			await Inquirer.prompt({
+				type: 'input',
+				message: 'What is the snake-case filename of the font, with font variant ? (ex : helvetica-neue-bold)',
+				name: 'filename'
+			}).then( answer => filename = answer.filename );
+
+			// Get mixin name
+			let mixinName = '';
+			await Inquirer.prompt({
+				type: 'input',
+				message: 'What camelCase mixin name do you want, without font variant ? (ex : HelveticaNeue)',
+				name: 'mixinName'
+			}).then( answer => mixinName = answer.mixinName );
+
+			// Get font variant
+			let fontVariant = '';
+			await Inquirer.prompt({
+				type: 'input',
+				message: 'What is the camelCase font variant ? (ex : bold or regular)',
+				name: 'fontVariant'
+			}).then( answer => fontVariant = answer.fontVariant );
+
+			// Scaffold file
+			Files.new(`${fontsFolder}${mixinName}-${fontVariant}.less`).write(
+				QuickTemplate(
+					Files.getFiles('skeletons/scaffold/fontStyle').read(),
+					{
+						fontFamilyName: filename,
+						fontClassName: mixinName,
+						fontVariant: fontVariant
+					}
+				)
+			);
+
+			// Show import instructions
+			console.log('');
+			const mainPath = `${switches.srcPath}${switches.commonBundleName}/Main.less`;
+			console.log(`Import your font in ${ mainPath.bold }`.yellow);
+			console.log('');
+		}
+	},
+
 	// Separator
 	{ name: new Inquirer.Separator() },
 
@@ -377,7 +443,7 @@ module.exports = {
 				name: 'type',
 				message: 'What kind of component to create ?',
 				choices: scaffolderTypes,
-				pageSize: 10
+				pageSize: 20
 			}).then( answer =>
 			{
 				// Get scaffolder index

@@ -721,7 +721,7 @@ Sparky.task('clean', () =>
 	Files.getFiles(`${switches.distPath}index.html`).delete();
 
 	// Remove resources
-	Files.getFolders( switches.resourcesPath ).delete();
+	Files.getFolders(`${switches.distPath}${switches.resourcesPath}`).delete();
 });
 
 /**

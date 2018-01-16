@@ -28,7 +28,7 @@ const setup = async () =>
 
 	// Show success
 	console.log('');
-	console.log(`Project ${projectName} created ! Type ${'node fuse'.bold} for more to start.`.green);
+	console.log(`Project ${projectName} created ! Type ${'node fuse'.bold} to start.`.green);
 	console.log('');
 
 	// Delete this very file
