@@ -4,7 +4,6 @@
 # Compiled bundles and resources
 dist/index.html
 dist/assets/bundles/*
-dist/assets/sprites/*
 dist/assets/resources/*
 
 # Deployer env
