@@ -90,5 +90,5 @@ if ( initCount == 0 )
 
 // Inject atoms into config every time
 GlobalConfig.instance.inject({
-	atoms: require('./atoms/atoms.json')
+	atoms: require('./atoms').Atoms
 });

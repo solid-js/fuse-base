@@ -3,7 +3,6 @@
 
 /**
  * TODO Fuse :
- * - IMPORTANT Patch double compile atoms.json !
  * - IMPORTANT Tester toutes les possibilités de Base et couvrir tous les problèmes
  * - Files to NPM
  * - Fuse installer
@@ -43,8 +42,7 @@ const {
 	LESSPlugin,
 	PostCSSPlugin,
 	CSSPlugin,
-	CSSResourcePlugin,
-	JSONPlugin
+	CSSResourcePlugin
 } = require("fuse-box");
 const Sparky = require("fuse-box/sparky");
 
@@ -68,9 +66,6 @@ const { Files } = require("./helpers/files");
 
 // Get fuse switches
 const switches = require('./fuse-switches');
-
-// Less to JSON plugin
-const VariablesOutputLessPlugin = require('less-plugin-variables-output');
 
 
 // ----------------------------------------------------------------------------- FUSE BOX CONFIG
@@ -148,15 +143,7 @@ Sparky.task('config:fuse', () =>
 					ieCompat: false,
 
 					// Use relative URLs so url path don't get lost
-					relativeUrls: true,
-
-					// Less plugins
-					plugins: [
-						// Convert top level variables to json file
-						new VariablesOutputLessPlugin({
-							filename: `${ switches.srcPath }${ switches.commonBundleName }/${ switches.atomsPath }atoms.json`
-						})
-					]
+					relativeUrls: true
 				}),
 
 				// @see : http://fuse-box.org/plugins/post-css-plugin
@@ -228,9 +215,6 @@ Sparky.task('config:fuse', () =>
 				BUNDLE_PATH : switches.bundlesPath
 			}),
 
-			// JSON Plugin for atoms
-			JSONPlugin(),
-
 			// Generate index.html from template
 			switches.generateWebIndex
 			&&
@@ -278,6 +262,7 @@ Sparky.task('config:fuse', () =>
 		]
 	});
 });
+
 
 // ----------------------------------------------------------------------------- BUNDLES CONFIG
 
@@ -478,9 +463,7 @@ Sparky.task('config:bundles', () =>
 		// Enable watch / HMR on bundles
 		allBundles.map( (app) =>
 		{
-			// FIXME : atoms.json force dev to build twice
 			// Watch all bundles
-			//app.watch(`!atoms.json`);
 			app.watch();
 
 			// Do not HMR vendor bundle otherwise TypeChecking will dispatch 2 page reload
@@ -799,6 +782,14 @@ Sparky.task('deploy', async () =>
 });
 
 /**
+ * Convert less atoms to a typescript file
+ */
+Sparky.task('atoms', async () =>
+{
+	return require('./fuse-atoms').generateAtoms();
+});
+
+/**
  * Config tasks to be able to build.
  * Needs options before.
  */
@@ -808,7 +799,7 @@ let configTasks = ['config:fuse', 'config:bundles', 'config:typeChecking'];
  * Load configs and run fuse !
  * Will read options from CLI.
  */
-Sparky.task('dev', ['clean', 'deploy', 'config:options'].concat( configTasks ), () =>
+Sparky.task('dev', ['clean', 'deploy', 'atoms', 'config:options'].concat( configTasks ), () =>
 {
 	fuse.run();
 });
@@ -817,7 +808,7 @@ Sparky.task('dev', ['clean', 'deploy', 'config:options'].concat( configTasks ), 
  * Load configs and run fuse !
  * Will force options for production.
  */
-Sparky.task('production', ['clean', 'deploy', 'config:options', 'config:production', 'lessCheck'].concat( configTasks ), () =>
+Sparky.task('production', ['clean', 'deploy', 'atoms', 'config:options', 'config:production', 'lessCheck'].concat( configTasks ), () =>
 {
 	fuse.run();
 });

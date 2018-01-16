@@ -13,8 +13,8 @@ deployer/env
 # Deployed config
 src/_common/data/config.ts
 
-# Generated atoms.js
-src/_common/atoms/atoms.json
+# Generated atoms
+src/_common/atoms.ts
 
 
 # ------------------------------------------------------------------------------ LOGS FILES
