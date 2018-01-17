@@ -32,33 +32,35 @@ const initCount = SolidBundles.registerAppBundleInit( module.exports.name );
 if ( initCount == 0 )
 {
 	/**
-	 * GSAP
+	 * GSAP public scope corresponding to @types/gsap
 	 */
+	window['gsap'] = {
 
-	// GSAP core
-	require('gsap/TweenLite');
-	require('gsap/TimelineLite.js');
+		// GSAP core
+		TweenLite: require('gsap/TweenLite'),
+		TimelineLite: require('gsap/TimelineLite.js'),
 
-	// Easings
-	require('gsap/EasePack.js');
+		// Easings
+		EasePack: require('gsap/EasePack.js'),
 
-	// Plugins
-	require('gsap/AttrPlugin.js');
-	require('gsap/BezierPlugin.js');
-	require('gsap/ColorPropsPlugin.js');
-	require('gsap/CSSPlugin.js');
-	//require('gsap/CSSRulePlugin.js');
-	require('gsap/DirectionalRotationPlugin.js');
-	//require('gsap/Draggable.js');
-	//require('gsap/EaselPlugin.js');
-	//require('gsap/EndArrayPlugin.js');
-	//require('gsap/jquery.gsap.js');
-	require('gsap/ModifiersPlugin.js');
-	//require('gsap/PixiPlugin.js');
-	//require('gsap/RaphaelPlugin.js');
-	require('gsap/RoundPropsPlugin.js');
-	require('gsap/ScrollToPlugin.js');
-	//require('gsap/TextPlugin.js');
+		// Plugins
+		AttrPlugin: require('gsap/AttrPlugin.js'),
+		BezierPlugin: require('gsap/BezierPlugin.js'),
+		ColorPropsPlugin: require('gsap/ColorPropsPlugin.js'),
+		CSSPlugin: require('gsap/CSSPlugin.js'),
+		//CSSRulePlugin: require('gsap/CSSRulePlugin.js'),
+		DirectionalRotationPlugin: require('gsap/DirectionalRotationPlugin.js'),
+		//Draggable: require('gsap/Draggable.js'),
+		//EaselPlugin: require('gsap/EaselPlugin.js'),
+		//EndArrayPlugin: require('gsap/EndArrayPlugin.js'),
+		//jquery: require('gsap/jquery.gsap.js'),
+		ModifiersPlugin: require('gsap/ModifiersPlugin.js'),
+		//PixiPlugin: require('gsap/PixiPlugin.js'),
+		//RaphaelPlugin: require('gsap/RaphaelPlugin.js'),
+		RoundPropsPlugin: require('gsap/RoundPropsPlugin.js'),
+		ScrollToPlugin: require('gsap/ScrollToPlugin.js'),
+		//TextPlugin: require('gsap/TextPlugin.js'),
+	};
 
 	/**
 	 * ZEPTO
@@ -70,16 +72,6 @@ if ( initCount == 0 )
 	require('zepto/src/ie.js');
 	require('zepto/src/selector.js');
 	require('zepto/src/ajax.js');
-}
-
-
-// ----------------------------------------------------------------------------- GLOBAL SCOPE MAPPING
-
-// Do not require libraries if this is an HMR trigger
-if ( initCount == 0 )
-{
-	// Map green sock globals into gsap so this is compatible with GSAP typings
-	window['gsap'] = window['GreenSockGlobals'];
 }
 
 
