@@ -17,7 +17,7 @@
 }
 
 // Font variant mixin
-.%%fontClassName%%-%%fontVariant%%
+.%%fontClassName%%-%%fontVariant%% ()
 {
 	font-family : '%%fontFamilyName%%', sans-serif;
 	.fontSmooth();
