@@ -15,6 +15,11 @@ src/_common/data/config.ts
 # Generated atoms
 src/_common/atoms.ts
 
+# Generated sprites
+src/_common/sprites/*.less
+src/_common/sprites/*.png
+src/_common/sprites/*.ts
+
 
 # ------------------------------------------------------------------------------ LOGS FILES
 
