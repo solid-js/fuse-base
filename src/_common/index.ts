@@ -31,36 +31,40 @@ const initCount = SolidBundles.registerAppBundleInit( module.exports.name );
 // Do not require libraries if this is an HMR trigger
 if ( initCount == 0 )
 {
-	/**
-	 * GSAP public scope corresponding to @types/gsap
-	 */
-	window['gsap'] = {
+	// Create GSAP scope
+	const gsap = {};
 
-		// GSAP core
-		TweenLite: require('gsap/TweenLite'),
-		TimelineLite: require('gsap/TimelineLite.js'),
+	// Enable GreenSockGlobals on window so plugins will know where to go
+	window['GreenSockGlobals'] = gsap;
 
-		// Easings
-		EasePack: require('gsap/EasePack.js'),
+	// Enable gsap on window so Typescript definitions will find it
+	window['gsap'] = gsap;
 
-		// Plugins
-		AttrPlugin: require('gsap/AttrPlugin.js'),
-		BezierPlugin: require('gsap/BezierPlugin.js'),
-		ColorPropsPlugin: require('gsap/ColorPropsPlugin.js'),
-		CSSPlugin: require('gsap/CSSPlugin.js'),
-		//CSSRulePlugin: require('gsap/CSSRulePlugin.js'),
-		DirectionalRotationPlugin: require('gsap/DirectionalRotationPlugin.js'),
-		//Draggable: require('gsap/Draggable.js'),
-		//EaselPlugin: require('gsap/EaselPlugin.js'),
-		//EndArrayPlugin: require('gsap/EndArrayPlugin.js'),
-		//jquery: require('gsap/jquery.gsap.js'),
-		ModifiersPlugin: require('gsap/ModifiersPlugin.js'),
-		//PixiPlugin: require('gsap/PixiPlugin.js'),
-		//RaphaelPlugin: require('gsap/RaphaelPlugin.js'),
-		RoundPropsPlugin: require('gsap/RoundPropsPlugin.js'),
-		ScrollToPlugin: require('gsap/ScrollToPlugin.js'),
-		//TextPlugin: require('gsap/TextPlugin.js'),
-	};
+	// GSAP core
+	gsap['TweenLite'] = require('gsap/TweenLite');
+	gsap['TimelineLite'] = require('gsap/TimelineLite');
+
+
+	// Easings
+	gsap['EasePack'] = require('gsap/EasePack');
+
+	// Plugins
+	gsap['AttrPlugin'] = require('gsap/AttrPlugin');
+	gsap['BezierPlugin'] = require('gsap/BezierPlugin');
+	gsap['ColorPropsPlugin'] = require('gsap/ColorPropsPlugin');
+	gsap['CSSPlugin'] = require('gsap/CSSPlugin');
+	//gsap['CSSRulePlugin'] = require('gsap/CSSRulePlugin');
+	gsap['DirectionalRotationPlugin'] = require('gsap/DirectionalRotationPlugin');
+	//gsap['Draggable'] = require('gsap/Draggable');
+	//gsap['EaselPlugin'] = require('gsap/EaselPlugin');
+	//gsap['EndArrayPlugin'] = require('gsap/EndArrayPlugin');
+	//gsap['jquery'] = require('gsap/jquery.gsap');
+	gsap['ModifiersPlugin'] = require('gsap/ModifiersPlugin');
+	//gsap['PixiPlugin'] = require('gsap/PixiPlugin');
+	//gsap['RaphaelPlugin'] = require('gsap/RaphaelPlugin');
+	gsap['RoundPropsPlugin'] = require('gsap/RoundPropsPlugin');
+	gsap['ScrollToPlugin'] = require('gsap/ScrollToPlugin');
+	//gsap['TextPlugin'] = require('gsap/TextPlugin');
 
 	/**
 	 * ZEPTO

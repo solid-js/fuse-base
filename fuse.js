@@ -250,6 +250,9 @@ Sparky.task('config:fuse', () =>
 				// Generate a manifest.json file containing bundles list if no index.html is built
 				//manifest: ( switches.generateWebIndex ? 'quantum.json' : false ),
 
+				// Disable replace type of which breaks TweenLite and Zepto ...
+				replaceTypeOf: false,
+
 				// Promise API support for legacy browsers
 				polyfills: switches.legacySupport ? ['Promise'] : [],
 
