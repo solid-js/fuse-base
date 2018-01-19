@@ -10,16 +10,14 @@ const setup = async () =>
 		type: 'input',
 		message: 'Project name for package.json ? (dash-case)',
 		name: 'projectName'
-	}).then( answer =>
-	{
-		projectName = answer.projectName
-	});
+	}).then( answer => projectName = answer.projectName);
 
 	// Set name and version into package.json
 	Files.getFiles('package.json').alterJSON( packageObject =>
 	{
 		packageObject.version = '0.1.0';
 		packageObject.name = projectName;
+		packageObject.author = '';
 		return packageObject
 	});
 
