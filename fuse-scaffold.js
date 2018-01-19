@@ -162,7 +162,7 @@ const scaffolders = [
 				type: 'list',
 				message: 'Which component system ?',
 				name: 'componentSystem',
-				choices : ['React', 'Zepto']
+				choices : ['React', 'DOM']
 			}).then( anwser => componentSystem = anwser.componentSystem );
 
 			// Ask for bundle name
@@ -277,13 +277,13 @@ const scaffolders = [
 
 
 	/**
-	 * Scaffold a Zepto based component
+	 * Scaffold a DOM based component
 	 */
 	{
-		name: 'Zepto component',
+		name: 'DOM component',
 		exec: async () =>
 		{
-			await scaffoldComponent('zeptoComponentScript');
+			await scaffoldComponent('DOMComponentScript');
 		}
 	},
 

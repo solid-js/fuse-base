@@ -1,6 +1,6 @@
 {
   "name": "solid-fuse-base",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "",
   "main": "fuse.js",
   "dependencies": {
@@ -8,7 +8,7 @@
     "normalize.css": "^7.0.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "solidify-lib": "^1.0.28",
+    "solidify-lib": "^1.1.1",
     "zepto": "^1.2.0"
   },
   "devDependencies": {

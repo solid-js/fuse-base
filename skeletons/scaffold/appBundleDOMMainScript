@@ -79,7 +79,7 @@ export class Main extends App
 	 */
 	protected ready ()
 	{
-		// Zepto app view
+		// DOM app view
 		this._appView = new AppView( GlobalConfig.instance.root );
 	}
 }

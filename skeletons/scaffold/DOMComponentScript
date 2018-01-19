@@ -1,5 +1,5 @@
 import "./%%capitalComponentName%%.less";
-import {JView} from "solidify-lib/core/ZeptoView";
+import {DOMView} from "solidify-lib/core/DOMView";
 
 // ----------------------------------------------------------------------------- STRUCT
 
@@ -8,9 +8,9 @@ import {JView} from "solidify-lib/core/ZeptoView";
 // ----------------------------------------------------------------------------- CLASS
 
 /**
- * This is a simple JQuery based view.
+ * This is a simple DOM based view.
  */
-export class %%capitalComponentName%% extends ZeptoView
+export class %%capitalComponentName%% extends DOMView
 {
 	// ------------------------------------------------------------------------- DOM NODES
 
