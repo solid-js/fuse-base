@@ -168,7 +168,7 @@ const scaffolders = [
 			// Ask for bundle name
 			Inquirer.prompt({
 				type: 'input',
-				message: 'App bundle name ? (snake-case)',
+				message: 'App bundle name ? (dash-case)',
 				name: 'bundleName'
 			}).then( answer =>
 			{
@@ -236,7 +236,7 @@ const scaffolders = [
 			// Ask for bundle name
 			Inquirer.prompt({
 				type: 'input',
-				message: 'Async bundle name ? (snake-case)',
+				message: 'Async bundle name ? (dash-case)',
 				name: 'bundleName'
 			}).then( answer =>
 			{
@@ -323,7 +323,7 @@ const scaffolders = [
 		{
 			Inquirer.prompt({
 				type: 'input',
-				message: 'Sprite name ? (avoid using word "sprite" and use snake-case)',
+				message: 'Sprite name ? (avoid using word "sprite" and use dash-case)',
 				name: 'spriteName'
 			}).then( answer =>
 			{
@@ -344,7 +344,7 @@ const scaffolders = [
 				// Log instructions
 				console.log('');
 				console.log('Sprite created.'.green);
-				console.log(`Add images into ${ folderPath.bold } folder, named with snake-case convention.`.yellow);
+				console.log(`Add images into ${ folderPath.bold } folder, named with dash-case convention.`.yellow);
 				console.log(`Sprite can be configured by editing ${ destinationSpriteConfigFileName.bold } file.`.yellow);
 				console.log(`Import your sprite in ${ `${switches.srcPath}${switches.commonBundleName}/Main.less`.bold } after a first ${ `node fuse sprites`.bold }. `.yellow);
 				console.log('');
@@ -367,7 +367,7 @@ const scaffolders = [
 			console.log('--- CONVERT YOUR FONT ---'.yellow.bold);
 			console.log('1. Go to http://www.font2web.com/ and convert your font.'.yellow);
 			console.log('2. Only keep .eot .ttf .woff files.'.yellow);
-			console.log('3. Rename them with the same filename, as snake-case.'.yellow);
+			console.log('3. Rename them with the same filename, as dash-case.'.yellow);
 			console.log('4. Put them into a folder named with the same name.'.yellow);
 			console.log(`5. Move this folder into ${ fontsFolder.bold } directory.`.yellow);
 			console.log('');
@@ -378,7 +378,7 @@ const scaffolders = [
 			let filename = '';
 			await Inquirer.prompt({
 				type: 'input',
-				message: 'What is the snake-case filename of the font, with font variant ? (ex : helvetica-neue-bold)',
+				message: 'What is the dash-case filename of the font, with font variant ? (ex : helvetica-neue-bold)',
 				name: 'filename'
 			}).then( answer => filename = answer.filename );
 

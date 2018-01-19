@@ -25,7 +25,7 @@ export class Main extends App
 	/**
 	 * App constructor
 	 */
-	constructor ( pParams )
+	constructor ( pParams:any = null )
 	{
 		// Inject params into config
 		GlobalConfig.instance.inject( pParams );
@@ -35,13 +35,13 @@ export class Main extends App
 
 		// Relay construction
 		// Do not launch init sequence if this is an HMR trigger
-		super( initCount == 0 );
+		super( initCount == 0, pParams );
 	}
 
 	/**
 	 * Prepare app
 	 */
-	protected prepare ()
+	protected prepare ( pParams:any = null )
 	{
 		// Register app instance as singleton
 		Main.__instance = this;
@@ -64,34 +64,7 @@ export class Main extends App
 	 */
 	protected initRoutes ():void
 	{
-		// Init router
-		// Google analytics is automatically called when page is chaning
-		Router.init(
-			GlobalConfig.instance.base,
-			[
-				// -- Home page
-				{
-					url		: '/',
-					// TODO : Full path here
-					page	: 'HomePage'
-				},
 
-				// -- Product pages
-				{
-					url		: '/products/',
-					page	: 'ProductPage',
-					action	: 'overview'
-				},
-				{
-					url		: '/products/{id}.html',
-					page	: 'ProductPage',
-					action	: 'product'
-				}
-			]
-		);
-
-		// Enable auto link listening
-		Router.listenLinks();
 	}
 
 
@@ -107,9 +80,6 @@ export class Main extends App
 	protected ready ()
 	{
 		// Zepto app view
-		this._appView = new AppView( this._parameters.root );
-
-		// Start router
-		Router.start();
+		this._appView = new AppView( GlobalConfig.instance.root );
 	}
 }

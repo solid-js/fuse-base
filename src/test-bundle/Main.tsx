@@ -28,7 +28,7 @@ export class Main extends App
 	/**
 	 * App constructor
 	 */
-	constructor ( pParams )
+	constructor ( pParams:any )
 	{
 		// Inject params into config
 		GlobalConfig.instance.inject( pParams );
@@ -38,13 +38,13 @@ export class Main extends App
 
 		// Relay construction
 		// Do not launch init sequence if this is an HMR trigger
-		super( initCount == 0 );
+		super( initCount == 0, pParams );
 	}
 
 	/**
 	 * Prepare app
 	 */
-	protected prepare ()
+	protected prepare (pParams:any = null)
 	{
 		// Register app instance as singleton
 		Main.__instance = this;

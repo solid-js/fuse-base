@@ -3,7 +3,6 @@
 
 /**
  * TODO Fuse :
- * - IMPORTANT Tester toutes les possibilités de Base et couvrir tous les problèmes
  * - Files.js + .d.ts to NPM
  *
  * TODO Doc :
@@ -76,6 +75,9 @@ let allBundles = [];
 // Fuse and options on global scope
 let fuse;
 let options;
+
+// Deployed env properties
+let deployedEnvProperties;
 
 Sparky.task('config:fuse', () =>
 {
@@ -186,8 +188,7 @@ Sparky.task('config:fuse', () =>
 					dist: `${switches.distPath}${switches.resourcesPath}`,
 
 					// Rewriting resources paths
-					// TODO : ADD BASE ?
-					resolve: (f) => `${switches.resourcesPath}${f}`,
+					resolve: (f) => `${deployedEnvProperties.base}${switches.resourcesPath}${f}`,
 
 					// Include images as Base64 into bundle
 					// Please use Less data-uri instead @see http://lesscss.org/functions/#misc-functions-data-uri
@@ -211,7 +212,10 @@ Sparky.task('config:fuse', () =>
 				VERSION: require('./package.json').version,
 
 				// Inject bundle path for SolidBundles
-				BUNDLE_PATH : switches.bundlesPath
+				BUNDLE_PATH : switches.bundlesPath,
+
+				// Base path from deployed env properties
+				BASE : deployedEnvProperties.base
 			}),
 
 			// Generate index.html from template
@@ -222,8 +226,7 @@ Sparky.task('config:fuse', () =>
 				template: `${switches.srcPath}index.html`,
 
 				// Relative path to bundles
-				// TODO : ADD BASE ?
-				path: switches.bundlesPath,
+				path: deployedEnvProperties.base + switches.bundlesPath,
 				//resolve : output => 'assets/'+output.lastPrimaryOutput.filename
 
 				// Index file name, relative to bundle path, cheap trick
@@ -403,7 +406,7 @@ Sparky.task('config:bundles', () =>
 			currentAppBundle.splitConfig({
 
 				// Relative path from main bundle to load code splitted bundles
-				browser: switches.bundlesPath,
+				browser: deployedEnvProperties.base + switches.bundlesPath,
 
 				// Where to put async bundles. Default is same directory than regular bundles.
 				//dest: switches.bundlesPath
@@ -800,7 +803,12 @@ Sparky.task('lessCheck', () =>
  */
 Sparky.task('deploy', async () =>
 {
-	return require('./fuse-deploy').deploy();
+	// Launch deployer
+	return require('./fuse-deploy').deploy().then(
+
+		// Save deployed properties for EnvPlugin
+		currentEnvProperties => deployedEnvProperties = currentEnvProperties
+	);
 });
 
 /**

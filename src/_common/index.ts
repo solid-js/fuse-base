@@ -1,5 +1,6 @@
 import {SolidBundles} from "solidify-lib/helpers/SolidBundles";
 import {GlobalConfig} from "./data/GlobalConfig";
+import {ResponsiveManager} from "solidify-lib/helpers/ResponsiveManager";
 
 
 // ----------------------------------------------------------------------------- BUNDLE INFO
@@ -92,11 +93,12 @@ if ( initCount == 0 )
 
 	// 2. Inject version from package.json
 	GlobalConfig.instance.inject({
-		version: process.env['VERSION']
+		version: process.env['VERSION'],
+		base: process.env['BASE']
 	});
-}
 
-// Inject atoms into config every time
-GlobalConfig.instance.inject({
-	atoms: require('./atoms').Atoms
-});
+	// Inject atoms into ResponsiveManager
+	ResponsiveManager.instance.autoSetBreakpointsFromLess(
+		require('./atoms').Atoms
+	);
+}

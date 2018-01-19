@@ -8,7 +8,7 @@ const setup = async () =>
 	let projectName = '';
 	await Inquirer.prompt({
 		type: 'input',
-		message: 'Project name for package.json ? (snake-case)',
+		message: 'Project name for package.json ? (dash-case)',
 		name: 'projectName'
 	}).then( answer =>
 	{

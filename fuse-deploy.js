@@ -156,7 +156,7 @@ module.exports = {
 			});
 
 			// Resolve promise
-			resolve();
+			resolve( currentEnvProperties );
 		}
 	),
 

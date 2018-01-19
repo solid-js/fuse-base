@@ -5,20 +5,17 @@
  */
 export class GlobalConfigProperties
 {
-	// Compiled version of the app, from package.json
+	// Compiled version of the app, from package.json and process.env
 	version		:string;
+
+	// Base http path to access to the app, from process.env
+	base		:string;
 
 	// Root node where the app DOM will be append
 	root		:Element;
 
-	// Base http path to access to the app
-	base		:string;
-
 	// Locale translation code
 	locale		:string;
-
-	// Compiled atoms from LESS
-	atoms		:{[index:string] : string};
 
 	/**
 	 * YOUR PROPERTIES HERE
@@ -59,6 +56,10 @@ export class GlobalConfig extends GlobalConfigProperties
 	 */
 	inject (pProps:any)
 	{
+		// Check if props are injectable
+		if (pProps == null || typeof pProps !== 'object') return;
+
+		// Inject props
 		for (let i in pProps)
 		{
 			this[i] = pProps[i];
