@@ -25,7 +25,8 @@
 // Target the sprite as background
 .{{spritePrefix}}
 {
-	background: no-repeat url('{{spritePath}}');
+	background-repeat: no-repeat;
+	background-image: url('{{spritePath}}');
 }
 
 

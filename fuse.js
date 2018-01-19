@@ -49,6 +49,9 @@ const colors = require('colors'); // @see : https://github.com/marak/colors.js/
 // Node path utils
 const path = require('path');
 
+// Node spawn process
+const spawn = require('child_process').spawnSync;
+
 // Get Typescript checking helper
 const { TypeHelper } = require('fuse-box-typechecker');
 
@@ -76,8 +79,7 @@ let options;
 
 Sparky.task('config:fuse', () =>
 {
-	// Init fuse box if not already done
-	if (fuse) return;
+	// Init FuseBox
 	fuse = FuseBox.init({
 
 		// Sources directory
@@ -266,6 +268,9 @@ Sparky.task('config:fuse', () =>
 
 // ----------------------------------------------------------------------------- BUNDLES CONFIG
 
+/**
+ * Configure bundles for fuse with code splitting
+ */
 Sparky.task('config:bundles', () =>
 {
 	// Get app bundles list from file system
@@ -289,9 +294,7 @@ Sparky.task('config:bundles', () =>
 		fuse.bundle( switches.vendorsBundleName )
 
 		// Contains everything but app bundles dependencies
-		.instructions(
-			`~ ${switches.entryPoint}`
-		)
+		.instructions( `~ ${switches.entryPoint}` )
 
 		// Include shimmed libs
 		// @see : http://fuse-box.org/page/configuration#shimming
@@ -500,12 +503,13 @@ Sparky.task('config:bundles', () =>
 /**
  * Configure Type Checker
  */
-Sparky.task('config:typeChecking', () =>
+Sparky.task('config:typeCheck', () =>
 {
 	// Disabled type checking from options
-	if (options.noTypeCheck)
+	if (options != null && 'noTypeCheck' in options && options.noTypeCheck)
 	{
 		console.log(`\n > Warning, type checking disabled.`.red.bold);
+		console.log('');
 		return;
 	}
 
@@ -590,6 +594,7 @@ Sparky.task('config:production', () =>
  * Start and configure CLI
  */
 const cli = CLI({
+	// CLI options
 	options: {
 		'quantum':  {
 			type: 'boolean',
@@ -620,9 +625,48 @@ const cli = CLI({
 			default: false
 		},
 	},
+
+	// Help message
 	taskDescriptions: {
 		'default' : `
 			Show this message
+		`,
+		'noProblemo' : `
+			Tries to solve common problems.
+		`,
+		'selectEnv' : `
+			Select env for deployer. 
+
+			${'@param %envName%'.bold}
+				- Deploy env without showing env list through CLI.
+		`,
+		'deploy' : `
+			Deploy current selected env.
+			Automatically done by ${'dev'.bold} and ${'production'.bold}.  
+		`,
+		'atoms' : `
+			Generate atoms.ts files from atoms less files.
+			Automatically done by ${'dev'.bold} and ${'production'.bold}. 
+		`,
+		'clean' : `
+			Clean fuse cache. Automatically done before dev and production tasks. 
+		`,
+		'cleanSprites' : `
+			Clean generated sprites.
+		`,
+		'sprites' : `
+			Clean and compile sprites. 
+		`,
+		'scaffold' : `
+			Create a new component interactively. 
+		`,
+		'lessCheck' : `
+			Lint every Less files and throw if there is an error on any file.
+			Useful to block Continuous Integration process on errors. 
+		`,
+		'typeCheck' : `
+			Lint every Typescript files and throw if there is an error on any file.
+			Automatically done by ${'dev'.bold} and ${'production'.bold}.
 		`,
 		'dev' : `
 			Run fuse, compile all bundles and watch.
@@ -649,7 +693,7 @@ const cli = CLI({
 				- Disable type checking, only for quick tests !
 		`,
 		'production' : `
-			Run fuse and compile all bundles for production (Quantum + Uglify enabled).
+			Run fuse, compile sprites, and compile all bundles for production (Quantum + Uglify enabled).
 
 			${'@param --verbose'.bold}
 				- Enable debug and verbose mode on fuse
@@ -659,24 +703,6 @@ const cli = CLI({
 
 			${'@param --noTypeCheck'.bold}
 				- Disable type checking, only for quick tests !
-		`,
-		'clean' : `
-			Clean fuse cache. Automatically done before dev and production tasks. 
-		`,
-		'scaffold' : `
-			Create a new component interactively. 
-		`,
-		'cleanSprites' : `
-			Clean generated sprites.
-		`,
-		'sprites' : `
-			Clean and compile sprites. 
-		`,
-		'selectEnv' : `
-			Select env for deployer. 
-
-			${'@param %envName%'.bold}
-				- Deploy env without showing env list through CLI.
 		`
 	}
 });
@@ -698,8 +724,8 @@ Sparky.task('default', () =>
 		);
 	});
 
-	// Show help
-	cli.showHelp( true );
+	// Quit so we do not get sparky log
+	process.exit();
 });
 
 
@@ -740,17 +766,15 @@ Sparky.task('cleanSprites', () =>
 Sparky.task('lessCheck', () =>
 {
 	// Disabled less checking from options
-	if (options.noLessCheck)
+	if (options != null && 'noLessCheck' in options && options.noLessCheck)
 	{
 		console.log(`\n > Warning, less checking disabled.`.red.bold);
+		console.log('');
 		return;
 	}
 
-	// Spawn less compiler as a new process
-	let spawn = require('child_process').spawnSync;
-
 	// Browser every files.
-	// BETTER : Only check not already check files.
+	// BETTER : Only check not already check files. ?
 	Files.getFiles(`${switches.srcPath}**/*.less`).all( file =>
 	{
 		console.log(`Checking ${file} ...`.grey);
@@ -791,13 +815,13 @@ Sparky.task('atoms', async () =>
  * Config tasks to be able to build.
  * Needs options before.
  */
-let configTasks = ['config:fuse', 'config:bundles', 'config:typeChecking'];
+let configTasks = ['config:fuse', 'config:bundles', 'config:typeCheck'];
 
 /**
  * Load configs and run fuse !
  * Will read options from CLI.
  */
-Sparky.task('dev', ['clean', 'deploy', 'atoms', 'config:options'].concat( configTasks ), () =>
+Sparky.task('dev', ['deploy', 'atoms', 'config:options'].concat( configTasks ), () =>
 {
 	fuse.run();
 });
@@ -806,7 +830,7 @@ Sparky.task('dev', ['clean', 'deploy', 'atoms', 'config:options'].concat( config
  * Load configs and run fuse !
  * Will force options for production.
  */
-Sparky.task('production', ['clean', 'deploy', 'atoms', 'config:options', 'config:production', 'lessCheck'].concat( configTasks ), () =>
+Sparky.task('production', ['deploy', 'atoms', 'sprites', 'config:options', 'config:production', 'lessCheck'].concat( configTasks ), () =>
 {
 	fuse.run();
 });
@@ -833,4 +857,44 @@ Sparky.task('sprites', ['cleanSprites'], async () =>
 Sparky.task('selectEnv', async () =>
 {
 	return require('./fuse-deploy').selectEnv();
+});
+
+/**
+ * Tries to patches common problems.
+ */
+Sparky.task('noProblemo', async () =>
+{
+	// Intro message
+	console.log('');
+	console.log(`No problemo amigo !`.green.italic);
+	console.log('');
+
+	// Reinstall node_modules with full-blast method
+	console.log('Reinstalling node modules ...'.yellow);
+	let npmUpdate = spawn('npm', ['run', 'please']);
+	console.log(npmUpdate.stderr.toString() || npmUpdate.stdout.toString());
+	console.log('Done !'.green);
+	console.log('')
+
+	// Clean everything
+	console.log('Cleaning ...');
+	await Sparky.exec('clean');
+	console.log('Done !'.green);
+	console.log('');
+
+	// Generate sprites
+	console.log('Generating sprites ...');
+	await Sparky.exec('sprites');
+	console.log('Done !'.green);
+	console.log('');
+
+	// Check less files
+	console.log('Check less files ...');
+	await Sparky.exec('lessCheck');
+	console.log('Done !'.green);
+	console.log('');
+
+	// Tries dev mode
+	console.log('Retrying dev mode...');
+	await Sparky.exec('dev');
 });
