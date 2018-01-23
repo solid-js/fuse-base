@@ -54,7 +54,7 @@ module.exports = {
 					const semiIndex = splitted.indexOf(';');
 
 					// Extract var name and trim it
-					const varName = splitted.substring(arobaseIndex + 1, colonIndex - 1).trim();
+					const varName = splitted.substring(arobaseIndex + 1, colonIndex).trim();
 
 					// Extract value and trim it
 					const value = splitted.substring(colonIndex + 1, Math.min(splitted.length, semiIndex)).trim();
