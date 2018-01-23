@@ -16,9 +16,9 @@ src/_common/data/config.ts
 src/_common/atoms.ts
 
 # Generated sprites
-src/_common/sprites/*.less
-src/_common/sprites/*.png
-src/_common/sprites/*.ts
+src/*/sprites/*.less
+src/*/sprites/*.png
+src/*/sprites/*.ts
 
 
 # ------------------------------------------------------------------------------ LOGS FILES
