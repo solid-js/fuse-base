@@ -711,6 +711,7 @@ const cli = CLI({
 
 		'production' : `
 			Run fuse, compile sprites, and compile all bundles for production (Quantum + Uglify enabled).
+			After fuse, it will optimize generated resources.
 
 			${'@param --verbose'.bold}
 				- Enable debug and verbose mode on fuse
@@ -720,7 +721,11 @@ const cli = CLI({
 
 			${'@param --noTypeCheck'.bold}
 				- Disable type checking, only for quick tests !
-		`
+		`,
+
+		'optimize' : `
+			Optimize fuse generated resources. 
+		`,
 	}
 });
 
@@ -852,9 +857,13 @@ Sparky.task('dev', ['deploy', 'atoms', 'config:options'].concat( configTasks ), 
  * Load configs and run fuse !
  * Will force options for production.
  */
-Sparky.task('production', ['deploy', 'atoms', 'sprites', 'config:options', 'config:production', 'lessCheck'].concat( configTasks ), () =>
+Sparky.task('production', ['deploy', 'atoms', 'sprites', 'config:options', 'config:production', 'lessCheck'].concat( configTasks ), async () =>
 {
-	fuse.run();
+	// Compile with fuse now everything is ready
+	await fuse.run();
+
+	// Optimize generated resources
+	Sparky.exec('optimize');
 });
 
 /**
@@ -871,6 +880,14 @@ Sparky.task('scaffold', async () =>
 Sparky.task('sprites', ['cleanSprites'], async () =>
 {
 	return require('./fuse-sprites').generateSprites();
+});
+
+/**
+ * Optimize generated resources
+ */
+Sparky.task('optimize', async () =>
+{
+	return require('./fuse-optimize').optimize();
 });
 
 /**
