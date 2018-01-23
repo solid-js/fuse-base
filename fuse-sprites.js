@@ -194,8 +194,8 @@ module.exports = {
 				// If we have an error
 				if (err)
 				{
-					console.log('');
-					console.log(`Error while creating sprite ${error}`.red.bold);
+					console.log(`Error while creating sprite ${ err }`.red.bold);
+					console.log("\007");
 					process.exit(1);
 				}
 

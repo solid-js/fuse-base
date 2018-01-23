@@ -3,6 +3,7 @@
 
 /**
  * TODO Fuse :
+ * - IMPORTANT Tester toutes les possibilités de Base et couvrir tous les problèmes
  * - Files.js + .d.ts to NPM
  *
  * TODO Doc :
@@ -188,7 +189,7 @@ Sparky.task('config:fuse', () =>
 					dist: `${switches.distPath}${switches.resourcesPath}`,
 
 					// Rewriting resources paths
-					resolve: (f) => `${deployedEnvProperties.base}${switches.resourcesPath}${f}`,
+					resolve: (f) => `${deployedEnvProperties.base}${switches.resourcesPath}${f}?${require('./package.json').version}`,
 
 					// Include images as Base64 into bundle
 					// Please use Less data-uri instead @see http://lesscss.org/functions/#misc-functions-data-uri
@@ -634,9 +635,11 @@ const cli = CLI({
 		'default' : `
 			Show this message
 		`,
+
 		'noProblemo' : `
 			Tries to solve common problems.
 		`,
+
 		'selectEnv' : `
 			Select env for deployer. 
 
@@ -647,22 +650,27 @@ const cli = CLI({
 			Deploy current selected env.
 			Automatically done by ${'dev'.bold} and ${'production'.bold}.  
 		`,
+
 		'atoms' : `
 			Generate atoms.ts files from atoms less files.
 			Automatically done by ${'dev'.bold} and ${'production'.bold}. 
 		`,
+
 		'clean' : `
 			Clean fuse cache. Automatically done before dev and production tasks. 
 		`,
+
 		'cleanSprites' : `
 			Clean generated sprites.
 		`,
 		'sprites' : `
 			Clean and compile sprites. 
 		`,
+
 		'scaffold' : `
 			Create a new component interactively. 
 		`,
+
 		'lessCheck' : `
 			Lint every Less files and throw if there is an error on any file.
 			Useful to block Continuous Integration process on errors. 
@@ -671,6 +679,7 @@ const cli = CLI({
 			Lint every Typescript files and throw if there is an error on any file.
 			Automatically done by ${'dev'.bold} and ${'production'.bold}.
 		`,
+
 		'dev' : `
 			Run fuse, compile all bundles and watch.
 
@@ -695,6 +704,11 @@ const cli = CLI({
 			${'@param --noTypeCheck'.bold}
 				- Disable type checking, only for quick tests !
 		`,
+		'devAfterPull' : `
+			Same as dev but exec ${`npm update`.bold} and clean tasks before.
+			Useful after a ${`git pull`.bold} when working in team.
+		`,
+
 		'production' : `
 			Run fuse, compile sprites, and compile all bundles for production (Quantum + Uglify enabled).
 
@@ -865,6 +879,34 @@ Sparky.task('sprites', ['cleanSprites'], async () =>
 Sparky.task('selectEnv', async () =>
 {
 	return require('./fuse-deploy').selectEnv();
+});
+
+/**
+ * Select env.
+ */
+Sparky.task('devAfterPull', async () =>
+{
+	// Reinstall node_modules with full-blast method
+	console.log('Updating node modules ...'.yellow);
+	spawn('npm', ['up']);
+	console.log('Done !'.green);
+	console.log('');
+
+	// Clean everything
+	console.log('Cleaning ...');
+	await Sparky.exec('clean');
+	console.log('Done !'.green);
+	console.log('');
+
+	// Generate sprites
+	console.log('Generating sprites ...');
+	await Sparky.exec('sprites');
+	console.log('Done !'.green);
+	console.log('');
+
+	// Tries dev mode
+	console.log('Retrying dev mode...');
+	await Sparky.exec('dev');
 });
 
 /**
