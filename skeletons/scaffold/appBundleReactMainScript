@@ -7,6 +7,10 @@ import {EnvUtils} from "solidify-lib/utils/EnvUtils";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
+// Get app bundle name from index.ts
+const appBundleName = require('./index').name;
+
+
 export class Main extends App
 {
 	// ------------------------------------------------------------------------- SINGLETON
@@ -34,11 +38,14 @@ export class Main extends App
 		GlobalConfig.instance.inject( pParams );
 
 		// Register init of this app bundle and get init count to avoid HMR
-		const initCount = SolidBundles.registerAppBundleInit( require('./index').name );
+		SolidBundles.registerAppBundleInit( appBundleName );
 
 		// Relay construction
-		// Do not launch init sequence if this is an HMR trigger
-		super( initCount == 0, pParams );
+		super(
+			// Do not launch init sequence if this is an HMR trigger
+			SolidBundles.getAppBundleInitCount( appBundleName ) == 0,
+			pParams
+		);
 	}
 
 	/**

@@ -24,14 +24,13 @@ require('./Main.less');
 // ----------------------------------------------------------------------------- INIT COUNT AND HMR TRIGGERS
 
 // Register init of this app bundle and get init count to avoid HMR
-const initCount = SolidBundles.registerAppBundleInit( module.exports.name );
-
-
-// ----------------------------------------------------------------------------- INCLUDED LIBRARIES
+SolidBundles.registerAppBundleInit( module.exports.name );
 
 // Do not require libraries if this is an HMR trigger
-if ( initCount == 0 )
+if ( SolidBundles.getAppBundleInitCount( module.exports.name ) == 0 )
 {
+	// ------------------------------------------------------------------------- GSAP
+
 	// Create GSAP scope
 	const gsap = {};
 
@@ -67,24 +66,20 @@ if ( initCount == 0 )
 	gsap['ScrollToPlugin'] = require('gsap/ScrollToPlugin');
 	//gsap['TextPlugin'] = require('gsap/TextPlugin');
 
-	/**
-	 * ZEPTO
-	 */
 
+	// ------------------------------------------------------------------------- ZEPTO
+
+	// Include zepto lib
 	require('zepto/src/zepto.js');
 	require('zepto/src/event.js');
 	require('zepto/src/form.js');
 	require('zepto/src/ie.js');
 	require('zepto/src/selector.js');
 	require('zepto/src/ajax.js');
-}
 
 
-// ----------------------------------------------------------------------------- GLOBAL CONFIG
+	// ------------------------------------------------------------------------- GLOBAL CONFIG
 
-// Do not prepare GlobalConfig if this is an HMR trigger
-if ( initCount == 0 )
-{
 	// Load config data
 	const embeddedConfig = require('./data/config');
 
