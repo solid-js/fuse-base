@@ -779,7 +779,7 @@ Sparky.task('clean', () =>
 Sparky.task('cleanSprites', () =>
 {
 	// Remove generated LESS / Typescript and PNG
-	Files.getFiles(`${ switches.srcPath }${ switches.commonBundleName }/${ switches.spritesPath }*.+(less|ts|png)`).delete();
+	Files.getFiles(`${ switches.srcPath }*/${ switches.spritesPath }*.+(less|ts|png)`).delete();
 });
 
 /**

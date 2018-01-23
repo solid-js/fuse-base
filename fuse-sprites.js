@@ -1,218 +1,469 @@
-const { Files } = require('./helpers/files');
-const switches = require('./fuse-switches');
+
+const Inquirer = require('inquirer');
 const path = require('path');
-const nsg = require('node-sprite-generator');
-const Handlebars = require('handlebars');
+const switches = require('./fuse-switches');
+const { Files } = require('./helpers/files');
+const { QuickTemplate } = require('./helpers/quick-template');
+const { CapitalizeFirst } = require('./helpers/capitalize');
 
+// ----------------------------------------------------------------------------- COMMON TASKS
 
-// ----------------------------------------------------------------------------- CONFIG
+/**
+ * Ask for the bundle
+ */
+const askWhichBundle = (pNoCommon, pNoAsync) =>
+{
+	// All app and async bundles
+	const bundlesList = [];
 
-// Sprite namming
-const outputSpriteExtension     = '.png';
-const spritePrefix              = 'sprite';
-const separator                 = '-';
+	// Get app bundles
+	const appBundlesPaths = Files.getFolders(`${switches.srcPath}*`).files;
 
-// Default sprite config
-const defaultSpriteConfig = {
-	layout: 'packed',
-	pixelRatio: 1,
-	layoutOptions: {
-		padding: 2,
-		scaling: 1
+	// Browser app bundles
+	appBundlesPaths.map( appBundlePath =>
+	{
+		// Skip common bundle if asked
+		if (pNoCommon && path.basename(appBundlePath) === switches.commonBundleName) return;
+
+		// Add this app bundle into bundles list
+		appBundlePath = `${appBundlePath}/`;
+		bundlesList.push( appBundlePath );
+
+		// Skip async bundles if asked
+		if (pNoAsync) return;
+
+		// Get async bundles into this bundle
+		Files.getFolders(`${ appBundlePath }${ switches.asyncPath }/*`).all( file =>
+		{
+			// Add this async bundle to bundles list
+			bundlesList.push(`${file}/`);
+		});
+	});
+
+	return Inquirer.prompt({
+		type: 'list',
+		name: 'bundleName',
+		message : 'Which bundle ?',
+		choices: bundlesList
+	});
+}
+
+/**
+ * Ask for the sub-folder
+ */
+const askWhichSubFolder = () =>
+{
+	return Inquirer.prompt({
+		type: 'list',
+		name: 'subFolder',
+		message : 'Which sub-folder ?',
+		choices: switches.includedFoldersWithoutImports
+	});
+}
+
+/**
+ * Ask for the component name
+ */
+const askComponentName = () =>
+{
+	return Inquirer.prompt({
+		type: 'input',
+		message: 'Component name ? (camelCase)',
+		name: 'componentName'
+	});
+}
+
+/**
+ * Ask question and scaffold a component with a specific script template
+ * @param scriptTemplate Name of the script template file to use
+ * @returns {Promise<any>}
+ */
+const scaffoldComponent = async ( scriptTemplate ) =>
+{
+	return new Promise( async ( resolve ) =>
+	{
+		// Get bundle path
+		let bundlePath = '';
+		await askWhichBundle().then( answer =>
+		{
+			bundlePath = answer.bundleName;
+		});
+
+		// Get sub-folder (like component / pages ...)
+		let subFolder = '';
+		await askWhichSubFolder().then( answer =>
+		{
+			subFolder = answer.subFolder;
+		})
+
+		// Get component name
+		let componentName = '';
+		await askComponentName().then( answer =>
+		{
+			componentName = answer.componentName;
+		});
+
+		// Lower and capital component name
+		let lowerComponentName = CapitalizeFirst( componentName, false);
+		let upperComponentName = CapitalizeFirst( componentName, true);
+
+		// Base path of the component (no extension here)
+		let componentPath = `${bundlePath}${subFolder}/${lowerComponentName}/${upperComponentName}`;
+
+		// Check if component already exists
+		if (Files.getFiles(`${componentPath}.tsx`).files.length > 0)
+		{
+			console.log(`This component already exists. Aborting.`.red.bold);
+			return;
+		}
+
+		// Scaffold the script
+		Files.new(`${componentPath}.tsx`).write(
+			QuickTemplate(
+				Files.getFiles('skeletons/scaffold/' + scriptTemplate).read(),
+				{
+					capitalComponentName: upperComponentName
+				}
+			)
+		);
+
+		// Scaffold the style
+		Files.new(`${componentPath}.less`).write(
+			QuickTemplate(
+				Files.getFiles('skeletons/scaffold/componentStyle').read(),
+				{
+					capitalComponentName: upperComponentName
+				}
+			)
+		);
+
+		// Done
+		resolve();
+	});
+}
+
+// ----------------------------------------------------------------------------- SCAFFOLDERS
+
+const scaffolders = [
+
+	// Separator
+	{ name: new Inquirer.Separator() },
+
+	/**
+	 * Scaffold an app bundle
+	 */
+	{
+		name: 'App bundle',
+		exec: async () =>
+		{
+			// Ask for component system
+			let componentSystem = '';
+			await Inquirer.prompt({
+				type: 'list',
+				message: 'Which component system ?',
+				name: 'componentSystem',
+				choices : ['React', 'DOM']
+			}).then( anwser => componentSystem = anwser.componentSystem );
+
+			// Ask for bundle name
+			Inquirer.prompt({
+				type: 'input',
+				message: 'App bundle name ? (dash-case)',
+				name: 'bundleName'
+			}).then( answer =>
+			{
+				// Get bundle name from answer
+				const bundleName = answer.bundleName;
+
+				// Check if bundle already exists
+				if (Files.getFolders(`${ switches.srcPath }${ bundleName }`).files.length > 0)
+				{
+					console.log(`This bundle already exists. Aborting.`.red.bold);
+					return;
+				}
+
+				// Create default folders with .gitkeep files
+				switches.includedFoldersWithoutImports.concat('models', 'async')
+				.map( folderName =>
+				{
+					Files.new(`${ switches.srcPath }${ bundleName }/${ folderName }/.gitkeep`).write('');
+				});
+
+				// Create index
+				Files.new( `${ switches.srcPath }${ bundleName }/${ switches.entryPoint }` ).write(
+					QuickTemplate(
+						Files.getFiles('skeletons/scaffold/appBundleIndex').read(),
+						{
+							bundleName: bundleName
+						}
+					)
+				);
+
+				// Create main script
+				Files.getFiles(`skeletons/scaffold/appBundle${componentSystem}MainScript`)
+				.copyTo( `${ switches.srcPath }${ bundleName }/Main.tsx`);
+
+				// Create style gateway so relative imports will work
+				Files.new(`${ switches.srcPath }${ bundleName }/Main.less`).write(
+					QuickTemplate(
+						Files.getFiles('skeletons/scaffold/appBundleStyle').read(),
+						{
+							commonPath: switches.commonBundleName
+						}
+					)
+				);
+
+				// TODO : INIT APP VIEW WITH VIEW STACK
+			});
+		}
 	},
-	compositorOptions: {
-		compressionLevel	: 6,
-		filter          	: 'none'
-	}
-};
 
+	/**
+	 * Scaffold an async bundle
+	 */
+	{
+		name: 'Async bundle',
+		exec: async () =>
+		{
+			// Get bundle path
+			// Disallow common and async bundles
+			let bundlePath = '';
+			await askWhichBundle(true, true).then( answer =>
+			{
+				bundlePath = answer.bundleName;
+			});
+
+			// Ask for bundle name
+			Inquirer.prompt({
+				type: 'input',
+				message: 'Async bundle name ? (dash-case)',
+				name: 'bundleName'
+			}).then( answer =>
+			{
+				// Get bundle name from answer
+				const bundleName = answer.bundleName;
+
+				// Root path of async bundles
+				const asyncRoot = `${ bundlePath }${ switches.asyncPath }`;
+
+				// Check if bundle already exists
+				if (Files.getFolders(`${ asyncRoot }${ bundleName }`).files.length > 0)
+				{
+					console.log(`This bundle already exists. Aborting.`.red.bold);
+					return;
+				}
+
+				// Create default folders
+				switches.includedFoldersWithoutImports
+				.map( folderName =>
+				{
+					Files.new(`${ asyncRoot }${ bundleName }/${ folderName }/.gitkeep`).write('');
+				});
+
+				// Create entry point
+				Files.getFiles('skeletons/scaffold/asyncBundleEntryPoint')
+				.copyTo( `${ asyncRoot }${ bundleName }/Main.tsx` )
+
+				// Create style gateway so relative imports will work
+				Files.getFiles('skeletons/scaffold/asyncBundleStyle')
+				.copyTo(`${ asyncRoot }${ bundleName }/main.less`);
+			});
+		}
+	},
+
+
+	// Separator
+	{ name: new Inquirer.Separator() },
+
+
+	/**
+	 * Scaffold a DOM based component
+	 */
+	{
+		name: 'DOM component',
+		exec: async () =>
+		{
+			await scaffoldComponent('DOMComponentScript');
+		}
+	},
+
+	/**
+	 * Scaffold a react based component
+	 */
+	{
+		name: 'React component',
+		exec: async () =>
+		{
+			await scaffoldComponent('reactComponentScript');
+		}
+	},
+
+	/**
+	 * Scaffold a react based page
+	 */
+	{
+		name: 'React page',
+		exec: async () =>
+		{
+			await scaffoldComponent('reactPageScript');
+		}
+	},
+
+
+	// Separator
+	{ name: new Inquirer.Separator() },
+
+
+	/**
+	 * Scaffold a new sprite
+	 */
+	{
+		name: 'Sprite',
+		exec: async () =>
+		{
+			// Get bundle path
+			let bundlePath = '';
+			await askWhichBundle().then( answer =>
+			{
+				bundlePath = answer.bundleName;
+			});
+
+			// Get sprite name
+			let spriteName = '';
+			await Inquirer.prompt({
+				type: 'input',
+				message: 'Sprite name ? (avoid using word "sprite" and use dash-case)',
+				name: 'spriteName'
+			}).then( answer => spriteName = answer.spriteName );
+
+			// Compute folder path with trailing slash
+			const folderPath = `${ bundlePath }${ switches.spritesPath }${ spriteName }/`;
+
+			// Destination sprite config file name
+			const destinationConfigPath = `${ bundlePath }${ switches.spritesPath }sprite-${spriteName}.config.js`;
+
+			// Create folders
+			Files.new( folderPath ).createFolders();
+
+			// Create sprite config and folder
+			Files.new( destinationConfigPath ).write(
+				Files.getFiles(`skeletons/scaffold/spriteConfig`).read()
+			);
+
+			// Log instructions
+			console.log('');
+			console.log('Sprite created.'.green);
+			console.log(`Add images into ${ folderPath.bold } folder, named with dash-case convention.`.yellow);
+			console.log(`Sprite can be configured by editing ${ destinationConfigPath.bold } file.`.yellow);
+			console.log(`Import your sprite in ${ `${bundlePath}Main.less`.bold } after a first ${ `node fuse sprites`.bold }. `.yellow);
+			console.log('');
+		}
+	},
+
+	/**
+	 * Scaffold a new font face
+	 */
+	{
+		name: 'Font face',
+		exec: async () =>
+		{
+			// Where fonts are stored
+			const fontsFolder = `${switches.srcPath}${switches.commonBundleName}/fonts/`;
+
+			// Convertion instructions
+			console.log('');
+			console.log('--- CONVERT YOUR FONT ---'.yellow.bold);
+			console.log('1. Go to http://www.font2web.com/ and convert your font.'.yellow);
+			console.log('2. Only keep .eot .ttf .woff files.'.yellow);
+			console.log('3. Rename them with the same filename, as dash-case.'.yellow);
+			console.log('4. Put them into a folder named with the same name.'.yellow);
+			console.log(`5. Move this folder into ${ fontsFolder.bold } directory.`.yellow);
+			console.log('');
+			console.log(`Ex : ${ fontsFolder }helvetica-neue-bold/helvetica-neue-bold.{eot,ttf,woff}`);
+			console.log('');
+
+			// Get file name
+			let filename = '';
+			await Inquirer.prompt({
+				type: 'input',
+				message: 'What is the dash-case filename of the font, with font variant ? (ex : helvetica-neue-bold)',
+				name: 'filename'
+			}).then( answer => filename = answer.filename );
+
+			// Get mixin name
+			let mixinName = '';
+			await Inquirer.prompt({
+				type: 'input',
+				message: 'What CamelCase mixin name do you want, without font variant ? (ex : HelveticaNeue)',
+				name: 'mixinName'
+			}).then( answer => mixinName = CapitalizeFirst(answer.mixinName, true) );
+
+			// Get font variant
+			let fontVariant = '';
+			await Inquirer.prompt({
+				type: 'input',
+				message: 'What is the camelCase font variant ? (ex : bold or regular)',
+				name: 'fontVariant'
+			}).then( answer => fontVariant = CapitalizeFirst(answer.fontVariant, false) );
+
+			// Scaffold file
+			Files.new(`${fontsFolder}${mixinName}-${fontVariant}.less`).write(
+				QuickTemplate(
+					Files.getFiles('skeletons/scaffold/fontStyle').read(),
+					{
+						fontFamilyName: filename,
+						fontClassName: mixinName,
+						fontVariant: fontVariant
+					}
+				)
+			);
+
+			// Show import instructions
+			console.log('');
+			console.log('Font face created.'.green);
+			console.log(`Import your font as (reference) in ${ `${switches.srcPath}${switches.commonBundleName}/Main.less`.bold }`.yellow);
+			console.log('');
+		}
+	},
+
+	// Separator
+	{ name: new Inquirer.Separator() },
+
+];
+
+// ----------------------------------------------------------------------------- PUBLIC API
 
 module.exports = {
 
 	/**
-	 * Generate sprites
+	 * Start scaffolder
 	 */
-	generateSprites: () => new Promise( (resolve) =>
-	{
-		// ------------------------------------------------------------------------- PREPARE
+	startScaffolder: () => new Promise(
 
-		// Get skeletons
-		let skeletons = [
-
-			// LESS Template
-			{
-				extension: 'less',
-				template: Handlebars.compile(
-					Files.getFiles(`skeletons/sprites/spriteTemplateLess`).read()
-				)
-			},
-
-			// JSON Template
-			{
-				extension: 'ts',
-				template: Handlebars.compile(
-					Files.getFiles(`skeletons/sprites/spriteTemplateTypescript`).read()
-				)
-			},
-		];
-
-
-		// Generate sprite seed for cache busting
-		const spriteSeed = (
-			(Math.random() * Math.pow(10, 16)).toString(16)
-			+ new Date().getTime().toString(16)
-		);
-
-
-		// ------------------------------------------------------------------------- GENERATE STYLE SHEET
-
-		// Function called to generate a stylesheet
-		const generateStylesheets = (pSpriteName, pSpriteData, pStylesheetOutputPath, pPNGOutputPath, pStylesheetOptions, pCallback) =>
+		( resolve ) =>
 		{
-			// Create clean styleSheet data for handlebars skeletons
-			const cleanStylesheetData = {
-				spriteName    : pSpriteName,
-				spritePrefix  : pStylesheetOptions.prefix,
-				spriteSeed    : spriteSeed,
-				spriteWidth   : pSpriteData.width,
-				spriteHeight  : pSpriteData.height,
-				spritePath    : pStylesheetOptions.spritePath,
-				textures      : []
-			};
+			// Get scaffolder to present listing to user
+			let scaffolderTypes = scaffolders.map( scaffolder => scaffolder.name );
 
-			// Browse images
-			for (let i in pSpriteData.images)
+			// List available scaffolders to user
+			Inquirer.prompt({
+				type: 'list',
+				name: 'type',
+				message: 'What kind of component to create ?',
+				choices: scaffolderTypes,
+				pageSize: 20
+			}).then( answer =>
 			{
-				// Target this image data
-				let currentImage = pSpriteData.images[i];
+				// Get scaffolder index
+				const scaffolderIndex = scaffolderTypes.indexOf( answer.type );
 
-				// Add clean data to clean styleSheet data
-				cleanStylesheetData.textures.push({
-					x       : currentImage.x,
-					y       : currentImage.y,
-					width   : currentImage.width,
-					height  : currentImage.height,
-					name    : path.basename( currentImage.path, path.extname( currentImage.path ) )
-				});
-			}
-
-			// Add lastOne flag for JSON files
-			cleanStylesheetData.textures[cleanStylesheetData.textures.length - 1].lastOne = true;
-
-			// Browse already loaded skeletons
-			for (let i in skeletons)
-			{
-				// Generate styleSheet from skeleton and write it to output file
-				let currentSkeleton = skeletons[i];
-				Files.new(`${pStylesheetOutputPath}.${currentSkeleton.extension}`).write(
-					currentSkeleton.template( cleanStylesheetData )
-				);
-			}
-
-			// We are all set
-			pCallback();
-		}
-
-
-		// ------------------------------------------------------------------------- GENERATE SPRITE
-
-		let totalSprites = 0;
-
-		// Browse bundles
-		Files.getFolders(`${ switches.srcPath }*`).all( bundle =>
-		{
-			// Browser sprites folders
-			Files.getFolders(`${ bundle }/${ switches.spritesPath }*/`).all(folder =>
-			{
-				console.log(`Generating sprite ${folder} ...`.yellow);
-
-				++totalSprites;
-
-				// Read sprite config
-				let spriteConfig;
-				try
-				{
-					spriteConfig = require(`./${ path.dirname(folder) }/sprite-${ path.basename(folder) }.config.js`);
-				}
-
-				// Default sprite config
-				catch (error)
-				{
-					console.log('Config file not found. Using default config'.yellow);
-					spriteConfig = defaultSpriteConfig;
-				}
-
-				// Get images list
-				const images = Files.getFiles( path.join(folder, '*.+(jpg|jpeg|png|gif)') ).files;
-
-				// Get sprite name from folder name
-				const spriteName = path.basename( folder );
-
-				// Output path for styles / typescript and PNG file
-				const outputPath = `${ bundle }/${switches.spritesPath}${spritePrefix}${separator}${spriteName}`;
-
-				// Compute nsg options
-				const nsgOptions = {
-
-					// List of all images to include
-					src: images,
-
-					// Compiled PNG sprite file path
-					spritePath: `${outputPath}.png`,
-
-					// Compiled stylesheet path, without extension
-					stylesheetPath: outputPath,
-
-					// Stylesheet options
-					stylesheetOptions: {
-						// Prefix for each image
-						prefix		: `${spritePrefix}${separator}${spriteName}`,
-
-						// Relative path from web page to get PNG file
-						spritePath  : `./${spritePrefix}${separator}${spriteName}.png`,
-
-						// Pixel ratio from sprite config
-						pixelRatio  : spriteConfig.pixelRatio
-					},
-
-					// Layout config from config file
-					layout: spriteConfig.layout,
-
-					// Layout options from config file
-					layoutOptions: spriteConfig.layoutOptions,
-
-					// Use pure node compositor
-					compositor: 'jimp',
-
-					// Compositor options from config file
-					compositorOptions: spriteConfig.compositorOptions,
-
-					// Method to generate sprite sheet
-					stylesheet : generateStylesheets.bind(this, spriteName)
-				};
-
-				// Compile and check errors
-				nsg(nsgOptions, (err) =>
-				{
-					// If we have an error
-					if (err)
-					{
-						console.log(`Error while creating sprite ${ err }`.red.bold);
-						console.log("\007");
-						process.exit(1);
-					}
-
-					// If every sprite has compiled
-					else if (--totalSprites === 0)
-					{
-						// We are done
-						resolve();
-					}
-				});
+				// Start this scaffolder
+				scaffolders[ scaffolderIndex ].exec();
 			});
-
-		});
-
-	})
+		}
+	)
 
 }
+
+
+
