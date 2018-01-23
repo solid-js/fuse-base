@@ -7,8 +7,8 @@ import {EnvUtils} from "solidify-lib/utils/EnvUtils";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-// Get app bundle name from index.ts
-const appBundleName = require('./index').name;
+// App bundle name on local module scope
+let appBundleName:string;
 
 
 export class Main extends App
@@ -36,6 +36,9 @@ export class Main extends App
 	{
 		// Inject params into config
 		GlobalConfig.instance.inject( pParams );
+
+		// Get app bundle name now it's loaded
+		appBundleName = require('./index').name;
 
 		// Register init of this app bundle and get init count to avoid HMR
 		SolidBundles.registerAppBundleInit( appBundleName );
