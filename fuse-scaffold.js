@@ -319,36 +319,44 @@ const scaffolders = [
 	 */
 	{
 		name: 'Sprite',
-		exec: () =>
+		exec: async () =>
 		{
-			Inquirer.prompt({
+			// Get bundle path
+			let bundlePath = '';
+			await askWhichBundle().then( answer =>
+			{
+				bundlePath = answer.bundleName;
+			});
+
+			// Get sprite name
+			let spriteName = '';
+			await Inquirer.prompt({
 				type: 'input',
 				message: 'Sprite name ? (avoid using word "sprite" and use dash-case)',
 				name: 'spriteName'
-			}).then( answer =>
-			{
-				// Destination sprite config file name
-				const destinationSpriteConfigFileName = 'sprite-config.js';
+			}).then( answer => spriteName = answer.spriteName );
 
-				// Get sprite name from answer
-				const spriteName = answer.spriteName;
+			// Compute folder path with trailing slash
+			const folderPath = `${ bundlePath }${ switches.spritesPath }${ spriteName }/`;
 
-				// Compute folder path with trailing slash
-				const folderPath = `${ switches.srcPath }${ switches.commonBundleName }/${ switches.spritesPath }${ spriteName }/`;
+			// Destination sprite config file name
+			const destinationConfigPath = `${ bundlePath }${ switches.spritesPath }sprites-${spriteName}.config.js`;
 
-				// Create sprite config and folder
-				Files.new(`${folderPath}${destinationSpriteConfigFileName}`).write(
-					Files.getFiles(`skeletons/scaffold/spriteConfig`).read()
-				);
+			// Create folders
+			Files.new( folderPath ).createFolders();
 
-				// Log instructions
-				console.log('');
-				console.log('Sprite created.'.green);
-				console.log(`Add images into ${ folderPath.bold } folder, named with dash-case convention.`.yellow);
-				console.log(`Sprite can be configured by editing ${ destinationSpriteConfigFileName.bold } file.`.yellow);
-				console.log(`Import your sprite in ${ `${switches.srcPath}${switches.commonBundleName}/Main.less`.bold } after a first ${ `node fuse sprites`.bold }. `.yellow);
-				console.log('');
-			});
+			// Create sprite config and folder
+			Files.new( destinationConfigPath ).write(
+				Files.getFiles(`skeletons/scaffold/spriteConfig`).read()
+			);
+
+			// Log instructions
+			console.log('');
+			console.log('Sprite created.'.green);
+			console.log(`Add images into ${ folderPath.bold } folder, named with dash-case convention.`.yellow);
+			console.log(`Sprite can be configured by editing ${ destinationConfigPath.bold } file.`.yellow);
+			console.log(`Import your sprite in ${ `${bundlePath}Main.less`.bold } after a first ${ `node fuse sprites`.bold }. `.yellow);
+			console.log('');
 		}
 	},
 
@@ -456,6 +464,3 @@ module.exports = {
 	)
 
 }
-
-
-

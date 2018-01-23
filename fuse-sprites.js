@@ -118,95 +118,101 @@ module.exports = {
 
 		let totalSprites = 0;
 
-		// Browser sprites folders
-		Files.getFolders(`${ switches.srcPath }${ switches.commonBundleName }/${ switches.spritesPath }*/`).all(folder =>
+		// Browse bundles
+		Files.getFolders(`${ switches.srcPath }*`).all( bundle =>
 		{
-			console.log(`Generating sprite ${folder} ...`.yellow);
-
-			++totalSprites;
-
-			// Read sprite config
-			let spriteConfig;
-			try
+			// Browser sprites folders
+			Files.getFolders(`${ bundle }/${ switches.spritesPath }*/`).all(folder =>
 			{
-				spriteConfig = require(`./${ path.join(folder, 'sprite-config.js') }`);
-			}
+				console.log(`Generating sprite ${folder} ...`.yellow);
 
-			// Default sprite config
-			catch (error)
-			{
-				console.log('Config file not found. Using default config'.yellow);
-				spriteConfig = defaultSpriteConfig;
-			}
+				++totalSprites;
 
-			// Get images list
-			const images = Files.getFiles( path.join(folder, '*.+(jpg|jpeg|png|gif)') ).files;
-
-			// Get sprite name from folder name
-			const spriteName = path.basename( folder );
-
-			// Output path for styles / typescript and PNG file
-			const outputPath = `${switches.srcPath}${switches.commonBundleName}/${switches.spritesPath}${spritePrefix}${separator}${spriteName}`;
-
-			// Compute nsg options
-			const nsgOptions = {
-
-				// List of all images to include
-				src: images,
-
-				// Compiled PNG sprite file path
-				spritePath: `${outputPath}.png`,
-
-				// Compiled stylesheet path, without extension
-				stylesheetPath: outputPath,
-
-				// Stylesheet options
-				stylesheetOptions: {
-					// Prefix for each image
-					prefix		: `${spritePrefix}${separator}${spriteName}`,
-
-					// Relative path from web page to get PNG file
-					spritePath  : `./${spritePrefix}${separator}${spriteName}.png`,
-
-					// Pixel ratio from sprite config
-					pixelRatio  : spriteConfig.pixelRatio
-				},
-
-				// Layout config from config file
-				layout: spriteConfig.layout,
-
-				// Layout options from config file
-				layoutOptions: spriteConfig.layoutOptions,
-
-				// Use pure node compositor
-				compositor: 'jimp',
-
-				// Compositor options from config file
-				compositorOptions: spriteConfig.compositorOptions,
-
-				// Method to generate sprite sheet
-				stylesheet : generateStylesheets.bind(this, spriteName)
-			};
-
-			// Compile and check errors
-			nsg(nsgOptions, (err) =>
-			{
-				// If we have an error
-				if (err)
+				// Read sprite config
+				let spriteConfig;
+				try
 				{
-					console.log(`Error while creating sprite ${ err }`.red.bold);
-					console.log("\007");
-					process.exit(1);
+					spriteConfig = require(`./${ path.dirname(folder) }/sprite-${ path.basename(folder) }.config.js`);
 				}
 
-				// If every sprite has compiled
-				else if (--totalSprites === 0)
+				// Default sprite config
+				catch (error)
 				{
-					// We are done
-					resolve();
+					console.log('Config file not found. Using default config'.yellow);
+					spriteConfig = defaultSpriteConfig;
 				}
+
+				// Get images list
+				const images = Files.getFiles( path.join(folder, '*.+(jpg|jpeg|png|gif)') ).files;
+
+				// Get sprite name from folder name
+				const spriteName = path.basename( folder );
+
+				// Output path for styles / typescript and PNG file
+				const outputPath = `${ bundle }/${switches.spritesPath}${spritePrefix}${separator}${spriteName}`;
+
+				// Compute nsg options
+				const nsgOptions = {
+
+					// List of all images to include
+					src: images,
+
+					// Compiled PNG sprite file path
+					spritePath: `${outputPath}.png`,
+
+					// Compiled stylesheet path, without extension
+					stylesheetPath: outputPath,
+
+					// Stylesheet options
+					stylesheetOptions: {
+						// Prefix for each image
+						prefix		: `${spritePrefix}${separator}${spriteName}`,
+
+						// Relative path from web page to get PNG file
+						spritePath  : `./${spritePrefix}${separator}${spriteName}.png`,
+
+						// Pixel ratio from sprite config
+						pixelRatio  : spriteConfig.pixelRatio
+					},
+
+					// Layout config from config file
+					layout: spriteConfig.layout,
+
+					// Layout options from config file
+					layoutOptions: spriteConfig.layoutOptions,
+
+					// Use pure node compositor
+					compositor: 'jimp',
+
+					// Compositor options from config file
+					compositorOptions: spriteConfig.compositorOptions,
+
+					// Method to generate sprite sheet
+					stylesheet : generateStylesheets.bind(this, spriteName)
+				};
+
+				// Compile and check errors
+				nsg(nsgOptions, (err) =>
+				{
+					// If we have an error
+					if (err)
+					{
+						console.log(`Error while creating sprite ${ err }`.red.bold);
+						console.log("\007");
+						process.exit(1);
+					}
+
+					// If every sprite has compiled
+					else if (--totalSprites === 0)
+					{
+						// We are done
+						resolve();
+					}
+				});
 			});
+
 		});
+
 	})
 
 }
