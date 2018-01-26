@@ -484,6 +484,10 @@ Sparky.task('config:bundles', () =>
 		});
 	}
 
+	// Write fake vendors map so browser stops annoying us with this.
+	Files.new(`${switches.distPath}${switches.bundlesPath}${switches.vendorsBundleName}.js.map`)
+	.write(`{"version":0,"sources":[],"mappings":[]}`);
+
 	/**
 	 * BUNDLES TO REQUIRE INTO COMMON
 	 * TODO : HUGE DOC
@@ -848,9 +852,9 @@ let configTasks = ['config:fuse', 'config:bundles', 'config:typeCheck'];
  * Load configs and run fuse !
  * Will read options from CLI.
  */
-Sparky.task('dev', ['deploy', 'atoms', 'config:options'].concat( configTasks ), () =>
+Sparky.task('dev', ['deploy', 'atoms', 'config:options'].concat( configTasks ), async () =>
 {
-	fuse.run();
+	await fuse.run();
 });
 
 /**
