@@ -4,6 +4,11 @@
 declare export class Files
 {
 	/**
+	 * Enable or disable console log
+	 */
+	static setVerbose (value:boolean):void;
+
+	/**
 	 * Shortcut to target existing files from a glob.
 	 */
 	static getFiles (pGlob):Files;

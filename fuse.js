@@ -529,6 +529,10 @@ Sparky.task('config:typeCheck', () =>
 		basePath: switches.srcPath,
 		shortenFilenames: true
 	});
+	console.log('');
+
+	// First type check to know if hot module reloading is ready
+	let firstCheck = true;
 
 	// Shortcut method to run Type Checking with alerts if anything failed
 	const runTypeCheck = () =>
@@ -544,11 +548,20 @@ Sparky.task('config:typeCheck', () =>
 		(totalErrors > 0)
 		? console.log("\007")
 		: console.log(`Bundles checked !`.green);
+		console.log('');
 
 		// Quit with an error if we are in quantum mode
 		if (options.quantum && totalErrors > 0)
 		{
 			process.exit(1);
+		}
+
+		// Show that hot module reloading is ready so we do not wait anymore
+		if (!options.quantum && !options.reload && firstCheck)
+		{
+			firstCheck = false;
+			console.log(`Hot Module Reloading is ready`.cyan.italic);
+			console.log('');
 		}
 	};
 
@@ -715,7 +728,6 @@ const cli = CLI({
 
 		'production' : `
 			Run fuse, compile sprites, and compile all bundles for production (Quantum + Uglify enabled).
-			After fuse, it will optimize generated resources.
 
 			${'@param --verbose'.bold}
 				- Enable debug and verbose mode on fuse
@@ -728,7 +740,8 @@ const cli = CLI({
 		`,
 
 		'optimize' : `
-			Optimize fuse generated resources. 
+	 		Optimize every images inside src folder and create .min versions with imagemin.
+	 		Sprites images will not be optimized because node fuse sprites handles it.
 		`,
 	}
 });
@@ -809,7 +822,7 @@ Sparky.task('lessCheck', () =>
 		let lessLint = spawn('./node_modules/less/bin/lessc', ['--no-ie-compat', '--lint', '--no-color', file]);
 
 		// Get error
-		let stderr = lessLint.stderr.toString();
+		let stderr = (lessLint.stderr || '').toString();
 
 		// Exit with error code if there is anything wrong
 		if (stderr !== '')
@@ -865,9 +878,6 @@ Sparky.task('production', ['deploy', 'atoms', 'sprites', 'config:options', 'conf
 {
 	// Compile with fuse now everything is ready
 	await fuse.run();
-
-	// Optimize generated resources
-	Sparky.exec('optimize');
 });
 
 /**
@@ -887,7 +897,8 @@ Sparky.task('sprites', ['cleanSprites'], async () =>
 });
 
 /**
- * Optimize generated resources
+ * Optimize every images inside src folder and create .min versions with imagemin.
+ * Sprites images will not be optimized because node fuse sprites handles it.
  */
 Sparky.task('optimize', async () =>
 {
@@ -943,7 +954,11 @@ Sparky.task('noProblemo', async () =>
 	// Reinstall node_modules with full-blast method
 	console.log('Reinstalling node modules ...'.yellow);
 	let npmUpdate = spawn('npm', ['run', 'please']);
-	console.log(npmUpdate.stderr.toString() || npmUpdate.stdout.toString());
+	console.log(
+		(npmUpdate.stderr || '').toString()
+		||
+		(npmUpdate.stdout || '').toString()
+	);
 	console.log('Done !'.green);
 	console.log('')
 

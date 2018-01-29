@@ -6,6 +6,9 @@ const fse = require('fs-extra');
 const colors = require('colors'); // @see : https://github.com/marak/colors.js/
 
 
+// Verbose enabled by default
+let verbose = true;
+
 
 /**
  * Files class.
@@ -38,6 +41,14 @@ class Files
 	static new (pPath)
 	{
 		return new Files(pPath, false, false);
+	}
+
+	/**
+	 * Enable or disable console log
+	 */
+	static setVerbose ( pVerbose )
+	{
+		verbose = pVerbose;
 	}
 
 
@@ -108,14 +119,14 @@ class Files
 	 */
 	delete ()
 	{
-		console.log(`Files.delete ${this.glob} ...`.yellow);
+		verbose && console.log(`Files.delete ${this.glob} ...`.yellow);
 
 		// Browse files or folders
 		this.files.map( file =>
 		{
 			// Remove
 			fse.removeSync( file );
-			console.log( `	Deleted ${file}`.grey );
+			verbose && console.log( `	Deleted ${file}`.grey );
 		});
 	}
 
@@ -125,18 +136,27 @@ class Files
 	 */
 	moveTo ( pDest )
 	{
-		console.log(`Files.moveTo ${this.glob} ...`.yellow);
+		verbose && console.log(`Files.moveTo ${this.glob} ...`.yellow);
+
+		// Trailing slash means we move the file inside the directory
+		const destIsADirectory = (
+			(pDest.lastIndexOf('/') === pDest.length - 1)
+		);
 
 		// Browse files or folders
 		this.files.map( file =>
 		{
 			// Get file name and compute destination file name
 			const fileName = path.basename( file );
-			const destination = path.join(pDest, fileName);
+			const destination = (
+				destIsADirectory
+					? path.join(pDest, fileName)
+					: pDest
+			)
 
 			// Move
 			fse.moveSync( file, destination );
-			console.log( `	${file} moved to ${destination}`.grey );
+			verbose && console.log( `	${file} moved to ${destination}`.grey );
 		});
 	}
 
@@ -147,11 +167,10 @@ class Files
 	 */
 	copyTo ( pDest )
 	{
-		console.log(`Files.copyTo ${this.glob} ...`.yellow);
+		verbose && console.log(`Files.copyTo ${this.glob} ...`.yellow);
 
+		// Trailing slash means we move the file inside the directory
 		const destIsADirectory = (
-			/*fs.lstatSync( pDest ).isDirectory()
-			||*/
 			(pDest.lastIndexOf('/') === pDest.length - 1)
 		);
 
@@ -168,7 +187,7 @@ class Files
 
 			// Copy
 			fse.copySync( file, destination );
-			console.log( `	${file} copied to ${destination}`.grey );
+			verbose && console.log( `	${file} copied to ${destination}`.grey );
 		});
 	}
 

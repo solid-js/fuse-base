@@ -25,5 +25,24 @@ module.exports = {
 
 		// Filter applied at composition ('all', 'none', 'sub', 'up', 'average', 'paeth')
 		filter          	: 'none'
+	},
+
+	// Remove this object to bypass imagemin
+	imagemin : {
+
+		// Output quality
+		//quality: '30-60',
+
+		// Dithering level
+		//floyd: .5,
+
+		// True to disable dithering
+		//nofs: true,
+
+		// Reduce number of color depth bits (from 0 to 4)
+		//posterize: 0,
+
+		// Speed trade-off (1: no speed opt, 10: Max speed but lower quality)
+		//speed: 3
 	}
 }
