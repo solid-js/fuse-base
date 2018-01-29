@@ -697,6 +697,11 @@ const cli = CLI({
 			Automatically done by ${'dev'.bold} and ${'production'.bold}.
 		`,
 
+		'optimize' : `
+	 		Optimize every images inside src folder and create .min versions with imagemin.
+	 		Sprites images will not be optimized because node ${'fuse sprites'.bold} handles it.
+		`,
+
 		'dev' : `
 			Run fuse, compile all bundles and watch.
 
@@ -737,11 +742,6 @@ const cli = CLI({
 
 			${'@param --noTypeCheck'.bold}
 				- Disable type checking, only for quick tests !
-		`,
-
-		'optimize' : `
-	 		Optimize every images inside src folder and create .min versions with imagemin.
-	 		Sprites images will not be optimized because node fuse sprites handles it.
 		`,
 	}
 });
