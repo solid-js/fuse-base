@@ -26,7 +26,9 @@
     "preserveConstEnums": true,
 
 		"importHelpers" : true,
-		"noEmitHelpers" : true
+		"noEmitHelpers" : true,
+
+    "allowUnreachableCode" : true
   },
 
 	"include" : [
