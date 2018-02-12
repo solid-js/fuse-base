@@ -7,7 +7,7 @@ It combines [Fuse-box](https://fuse-box.org/), [Typescript](https://www.typescri
 
 # Table of content
 
-- [00 - What and why](#What)
+- [00 - About](#about)
 - [01 - Install and setup](https://github.com/solid-js/fuse-base/blob/master/docs/01-Install-and-setup.md)
 - ~~WIP [02 - Architecture]()~~
 - ~~WIP [03 - Fuse and tasks]()~~
