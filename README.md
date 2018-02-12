@@ -12,13 +12,17 @@ It combines [Fuse-box](https://fuse-box.org/), [Typescript](https://www.typescri
 - ~~[02 - Architecture]()~~
 - ~~[03 - Fuse and tasks]()~~
 - ~~[04 - Deployer and environments]()~~
-- ~~[05 - Bundles and code splitting]()~~
+- ~~[05 - Bundles, vendors and code splitting]()~~
 - ~~[06 - Components and atomic design]()~~
 - ~~[07 - BEM]()~~
 - ~~[08 - React components]()~~
 - ~~[09 - Zepto components]()~~
 - ~~[10 - Sprites generator]()~~
 - ~~[11 - Scaffolder]()~~
+- ~~[12 - GlobalConfig]()~~
+- ~~[13 - Locales and translations]()~~
+- ~~[14 - Assets vs medias]()~~
+
 
 
 
