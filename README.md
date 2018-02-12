@@ -9,28 +9,28 @@ It combines [Fuse-box](https://fuse-box.org/), [Typescript](https://www.typescri
 
 - [00 - What and why](#What)
 - [01 - Install and setup](https://github.com/solid-js/fuse-base/blob/master/docs/01-Install-and-setup.md)
-- ~~[02 - Architecture]()~~
-- ~~[03 - Fuse and tasks]()~~
-- ~~[04 - Deployer and environments]()~~
-- ~~[05 - Bundles, vendors and code splitting]()~~
-- ~~[06 - Components and atomic design]()~~
-- ~~[07 - BEM]()~~
-- ~~[08 - React components]()~~
-- ~~[09 - Zepto components]()~~
-- ~~[10 - Sprites generator]()~~
-- ~~[11 - Scaffolder]()~~
-- ~~[12 - GlobalConfig]()~~
-- ~~[13 - Locales and translations]()~~
-- ~~[14 - Assets vs medias]()~~
+- ~~WIP [02 - Architecture]()~~
+- ~~WIP [03 - Fuse and tasks]()~~
+- ~~WIP [04 - Deployer and environments]()~~
+- ~~WIP [05 - Bundles, vendors and code splitting]()~~
+- ~~WIP [06 - Components and atomic design]()~~
+- ~~WIP [07 - BEM]()~~
+- ~~WIP [08 - React components]()~~
+- ~~WIP [09 - Zepto components]()~~
+- ~~WIP [10 - Sprites generator]()~~
+- ~~WIP [11 - Scaffolder]()~~
+- ~~WIP [12 - GlobalConfig]()~~
+- ~~WIP [13 - Locales and translations]()~~
+- ~~WIP [14 - Assets vs medias]()~~
 
 
 
 
-# What
+# About
 
 #### For who ?
 
-- Front-end developers
+- Front-end developers and people working with Javascript every day
 - Studios, agencies and freelancers
 - Used by a small team working on [real projects](http://cher-ami.tv/)
  
@@ -50,8 +50,6 @@ It combines [Fuse-box](https://fuse-box.org/), [Typescript](https://www.typescri
 - Create components or pages interactively from your shell thanks to embedded scaffolder
 
 
-
-# Why
 
 #### Why Fuse ?
 
@@ -73,12 +71,12 @@ Also, Typescript is a static version of ECMA, and will evolve along with it, not
 
 #### Why React ?
 
-**TODO**
+**WIP**
 
 
 #### Why Less ?
 
-**TODO**
+**WIP**
 
 
 #### Which IDE ?
@@ -94,13 +92,13 @@ Other IDE can also work well thanks to Typescript :)
 #### About me
 
 [Solid Fuse Base](https://github.com/solid-js/fuse-base) and [Solidify Lib](https://github.com/solid-js/solidify) are projects maintained by [Alexis Bouhet](https://github.com/zouloux), lead developer at [Cher Ami](http://cher-ami.tv/).
-I do websites and applications since more than 10 years now. Started with Flash and Adobe Air, then mobile and Javascript.
-I try to integrate recurring tasks from my [professional and personal](http://zouloux.com) projects into this Framework / Workflow.
+Started with Flash and Adobe Air, then mobile and Javascript, making websites and applications since more than 10 years now. 
+I try to integrate recurring tasks from my [professional and personal](http://zouloux.com) projects into this Framework and Workflow.
+I want to keep things simple and avoid to the maximum common mistakes a team can make.
 
 
 #### Future
 
-I want to keeps things simple and avoid a maximum the common mistakes a team can make.
 This project is meant to stay at human scale and will not grow a lot more than this.
-Features will be added when needed several websites or webapp projects. Older features will be removed but still available with tags.
-Feel free to contact me for more info.
+Features will be added when needed several websites or webapp projects. Older features will be removed but will still be available with tags and branches.
+Feel free to contact me for more info or observation !

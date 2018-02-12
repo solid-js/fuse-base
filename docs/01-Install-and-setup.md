@@ -1,5 +1,9 @@
 # Install a new project
 
+You will need the latest [NodeJS](https://nodejs.org/en/) version installed on your environment.
+We advice to use [NVM](https://github.com/creationix/nvm) if you are on Linux or MacOS.
+
+
 ##### MacOS or Linux :
 - `curl https://raw.githubusercontent.com/solid-js/fuse-base/master/install.sh | sh`
 - `node setup` and follow instructions.
