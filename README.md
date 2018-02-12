@@ -95,7 +95,7 @@ Other IDE can also work well thanks to Typescript :)
 
 [Solid Fuse Base](https://github.com/solid-js/fuse-base) and [Solidify Lib](https://github.com/solid-js/solidify) are projects maintained by [Alexis Bouhet](https://github.com/zouloux), lead developer at [Cher Ami](http://cher-ami.tv/).
 I do websites and applications since more than 10 years now. Started with Flash and Adobe Air, then mobile and Javascript.
-I try to integrate recurring tasks from my [professional and personal]() projects into this Framework / Workflow.
+I try to integrate recurring tasks from my [professional and personal](http://zouloux.com) projects into this Framework / Workflow.
 
 
 #### Future
