@@ -62,7 +62,7 @@ const { QuickTemplate } = require('./helpers/quick-template');
 const { getAsyncBundlesFromGlob, filterShimsForQuantum } = require("./helpers/fuse-helpers");
 
 // Get Files helper for easy Files/Folder manipulating
-const { Files } = require("./helpers/files");
+const { Files } = require('@zouloux/files');
 
 // Get fuse switches
 const switches = require('./fuse-switches');

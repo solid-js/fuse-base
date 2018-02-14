@@ -1,5 +1,5 @@
 const Inquirer = require('inquirer');
-const { Files } = require('./helpers/files');
+const { Files } = require('@zouloux/files');
 
 // Setup process
 const setup = async () =>

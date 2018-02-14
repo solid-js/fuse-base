@@ -4,9 +4,12 @@ import {GlobalConfig} from "../_common/data/GlobalConfig";
 import {AppView} from "./components/appView/AppView";
 import {SolidBundles} from "solidify-lib/helpers/SolidBundles";
 import {EnvUtils} from "solidify-lib/utils/EnvUtils";
-import {ResponsiveManager} from "solidify-lib/helpers/ResponsiveManager";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+
+// App bundle name on local module scope
+let appBundleName:string;
+
 
 export class Main extends App
 {
@@ -29,17 +32,23 @@ export class Main extends App
 	/**
 	 * App constructor
 	 */
-	constructor ( pParams:any )
+	constructor ( pParams:any = null )
 	{
 		// Inject params into config
 		GlobalConfig.instance.inject( pParams );
 
+		// Get app bundle name now it's loaded
+		appBundleName = require('./index').name;
+
 		// Register init of this app bundle and get init count to avoid HMR
-		const initCount = SolidBundles.registerAppBundleInit( require('./index').name );
+		SolidBundles.registerAppBundleInit( appBundleName );
 
 		// Relay construction
-		// Do not launch init sequence if this is an HMR trigger
-		super( initCount == 0, pParams );
+		super(
+			// Do not launch init sequence if this is an HMR trigger
+			SolidBundles.getAppBundleInitCount( appBundleName ) == 0,
+			pParams
+		);
 	}
 
 	/**

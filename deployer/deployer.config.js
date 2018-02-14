@@ -1,4 +1,4 @@
-const { Files } = require('../helpers/files');
+const { Files } = require('@zouloux/files');
 const switches = require('../fuse-switches');
 
 module.exports = [

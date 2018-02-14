@@ -2,7 +2,7 @@
 const Inquirer = require('inquirer');
 const path = require('path');
 const switches = require('./fuse-switches');
-const { Files } = require('./helpers/files');
+const { Files } = require('@zouloux/files');
 const { QuickTemplate } = require('./helpers/quick-template');
 const { CapitalizeFirst } = require('./helpers/capitalize');
 

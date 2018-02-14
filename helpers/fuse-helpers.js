@@ -1,6 +1,6 @@
 
 const path = require('path');
-const { Files } = require('./files');
+const { Files } = require('@zouloux/files');
 
 module.exports = {
 
