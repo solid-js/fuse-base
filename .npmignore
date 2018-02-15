@@ -1,0 +1,12 @@
+# This file is here so Strider CD is able to transfer specific ressources to production servers.
+# Without this file, .gitignore file is used and so deployed files will be not on production
+# Also, we do not need following path on production server :
+
+# Do not transfer those files to production servers :
+deployer/
+helpers/
+skeletons/
+node_modules/
+src/
+.*
+*.*
