@@ -3,6 +3,7 @@
 # Also, we do not need following path on production server :
 
 # Do not transfer those files to production servers :
+.fusebox
 deployer/
 
 docs/
@@ -10,5 +11,3 @@ helpers/
 node_modules/
 skeletons/
 src/
-.*
-*.*
