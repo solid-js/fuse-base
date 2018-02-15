@@ -1,7 +1,8 @@
 const { Files } = require('@zouloux/files');
 const switches = require('./fuse-switches');
 const path = require('path');
-const nsg = require('@zouloux/node-sprite-generator');
+//const nsg = require('@zouloux/node-sprite-generator');
+const nsg = require('node-sprite-generator');
 const Handlebars = require('handlebars');
 const { optimizeFiles } = require('./fuse-optimize');
 
