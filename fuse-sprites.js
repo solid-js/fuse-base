@@ -263,6 +263,8 @@ module.exports = {
 
 		});
 
+		// If we do not have any sprites, we are done
+		if (totalSprites === 0) resolve();
 	})
 
 }
