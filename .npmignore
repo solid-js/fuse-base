@@ -4,9 +4,11 @@
 
 # Do not transfer those files to production servers :
 deployer/
+
+docs/
 helpers/
-skeletons/
 node_modules/
+skeletons/
 src/
 .*
 *.*
