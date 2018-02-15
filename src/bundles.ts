@@ -4,15 +4,15 @@
 // IMPORTANT : This is why we generate it before compiling
 module.exports = {
   paths : [
-  		'default/_common/index',
-		'default/main/index',
-		'default/test-bundle/index'
+  		'default/bundles.ts/index',
+		'default/index.html/index',
+		'default/index.ts/index'
   ],
   requires : () => {
     return [
-  		require('./_common/index'),
-		require('./main/index'),
-		require('./test-bundle/index')
+  		require('./bundles.ts/index'),
+		require('./index.html/index'),
+		require('./index.ts/index')
     ]
   }
 };
