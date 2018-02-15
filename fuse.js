@@ -726,10 +726,6 @@ const cli = CLI({
 			${'@param --noTypeCheck'.bold}
 				- Disable type checking, only for quick tests !
 		`,
-		'devAfterPull' : `
-			Same as dev but exec ${`npm update`.bold} and clean tasks before.
-			Useful after a ${`git pull`.bold} when working in team.
-		`,
 
 		'production' : `
 			Run fuse, compile sprites, and compile all bundles for production (Quantum + Uglify enabled).
@@ -911,34 +907,6 @@ Sparky.task('optimize', async () =>
 Sparky.task('selectEnv', async () =>
 {
 	return require('./fuse-deploy').selectEnv();
-});
-
-/**
- * Select env.
- */
-Sparky.task('devAfterPull', async () =>
-{
-	// Reinstall node_modules with full-blast method
-	console.log('Updating node modules ...'.yellow);
-	spawn('npm', ['up']);
-	console.log('Done !'.green);
-	console.log('');
-
-	// Clean everything
-	console.log('Cleaning ...');
-	await Sparky.exec('clean');
-	console.log('Done !'.green);
-	console.log('');
-
-	// Generate sprites
-	console.log('Generating sprites ...');
-	await Sparky.exec('sprites');
-	console.log('Done !'.green);
-	console.log('');
-
-	// Tries dev mode
-	console.log('Retrying dev mode...');
-	await Sparky.exec('dev');
 });
 
 /**

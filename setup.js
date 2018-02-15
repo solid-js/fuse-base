@@ -1,5 +1,6 @@
 const Inquirer = require('inquirer');
 const { Files } = require('@zouloux/files');
+require('colors');
 
 // Setup process
 const setup = async () =>
