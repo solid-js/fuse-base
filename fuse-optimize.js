@@ -28,6 +28,8 @@ const defaultConfig = {
 	//speed: 3
 };
 
+let tempUniqid = Date.now();
+let counter = 0;
 
 module.exports = {
 
@@ -47,10 +49,9 @@ module.exports = {
 		// If we need to add .min extension, output in a temp folder
 		let tempOutput = (
 			pAddDotMinAndDoNotOverride
-			? `temp-${Date.now()}/`
+			? `temp-${tempUniqid}-${ ++counter }/`
 			: pOutputFolder
 		);
-
 
 		// @see : https://github.com/imagemin/imagemin
 		imagemin(
@@ -58,7 +59,7 @@ module.exports = {
 			pInputFiles,
 
 			// Output
-			`${ tempOutput }`,
+			tempOutput,
 			{
 				plugins: [
 					// @see : https://github.com/imagemin/imagemin-jpegtran
@@ -74,13 +75,13 @@ module.exports = {
 		.then( files =>
 		{
 			// Disable files logs
-			Files.setVerbose(false);
+			Files.setVerbose( false );
 
 			// If we need to add min extension
-			if (pAddDotMinAndDoNotOverride)
+			if ( pAddDotMinAndDoNotOverride )
 			{
 				// Browse images inside temp folder
-				Files.getFiles(`${tempOutput}${imagesMiniMatch}`).all( file =>
+				pInputFiles.map( file =>
 				{
 					// Read file extension
 					const ext = path.extname( file );
@@ -89,18 +90,22 @@ module.exports = {
 					const newFileName = `${ path.basename( file, ext ) }.min${ ext }`;
 
 					// Path of the minified image, in the same folder
-					const minifiedImagePath = path.join( pOutputFolder, newFileName);
+					const minifiedDestinationPath = path.join( pOutputFolder, newFileName);
 
 					// Delete previously minified image
-					Files.getFiles( minifiedImagePath ).delete();
+					Files.getFiles( minifiedDestinationPath ).delete();
 
 					// Move file inside the same folder
-					Files.getFiles( file ).moveTo( minifiedImagePath );
+					const minifiedTempPath = path.join(
+						tempOutput,
+						path.basename( file )
+					);
+					Files.getFiles( minifiedTempPath ).moveTo( minifiedDestinationPath );
 				});
-
-				// Remove temp folder
-				Files.getFolders( tempOutput ).delete();
 			}
+
+			// Remove temp folder
+			Files.getFolders( tempOutput ).delete();
 
 			// Enable files logs back
 			Files.setVerbose(true);
@@ -108,7 +113,7 @@ module.exports = {
 			// Show files
 			files.map( file =>
 			{
-				console.log(`Image ${ path.basename(file.path) } optimized.`.grey);
+				console.log(`	Image ${ path.basename(file.path) } optimized.`.grey);
 			});
 
 			// Done
@@ -128,6 +133,8 @@ module.exports = {
 			`${ switches.srcPath }*/!(${ path.basename( switches.spritesPath ) })/**/${ imagesMiniMatch }`
 		).all( imageFile =>
 		{
+			// TODO : Clean all .min files ? Do it in fuse.js ?
+
 			// Skip already minified images
 			const imageBaseName = path.basename( imageFile, path.extname(imageFile) );
 			if ( imageBaseName.lastIndexOf('.min') === (imageBaseName.length - 4) ) return;
