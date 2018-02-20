@@ -340,7 +340,7 @@ const scaffolders = [
 			const folderPath = `${ bundlePath }${ switches.spritesPath }${ spriteName }/`;
 
 			// Destination sprite config file name
-			const destinationConfigPath = `${ bundlePath }${ switches.spritesPath }sprites-${spriteName}.config.js`;
+			const destinationConfigPath = `${ bundlePath }${ switches.spritesPath }sprite-${spriteName}.config.js`;
 
 			// Create folders
 			Files.new( folderPath ).createFolders();
