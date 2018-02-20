@@ -105,7 +105,10 @@ module.exports = {
 			}
 
 			// Remove temp folder
-			Files.getFolders( tempOutput ).delete();
+			if (pAddDotMinAndDoNotOverride)
+			{
+				Files.getFolders( tempOutput ).delete();
+			}
 
 			// Enable files logs back
 			Files.setVerbose(true);
