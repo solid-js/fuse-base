@@ -2,10 +2,6 @@
 // ----------------------------------------------------------------------------- TODO ZONE
 
 /**
- * TODO Fuse :
- * - IMPORTANT Tester toutes les possibilités de Base et couvrir tous les problèmes
- * - Files.js + .d.ts to NPM
- *
  * TODO Doc :
  * - IMPORTANT bundles.ts
  * - deployer
@@ -44,13 +40,14 @@ const {
 const Sparky = require("fuse-box/sparky");
 
 // Some colors in the terminal
-const colors = require('colors'); // @see : https://github.com/marak/colors.js/
+// @see : https://github.com/marak/colors.js/
+require('colors');
 
 // Node path utils
 const path = require('path');
 
 // Node spawn process
-const spawn = require('child_process').spawnSync;
+const ChildProcess = require('child_process');
 
 // Get Typescript checking helper
 const { TypeHelper } = require('fuse-box-typechecker');
@@ -124,7 +121,8 @@ Sparky.task('config:fuse', () =>
 		debug: options.verbose,
 
 		// @see : http://fuse-box.org/page/configuration#alias
-		alias: { },
+		alias: {
+		},
 
 		// @see : https://fuse-box.org/page/configuration#auto-import
 		autoImport : {
@@ -514,7 +512,7 @@ Sparky.task('config:bundles', () =>
 Sparky.task('config:typeCheck', () =>
 {
 	// Disabled type checking from options
-	if (options != null && 'noTypeCheck' in options && options.noTypeCheck)
+	if ( options.noTypeCheck )
 	{
 		console.log(`\n > Warning, type checking disabled.`.red.bold);
 		console.log('');
@@ -592,14 +590,6 @@ Sparky.task('config:typeCheck', () =>
 
 
 // ----------------------------------------------------------------------------- CLI
-
-/**
- * Prepare options from CLI
- */
-Sparky.task('config:options', () =>
-{
-	options = cli.options;
-});
 
 /**
  * Force options for production
@@ -742,6 +732,9 @@ const cli = CLI({
 	}
 });
 
+// Get options from CLI
+options = cli.options;
+
 /**
  * Default task : show help panel
  */
@@ -798,35 +791,80 @@ Sparky.task('cleanSprites', () =>
 /**
  * Check every less file because fuse will silently fail if there is a less error.
  */
-Sparky.task('lessCheck', () =>
+Sparky.task('lessCheck', async () =>
 {
-	// Disabled less checking from options
-	if (options != null && 'noLessCheck' in options && options.noLessCheck)
+	return new Promise( (resolve, reject) =>
 	{
-		console.log(`\n > Warning, less checking disabled.`.red.bold);
-		console.log('');
-		return;
-	}
-
-	// Browser every files.
-	// BETTER : Only check not already check files. ?
-	Files.getFiles(`${switches.srcPath}**/*.less`).all( file =>
-	{
-		console.log(`Checking ${file} ...`.grey);
-
-		// Lint with lessc, do not compile anything
-		let lessLint = spawn('./node_modules/less/bin/lessc', ['--no-ie-compat', '--lint', '--no-color', file]);
-
-		// Get error
-		let stderr = (lessLint.stderr || '').toString();
-
-		// Exit with error code if there is anything wrong
-		if (stderr !== '')
+		// Disabled less checking from options
+		if ( options.noLessCheck )
 		{
-			console.log( stderr.red.bold );
-			console.log("\007");
-			process.exit(1);
+			console.log(`\n > Warning, less checking disabled.`.red.bold);
+			console.log('');
+			return;
 		}
+
+		// Browser every files.
+		const lessFiles = Files.getFiles(`${switches.srcPath}**/*.less`).files;
+
+		// Files counter
+		const totalLessFiles = lessFiles.length;
+		let checkedLessFiles = 0;
+
+		options.verbose && console.log(`Checking ${totalLessFiles} LESS files ...`.yellow);
+
+		// Method to parallelise less checking in batches
+		const launchAsyncProcessList = (pMaxParallelProcesses, pHandler) =>
+		{
+			// Iterate to make our batch
+			const destination = checkedLessFiles + pMaxParallelProcesses;
+			for (let i = checkedLessFiles; i < destination; i ++)
+			{
+				// Every files are compiled
+				if (i >= totalLessFiles)
+				{
+					// We are done !
+					pHandler();
+					return;
+				}
+
+				// Target our less file path
+				const lessFile = lessFiles[ i ];
+
+				// We do in parallel, intense !
+				// BETTER : Trouver un moyen de ne pas recheck plusieurs fois les mêmes fichiers
+				// Lint with lessc, do not compile anything
+				let lessLint = ChildProcess.spawn('./node_modules/less/bin/lessc', ['--no-ie-compat', '--lint', '--no-color', lessFile]);
+
+				// Less linter process finished
+				lessLint.on('close', (code) =>
+				{
+					// File checked
+					options.verbose && console.log(`	${lessFile} checked`.grey);
+
+					// Get error
+					let stderr = (lessLint.stderr.read() || '').toString();
+
+					// Exit with error code if there is anything wrong
+					if (stderr !== '' || code !== 0)
+					{
+						console.log( stderr.red.bold );
+						console.log("\007");
+						reject();
+						process.exit(1);
+					}
+
+					// Resolve when every file is checked
+					if (++checkedLessFiles >= destination)
+					{
+						launchAsyncProcessList(pMaxParallelProcesses, pHandler);
+					}
+				});
+			}
+		}
+
+		// Start less check batch and resolve promise when we are done
+		// This value seems to be a good ratio between crushing our CPU and checking duration
+		launchAsyncProcessList(20, resolve);
 	});
 });
 
@@ -861,7 +899,7 @@ let configTasks = ['config:fuse', 'config:bundles', 'config:typeCheck'];
  * Load configs and run fuse !
  * Will read options from CLI.
  */
-Sparky.task('dev', ['deploy', 'atoms', 'config:options'].concat( configTasks ), async () =>
+Sparky.task('dev', ['deploy', 'atoms'].concat( configTasks ), async () =>
 {
 	await fuse.run();
 });
@@ -870,7 +908,7 @@ Sparky.task('dev', ['deploy', 'atoms', 'config:options'].concat( configTasks ), 
  * Load configs and run fuse !
  * Will force options for production.
  */
-Sparky.task('production', ['deploy', 'atoms', 'sprites', 'config:options', 'config:production', 'lessCheck'].concat( configTasks ), async () =>
+Sparky.task('production', ['deploy', 'atoms', 'sprites', 'config:production', 'lessCheck'].concat( configTasks ), async () =>
 {
 	// Compile with fuse now everything is ready
 	await fuse.run();
@@ -921,7 +959,7 @@ Sparky.task('noProblemo', async () =>
 
 	// Reinstall node_modules with full-blast method
 	console.log('Reinstalling node modules ...'.yellow);
-	let npmUpdate = spawn('npm', ['run', 'please']);
+	let npmUpdate = ChildProcess.spawnSync('npm', ['run', 'please']);
 	console.log(
 		(npmUpdate.stderr || '').toString()
 		||
