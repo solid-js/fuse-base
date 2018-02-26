@@ -39,9 +39,10 @@ module.exports = {
 	 * @param pOutputFolder Output folder for every input files
 	 * @param pPngConfig Png config overriding default config
 	 * @param pAddDotMinAndDoNotOverride Do not override image and add .min extension before real file extension.
+	 * @param pShowLogs Show console.log
 	 * @return {Promise<any>}
 	 */
-	optimizeFiles : (pInputFiles, pOutputFolder, pPngConfig, pAddDotMinAndDoNotOverride) => new Promise( (resolve) =>
+	optimizeFiles : (pInputFiles, pOutputFolder, pPngConfig, pAddDotMinAndDoNotOverride, pShowLogs = true) => new Promise( (resolve) =>
 	{
 		// Clone default config and override with custom config
 		const pngConfig = { ... defaultConfig, ... pPngConfig };
@@ -114,9 +115,9 @@ module.exports = {
 			Files.setVerbose(true);
 
 			// Show files
-			files.map( file =>
+			pShowLogs && files.map( file =>
 			{
-				console.log(`	Image ${ path.basename(file.path) } optimized.`.grey);
+				console.log(`Image ${ path.basename(file.path) } optimized.`.grey);
 			});
 
 			// Done

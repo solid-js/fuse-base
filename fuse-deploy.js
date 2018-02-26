@@ -91,9 +91,7 @@ const showError = ( pReason, reject ) =>
 const selectEnv = (pEnvName) =>
 {
 	Files.new('deployer/env').write( pEnvName );
-	console.log('');
 	console.log(`Env ${pEnvName} is now selected.`.green);
-	console.log('');
 }
 
 
@@ -172,8 +170,6 @@ module.exports = {
 			// Check if we have a env name as argument
 			if ( 3 in process.argv )
 			{
-				console.log(`Tips : You can omit env name to select through a list : "node fuse selectEnv"`.grey);
-
 				// Get selected env name from arguments
 				const selectedEnvName = process.argv[3];
 

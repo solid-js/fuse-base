@@ -111,7 +111,9 @@ Sparky.task('config:fuse', () =>
 		hash: ( switches.generateWebIndex && options.uglify ),
 
 		// Disable cache when building with Quantum
-		cache: !options.quantum,
+		// FIXME : A tester
+		// TODO : Proposer une option ?
+		cache: true,//!options.quantum,
 
 		// Enable sourcemaps if we don't uglify output
 		sourceMaps: !options.uglify,
@@ -785,7 +787,9 @@ Sparky.task('clean', () =>
 Sparky.task('cleanSprites', () =>
 {
 	// Remove generated LESS / Typescript and PNG
+	Files.setVerbose(false);
 	Files.getFiles(`${ switches.srcPath }*/${ switches.spritesPath }*.+(less|ts|png)`).delete();
+	Files.setVerbose(true);
 });
 
 /**
@@ -901,6 +905,8 @@ let configTasks = ['config:fuse', 'config:bundles', 'config:typeCheck'];
  */
 Sparky.task('dev', ['deploy', 'atoms'].concat( configTasks ), async () =>
 {
+	console.log('');
+	console.log(`Compiling bundles ...`.yellow);
 	await fuse.run();
 });
 
@@ -908,9 +914,10 @@ Sparky.task('dev', ['deploy', 'atoms'].concat( configTasks ), async () =>
  * Load configs and run fuse !
  * Will force options for production.
  */
-Sparky.task('production', ['deploy', 'atoms', 'sprites', 'config:production', 'lessCheck'].concat( configTasks ), async () =>
+Sparky.task('production', ['deploy', 'atoms', 'sprites', 'lessCheck', 'config:production'].concat( configTasks ), async () =>
 {
-	// Compile with fuse now everything is ready
+	console.log('');
+	console.log(`Compiling bundles ...`.yellow);
 	await fuse.run();
 });
 

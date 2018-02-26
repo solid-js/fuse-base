@@ -51,6 +51,9 @@ const optimizeImages = () =>
 			png.spriteConfig.imagemin,
 
 			// Do not add .min.png extension, we override
+			false,
+
+			// No console.log
 			false
 		)
 
@@ -148,7 +151,6 @@ module.exports = {
 		// ------------------------------------------------------------------------- GENERATE SPRITE
 
 		let totalSprites = 0;
-		console.log(`Generating sprites ...`.yellow);
 
 		// Browse bundles
 		Files.getFolders(`${ switches.srcPath }*`).all( bundle =>
@@ -227,7 +229,7 @@ module.exports = {
 				// When a sprite is generated
 				const completeHandler = ( error ) =>
 				{
-					console.log(`Sprite ${spriteName} generated.`.grey);
+					//console.log(`Sprite ${spriteName} generated.`.grey);
 
 					// If there is an imagemin config
 					if ('imagemin' in spriteConfig)
@@ -252,6 +254,8 @@ module.exports = {
 					// If every sprite has compiled
 					else if (--totalSprites === 0)
 					{
+						console.log(`Done !`.cyan);
+
 						// Optimise images
 						Promise.all( optimizeImages() ).then( resolve );
 					}
@@ -265,6 +269,8 @@ module.exports = {
 
 		// If we do not have any sprites, we are done
 		if (totalSprites === 0) resolve();
+
+		console.log(`Generating ${totalSprites} sprites ...`.yellow);
 	})
 
 }
