@@ -62,31 +62,25 @@ export class HomePage extends ReactPage<ReactPageProps, States>
 	 */
 	action ()
 	{
-	    // Remove if not used
+		// Remove if not used
 	}
 
 	/**
 	 * Play in animation.
-	 * Have to return a promise when animation is ended.
+	 * Call complete handler when animation is done.
 	 */
-	playIn ():Promise<any>
+	protected playInPromiseHandler (pCompleteHandler:() => void)
 	{
-		return new Promise( resolve =>
-		{
-			resolve();
-		});
+		pCompleteHandler();
 	}
 
 	/**
 	 * Play out animation.
-	 * Have to return a promise when animation is ended.
+	 * Call complete handler when animation is done.
 	 */
-	playOut ():Promise<any>
+	protected playOutPromiseHandler (pCompleteHandler:() => void)
 	{
-		return new Promise( resolve =>
-		{
-			resolve();
-		});
+		pCompleteHandler();
 	}
 }
 

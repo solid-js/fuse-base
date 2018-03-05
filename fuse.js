@@ -249,7 +249,9 @@ Sparky.task('config:fuse', () =>
 				// Will use uglify-es on non legacy mode
 				uglify: (
 					options.uglify
-					? { es6 : !switches.legacySupport }
+					? {
+						es6 : !switches.legacySupport
+					}
 					: false
 				),
 
@@ -484,9 +486,13 @@ Sparky.task('config:bundles', () =>
 		});
 	}
 
-	// Write fake vendors map so browser stops annoying us with this.
-	Files.new(`${switches.distPath}${switches.bundlesPath}${switches.vendorsBundleName}.js.map`)
-	.write(`{"version":0,"sources":[],"mappings":[]}`);
+	// Do not create sourcemaps when uglifying
+	if ( !options.uglify )
+	{
+		// Write fake vendors map so browser stops annoying us with this.
+		Files.new(`${switches.distPath}${switches.bundlesPath}${switches.vendorsBundleName}.js.map`)
+		.write(`{"version":0,"sources":[],"mappings":[]}`);
+	}
 
 	/**
 	 * BUNDLES TO REQUIRE INTO COMMON
@@ -804,6 +810,7 @@ Sparky.task('lessCheck', async () =>
 		{
 			console.log(`\n > Warning, less checking disabled.`.red.bold);
 			console.log('');
+			resolve();
 			return;
 		}
 
@@ -934,6 +941,8 @@ Sparky.task('scaffold', async () =>
  */
 Sparky.task('sprites', ['cleanSprites'], async () =>
 {
+	// TODO : noSprites options for production
+	// TODO : Inutile si on fait un système de cache pour les sprites
 	return require('./fuse-sprites').generateSprites();
 });
 

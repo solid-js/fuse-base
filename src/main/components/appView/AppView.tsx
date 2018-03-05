@@ -66,7 +66,7 @@ export class AppView extends ReactView<Props, States>
 	// ------------------------------------------------------------------------- HANDLERS
 
 
-	protected transitionControl ($oldPage:Element, $newPage:Element, pOldPage:IPage, pNewPage:IPage) : Promise<any>
+	protected transitionControl ($oldPage:HTMLElement, $newPage:HTMLElement, pOldPage:IPage, pNewPage:IPage) : Promise<any>
 	{
 		console.log('transitionControl');
 

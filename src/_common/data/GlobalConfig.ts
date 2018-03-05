@@ -12,7 +12,7 @@ export class GlobalConfigProperties
 	base		:string;
 
 	// Root node where the app DOM will be append
-	root		:Element;
+	root		:HTMLElement;
 
 	// Locale translation code
 	locale		:string;
