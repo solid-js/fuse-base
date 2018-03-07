@@ -85,7 +85,7 @@ exports.extensions = ['ts', 'tsx', 'less'];
  * Allows HMR and code splitting for CSS.
  * Set to a 'filename.css' to generate a unique css bundle including every css instructions.
  */
-exports.cssBundleFile = false; // `${bundlesPath}styles.css`;
+exports.cssBundleFile = false; // `${exports.bundlesPath}styles.css`;
 
 /**
  * Shimmed libs like jQuery.
