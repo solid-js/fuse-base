@@ -486,8 +486,8 @@ Sparky.task('config:bundles', () =>
 		});
 	}
 
-	// Do not create sourcemaps when uglifying
-	if ( !options.uglify )
+	// Do not create sourcemaps when using quantum
+	if ( !options.quantum )
 	{
 		// Write fake vendors map so browser stops annoying us with this.
 		Files.new(`${switches.distPath}${switches.bundlesPath}${switches.vendorsBundleName}.js.map`)
