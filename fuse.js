@@ -847,7 +847,7 @@ Sparky.task('lessCheck', async () =>
 				let lessLint = ChildProcess.spawn('./node_modules/less/bin/lessc', ['--no-ie-compat', '--lint', '--no-color', lessFile]);
 
 				// Less linter process finished
-				lessLint.on('close', (code) =>
+				lessLint.on('exit', (code) =>
 				{
 					// File checked
 					options.verbose && console.log(`	${lessFile} checked`.grey);
