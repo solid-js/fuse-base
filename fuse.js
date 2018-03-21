@@ -250,7 +250,9 @@ Sparky.task('config:fuse', () =>
 				uglify: (
 					options.uglify
 					? {
-						es6 : !switches.legacySupport
+						es6 : !switches.legacySupport,
+						mangle: exports.mangle,
+						toplevel: exports.mangle
 					}
 					: false
 				),

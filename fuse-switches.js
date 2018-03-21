@@ -53,6 +53,12 @@ exports.atomsTypescriptFile = 'atoms.ts';
 exports.monoBundle = false; //'bundle';
 
 /**
+ * Allow uglify to change var names in production.
+ * Mangle will help to have smaller bundles but can break things so use carefully !
+ */
+exports.mangle = false;
+
+/**
  * Generate an index.html from template.
  * If false, and quantum is enabled, will generate a quantum.json manifest file.
  * If enabled, dist/index.html will be removed when cleaning.
