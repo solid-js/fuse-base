@@ -30,8 +30,9 @@ const setup = async () =>
 	console.log(`Project ${projectName} created ! Type ${'node fuse'.bold} to start.`.green);
 	console.log('');
 
-	// Delete this very file
+	// Delete setup files
 	Files.getFiles('setup.js').delete();
+	Files.getFiles('install.js').delete();
 }
 
 // Launch setup
