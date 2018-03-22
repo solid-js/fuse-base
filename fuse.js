@@ -674,7 +674,7 @@ const cli = CLI({
 		`,
 
 		'clean' : `
-			Clean fuse cache.
+			Clean fuse cache. And delete compiled assets.
 		`,
 
 		'cleanSprites' : `
