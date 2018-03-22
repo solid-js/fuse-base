@@ -674,7 +674,7 @@ const cli = CLI({
 		`,
 
 		'clean' : `
-			Clean fuse cache. Automatically done before dev and production tasks. 
+			Clean fuse cache.
 		`,
 
 		'cleanSprites' : `
