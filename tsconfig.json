@@ -22,6 +22,8 @@
     "noImplicitAny": false,
     "suppressImplicitAnyIndexErrors": true,
 
+		"allowSyntheticDefaultImports" : true,
+
     "removeComments": true,
     "preserveConstEnums": true,
 

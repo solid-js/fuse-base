@@ -20,4 +20,4 @@ echo "Done !"
 echo ""
 
 echo "Project installed"
-echo "Run 'node setup' to continue setup."
+echo "Run 'node solid setup' to continue setup."

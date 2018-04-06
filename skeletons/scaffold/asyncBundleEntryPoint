@@ -1,7 +1,0 @@
-
-// Async bundle entry point
-
-export class Main
-{
-
-}

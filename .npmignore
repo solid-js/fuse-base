@@ -3,11 +3,17 @@
 # Also, we do not need following path on production server :
 
 # Do not transfer those files to production servers :
-.fusebox
-deployer/
+/.fusebox
+# Upload dist
+/node_modules/
+/properties/
+/solid/
+/src/
 
-docs/
-helpers/
-node_modules/
-skeletons/
-src/
+
+/install.sh
+/LICENSE
+/package-lock.json
+/README.md
+/solid*.js
+tsconfig.json

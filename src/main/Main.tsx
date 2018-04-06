@@ -86,10 +86,45 @@ export class Main extends App
 	 */
 	protected initRoutes ():void
 	{
+		let routes = [
+			{
+				url			: '/',
+				page		: 'HomePage',
+				async		: false,
+			},
+			{
+				url			: '/products.html',
+				page		: 'ProductOverviewPage',
+				async		: true,
+			},
+			{
+				url			: '/product-{#id}-{slug}.html',
+				page		: 'ProductDetailPage',
+				async		: true,
+			}
+		];
+
+		const pageImporters = require('./pages');
+
 		// Init router
-		// Google analytics is automatically called when page is chaning
+		// Google analytics is automatically called when page is changing
 		Router.init(
 			GlobalConfig.instance.base,
+			routes.map( (route:any) =>
+			{
+				pageImporters.map( pageImporter =>
+				{
+					if (pageImporter.page == route.page)
+					{
+						route.importer = pageImporter.importer;
+					}
+				});
+
+				delete route.async;
+
+				return route;
+			})
+			/*
 			[
 				// -- Home page
 				{
@@ -126,6 +161,7 @@ export class Main extends App
 					importer 	: () => import('./pages/productDetailPage/ProductDetailPage')
 				}
 			]
+			*/
 		);
 
 		// Enable auto link listening
