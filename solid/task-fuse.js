@@ -1,7 +1,6 @@
 // Get Fusebox and its modules
 const {
 	FuseBox,
-	CLI,
 	EnvPlugin,
 	WebIndexPlugin,
 	QuantumPlugin,
@@ -35,9 +34,6 @@ const solidConstants = require('../solid-constants.config');
 // Options from CLI and init overridden
 let options;
 
-// CLI object getting options
-let cli;
-
 /**
  * Init options from CLI and override
  * @param pOptionsOverride Options to override
@@ -45,52 +41,15 @@ let cli;
  */
 const _initCLIOptions = (pOptionsOverride) =>
 {
-	/**
-	 * Start and configure CLI
-	 */
-	cli = CLI({
-
-		// CLI options
-		options: {
-			'quantum'    : {
-				type   : 'boolean',
-				default: false
-			},
-			'uglify'     : {
-				type   : 'boolean',
-				default: false
-			},
-			'reload'     : {
-				type   : 'boolean',
-				default: false
-			},
-			'port'       : {
-				type   : 'number',
-				default: 4445
-			},
-			'quiet'    : {
-				type   : 'boolean',
-				default: false
-			},
-			'noTypeCheck': {
-				type   : 'boolean',
-				default: false
-			},
-			'noLessCheck': {
-				type   : 'boolean',
-				default: false
-			},
-		}
-	});
-
-	// Get CLI options
-	options = cli.options;
-
-	// Override options if we have properties to override
-	pOptionsOverride != null && Object.keys( pOptionsOverride ).map( overrideKey =>
-	{
-		options[ overrideKey ] = pOptionsOverride[ overrideKey ];
-	});
+	// Get options from argv with default values
+	options = require('./solid-tasks').getOptions({
+		quantum		: false,
+		uglify		: false,
+		reload		: false,
+		port		: 4445,
+		noTypeCheck	: false,
+		noLessCheck	: false
+	}, pOptionsOverride);
 };
 
 
@@ -244,7 +203,7 @@ const _initCssConfig = () =>
 		})
 	];
 
-}
+};
 
 
 // ----------------------------------------------------------------------------- FUSE INIT
@@ -302,6 +261,9 @@ const _initFuseConfig = () =>
 
 		// Init plugins common to all bundles
 		plugins: [
+
+			// TODO : Il y a un soucis de génération de cssOutput et monoBundle ici
+
 			// If we are not in CSS output mode
 			// Or if we are in mono bundle mode
 			// We configure the same CSS plugin pipe for every bundles
@@ -441,7 +403,11 @@ const _initBundlesConfig = () =>
 		appBundlesNames.map( currentBundleFolder =>
 		{
 			// Patch common output bundle name by removing the underscore
-			const outputBundleName = (currentBundleFolder === '_common' ? 'common' : currentBundleFolder);
+			const outputBundleName = (
+				( currentBundleFolder === solidConstants.commonBundleName )
+				? solidConstants.commonOutputFileName
+				: currentBundleFolder
+			);
 
 			// Create this new bundle and add it to the bundle list
 			let bundle = fuse.bundle( outputBundleName );
@@ -470,11 +436,11 @@ const _initBundlesConfig = () =>
 			});
 
 			// Add auto-started entry point and remove vendors dependencies
-			instructions.push(`!> [${ solidConstants.entryPoint }]`)
+			instructions.push(`!> [${ solidConstants.entryPoint }]`);
 
 			// In mono or multi bundle mode
 			// Add included path
-			instructions.push(`+ [${ currentBundleFolder }/${ includedFoldersGlob }/*/*.${ extensionsGlob }]`)
+			instructions.push(`+ [${ currentBundleFolder }/${ includedFoldersGlob }/*/*.${ extensionsGlob }]`);
 
 			// Browse other bundles to remove their files from this bundle
 			appBundlesNames.map( otherAppBundleName =>
@@ -623,7 +589,7 @@ const _preBuild = () =>
 
 	// Pre-build atoms typescript file
 	solidPreBuild.preBuildAtoms();
-}
+};
 
 
 // ----------------------------------------------------------------------------- DEPLOY
@@ -645,7 +611,8 @@ const _initDeployerAndDeploy = () =>
 
 	// Deploy and stop if there is an issue
 	solidDeploy.deploy();
-}
+};
+
 
 // ----------------------------------------------------------------------------- PUBLIC SCOPE
 
@@ -772,6 +739,4 @@ module.exports = {
 		// Run
 		await module.exports.run();
 	},
-}
-
-
+};

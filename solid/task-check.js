@@ -50,7 +50,7 @@ module.exports = {
 		const runTypeCheck = () =>
 		{
 			// Type checking can be long, so we show this to know what is going on
-			console.log(`\nType checking bundles ...`.cyan);
+			console.log(`\n  → Checking Typescript bundles ...`.cyan);
 
 			// Run type checker
 			const totalErrors = typeHelper.runSync();
@@ -88,7 +88,7 @@ module.exports = {
 			{
 				// Log bundle checked
 				if (completedBundles === 0) console.log('');
-				verbose && console.log(`  → Bundle ${proc.bundle.name} compiled.`.green);
+				verbose && console.log(`  → Bundle ${proc.bundle.name} compiled !`.green);
 
 				// Count until every bundle are compiled
 				if ( ++completedBundles >= pBundles.length )

@@ -49,7 +49,7 @@ const showInstructions = (pInstructions, pExamples) =>
 /**
  * Ask for the bundle
  */
-const askWhichBundle = (pNoCommon, pNoAsync) =>
+const askWhichBundle = (pNoCommon) =>
 {
 	// All app and async bundles
 	const bundlesList = [];
@@ -66,16 +66,6 @@ const askWhichBundle = (pNoCommon, pNoAsync) =>
 		// Add this app bundle into bundles list
 		appBundlePath = `${appBundlePath}/`;
 		bundlesList.push( appBundlePath );
-
-		// Skip async bundles if asked
-		if ( pNoAsync ) return;
-
-		// Get async bundles into this bundle
-		Files.getFolders(`${ appBundlePath }${ solidConstants.asyncPath }/*`).all( file =>
-		{
-			// Add this async bundle to bundles list
-			bundlesList.push(`${file}/`);
-		});
 	});
 
 	return Inquirer.prompt({
