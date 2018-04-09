@@ -8,7 +8,7 @@
     "normalize.css": "^8.0.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "solidify-lib": "^1.5.4",
+    "solidify-lib": "^1.5.11",
     "zepto": "^1.2.0"
   },
   "devDependencies": {

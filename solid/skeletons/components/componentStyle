@@ -1,3 +1,5 @@
+/*! %%capitalComponentName%% */
+
 // Import module dependencies as reference
 @import (reference) '../../Main.less';
 

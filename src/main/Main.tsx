@@ -86,54 +86,25 @@ export class Main extends App
 	 */
 	protected initRoutes ():void
 	{
-		let routes = [
-			{
-				url			: '/',
-				page		: 'HomePage',
-				async		: false,
-			},
-			{
-				url			: '/products.html',
-				page		: 'ProductOverviewPage',
-				async		: true,
-			},
-			{
-				url			: '/product-{#id}-{slug}.html',
-				page		: 'ProductDetailPage',
-				async		: true,
-			}
-		];
-
-		const pageImporters = require('./pages');
+		// Add generated pages dependencies file to dynamic page import.
+		// This will allow us to target pages by their names without explicit import.
+		// Only use if you don't specify importers in Router.init
+		Router.addDynamicPageImporters( require('./pages') );
 
 		// Init router
 		// Google analytics is automatically called when page is changing
 		Router.init(
 			GlobalConfig.instance.base,
-			routes.map( (route:any) =>
-			{
-				pageImporters.map( pageImporter =>
-				{
-					if (pageImporter.page == route.page)
-					{
-						route.importer = pageImporter.importer;
-					}
-				});
-
-				delete route.async;
-
-				return route;
-			})
-			/*
 			[
 				// -- Home page
 				{
 					url			: '/',
 					page		: 'HomePage',
 
-					// Use require to load synchronously
-					importer 	: () => require('./pages/homePage/HomePage')
 
+					// -- If you do not want to use dynamic importers :
+					// Use require to load synchronously
+					//importer 	: () => require('./pages/homePage/HomePage')
 					// Use import to load asynchronously
 					//importer 	: () => import('./pages/homePage/HomePage')
 				},
@@ -143,25 +114,25 @@ export class Main extends App
 					url			: '/products.html',
 					page		: 'ProductOverviewPage',
 
+
+					// -- If you do not want to use dynamic importers :
 					// Use require to load synchronously
 					//importer 	: () => require('./pages/productOverviewPage/ProductOverviewPage')
-
 					// Use import to load asynchronously
-					importer 	: () => import('./pages/productOverviewPage/ProductOverviewPage')
+					//importer 	: () => import('./pages/productOverviewPage/ProductOverviewPage')
 				},
 				{
 					// Prepend parameter with a # to force it as a numeric value
 					url			: '/product-{#id}-{slug}.html',
 					page		: 'ProductDetailPage',
 
+					// -- If you do not want to use dynamic importers :
 					// Use require to load synchronously
 					//importer 	: () => require('./pages/productDetailPage/ProductDetailPage')
-
 					// Use import to load asynchronously
-					importer 	: () => import('./pages/productDetailPage/ProductDetailPage')
+					//importer 	: () => import('./pages/productDetailPage/ProductDetailPage')
 				}
 			]
-			*/
 		);
 
 		// Enable auto link listening

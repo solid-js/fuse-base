@@ -247,7 +247,19 @@ const scaffolders = [
 					)
 				);
 
-				// TODO : INIT APP VIEW WITH VIEW STACK
+				// Scaffold the AppView script
+				Files.getFiles(`${ solidConstants.skeletonsPath }bundles/appBundle${componentSystem}AppView`)
+				.copyTo(`${ solidConstants.srcPath }${ bundleName }/components/appView/AppView.tsx`);
+
+				// Scaffold the AppView style
+				Files.new(`${ solidConstants.srcPath }${ bundleName }/components/appView/AppView.less`).write(
+					QuickTemplate(
+						Files.getFiles(`${ solidConstants.skeletonsPath }components/componentStyle`).read(),
+						{
+							capitalComponentName: 'AppView'
+						}
+					)
+				);
 			});
 		}
 	},

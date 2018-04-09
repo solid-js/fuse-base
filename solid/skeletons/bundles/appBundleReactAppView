@@ -1,4 +1,4 @@
-import "AppView.less";
+import "./AppView.less";
 import * as React from "react";
 import {ReactView} from "solidify-lib/react/ReactView";
 import {
@@ -111,7 +111,7 @@ export class AppView extends ReactView<Props, States>
 	 */
 	protected routeChangedHandler (pRouteMatch:IRouteMatch)
 	{
-		console.log('Route changed', pRouteMatch);
+		//console.log('Route changed', pRouteMatch);
 	}
 
 	/**
@@ -119,16 +119,15 @@ export class AppView extends ReactView<Props, States>
 	 */
 	protected routeNotFoundHandler (...rest)
 	{
-		console.error('ROUTE NOT FOUND', rest);
+		console.error('Route not found', rest);
 	}
 
 	/**
 	 * When a page is not found
-	 * @param {string} pPageName
 	 */
 	protected pageNotFoundHandler (pPageName:string)
 	{
-		console.error('PAGE NOT FOUND', pPageName);
+		console.error('Page not found', pPageName);
 	}
 
 	// ------------------------------------------------------------------------- STATES

@@ -86,6 +86,11 @@ export class Main extends App
 	 */
 	protected initRoutes ():void
 	{
+		// Add generated pages dependencies file to dynamic page import.
+		// This will allow us to target pages by their names without explicit import.
+		// Only use if you don't specify importers in Router.init
+		Router.addDynamicPageImporters( require('./pages') );
+
 		// Init router
 		// Google analytics is automatically called when page is chaning
 		Router.init(
@@ -98,9 +103,9 @@ export class Main extends App
 					// Page name (usually name of exported class)
 					page		: 'HomePage',
 
+          // -- If you do not want to use dynamic importers :
 					// Use require to load synchronously
-					importer 	: () => require('./pages/homePage/HomePage')
-
+					//importer 	: () => require('./pages/homePage/HomePage')
 					// Use import to load asynchronously
 					//importer 	: () => import('./pages/homePage/HomePage')
 				},
@@ -111,9 +116,10 @@ export class Main extends App
 					url			: '/product-{#id}-{slug}.html',
 					page		: 'ProductDetailPage',
 
-					// Use require to load synchronously
-					importer 	: () => require('./pages/productDetailPage/ProductDetailPage')
 
+          // -- If you do not want to use dynamic importers :
+					// Use require to load synchronously
+					//importer 	: () => require('./pages/productDetailPage/ProductDetailPage')
 					// Use import to load asynchronously
 					//importer 	: () => import('./pages/homePage/HomePage')
 				}
