@@ -7,6 +7,9 @@ const solidConstants = require('../solid-constants.config');
 // Fuse config, from init public method
 let fuseConfig;
 
+const fileTabs = "\t\t\t";
+
+const fileTabRegex = new RegExp(`(\n${fileTabs})`, 'gmi');
 
 /**
  * Public API
@@ -51,7 +54,7 @@ module.exports = {
 					return [\n${requires}
 					]
 				}
-			};`.replace(/(\n\t\t)/gmi, "\n")
+			};`.replace(fileTabRegex, "\n")
 		);
 
 		// Create a file that requires those app bundles so common can bootstrap them
@@ -59,10 +62,10 @@ module.exports = {
 		Files.new(`${solidConstants.srcPath}bundles.ts`).write(
 			bundlesTemplate(
 				pAppBundlesNames.map(
-					bundleNameToRequire => `\t\t\t\t'default/${ bundleNameToRequire }/index'`
+					bundleNameToRequire => `${fileTabs}\t\t'default/${ bundleNameToRequire }/index'`
 				).join(",\n"),
 				pAppBundlesNames.map(
-					bundleNameToRequire => `\t\t\t\t\trequire('./${ bundleNameToRequire }/index')`
+					bundleNameToRequire => `${fileTabs}\t\t\trequire('./${ bundleNameToRequire }/index')`
 				).join(",\n")
 			)
 		);
@@ -81,9 +84,9 @@ module.exports = {
 			 * This file list all pages of this module.
 			 * Forcing fuse to keep them and allowing dynamic import with quantum. 
 			 */
-			module.exports = [${pages}
+			module.exports = [\n${pages}
 			];`
-			.replace(/(\n\t\t)/gmi, "\n")
+			.replace(fileTabRegex, "\n")
 		);
 
 		// Browse every bundles to create a pages.ts file for each bundle
@@ -117,14 +120,15 @@ module.exports = {
 			// Create a file that requires those app bundles so common can bootstrap them
 			Files.new(`${solidConstants.srcPath}${appBundleName}/pages.ts`).write(
 				pagesTemplate(
-					pagesWithImporter.map( page => `
-						{
-							page: '${page.name}',
-							importer : () => ${ page.importFunction }('./${ page.path }/${ page.name }')
-						}`
+					pagesWithImporter.map( page =>
+						[
+							`\t{`,
+							`\t	page: '${page.name}',`,
+							`\t	importer : () => ${ page.importFunction }('./${ page.path }/${ page.name }'),`,
+							`\t}`,
+						].join("\n")
 					)
 					.join(",\n")
-					.replace(/(\t\t\t\t)/gmi, " \t")
 				)
 			)
 		});
@@ -153,7 +157,7 @@ module.exports = {
 			export const Atoms =
 			{\n${atoms}
 			};`
-			.replace(/(\n\t\t)/gmi, "\n")
+			.replace(fileTabRegex, "\n")
 		);
 
 		// Get less files
@@ -203,8 +207,8 @@ module.exports = {
 					// Var value add quotes of not already there
 					value: (
 						( value.charAt(0) === "'" || value.charAt(0) === '"' )
-							? value
-							: "'" + value + "'"
+						? value
+						: "'" + value + "'"
 					)
 				});
 			});
