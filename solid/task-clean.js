@@ -59,7 +59,7 @@ module.exports = {
 
 		// Reinstall node_modules with full-blast method
 		console.log('  → Reinstalling node modules ...'.cyan);
-		let npmUpdate = require('child_process').spawnSync('npm', ['run', 'please']);
+		let npmUpdate = require('child_process').spawnSync('npm', ['run', 'reset']);
 		console.log(
 			(npmUpdate.stderr || '').toString()
 			||
