@@ -11,14 +11,8 @@ const { Files } = require('@zouloux/files');
 const solidConstants = require('./solid-constants.config');
 const fuseConfig = require('./solid-fuse.config');
 
-
-// ----------------------------------------------------------------------------- DEFAULT / HELP
-
-/**
- * Default task, show help in CLI
- */
-Sparky.task('help', () => require('./solid/task-help').help());
-Sparky.task('default', () => Sparky.exec('help'));
+// Init solid tasks
+require('./solid/solid-tasks').init();
 
 
 // ----------------------------------------------------------------------------- SETUP

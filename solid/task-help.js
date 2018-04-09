@@ -20,7 +20,7 @@ const tasksMessages = {
 		'selectEnv' : `
 			Select env for deployer. 
 
-			${'@param %envName%'.bold}
+			${'%envName%'.bold}
 				- Deploy env without showing env list through CLI.
 		`
 	},
@@ -30,25 +30,25 @@ const tasksMessages = {
 			Run fuse, compile all bundles and watch.
 			Will check Typescript files and show Less errors inside the browser.
 
-			${'@param --quantum'.bold}
+			${'--quantum'.bold}
 				- Enable code splitting, async modules will be in separated bundled files.
 				- Enable treeshaking
 				- Disable Hot Module Reloading and changes watching
 
-			${'@param --uglify'.bold}
+			${'--uglify'.bold}
 				- Uglify bundles
 				- Works only if quantum is enabled
 
-			${'@param --reload'.bold}
+			${'--reload'.bold}
 				- Force full page reloading and disable Hot Module Reloading
 
-			${'@param --port'.bold}
+			${'--port %portNumber%'.bold}
 				- Change Server and HMR listening port, if running other fuse projects at the same time.
 
-			${'@param --quiet'.bold}
+			${'--quiet'.bold}
 				- Disable console logs.
 
-			${'@param --noTypeCheck'.bold}
+			${'--noTypeCheck'.bold}
 				- Disable type checking, not advised.
 		`,
 
@@ -56,13 +56,13 @@ const tasksMessages = {
 			Compile sprites and all bundles for production (Quantum + Uglify enabled).
 			Will check Less and Typescript files before compiling.
 
-			${'@param --quiet'.bold}
+			${'--quiet'.bold}
 				- Disable console logs.
 
-			${'@param --noLessCheck'.bold}
+			${'--noLessCheck'.bold}
 				- Disable less checking in production.
 
-			${'@param --noTypeCheck'.bold}
+			${'--noTypeCheck'.bold}
 				- Disable type checking in production.
 		`,
 	},
@@ -117,7 +117,7 @@ const tasksMessages = {
 			Lonely .min files will be removed.
 		`,
 	}
-}
+};
 
 /**
  * Public API
@@ -132,7 +132,7 @@ module.exports = {
 		{
 			// Construct a fat banner
 			const taskBannerWidth = 80;
-			let taskBannerText = '  ' + taskType
+			let taskBannerText = '  ' + taskType;
 			let spacesBanner = '';
 			for (let i = 0; i < taskBannerWidth; i ++)
 			{
@@ -145,19 +145,21 @@ module.exports = {
 
 			// Show task type in a fat banner
 			console.log('');
-			console.log( spacesBanner.inverse.bold );
-			console.log( taskBannerText.inverse.bold );
-			console.log( spacesBanner.inverse.bold + "\n");
+			console.log( ' ' + spacesBanner.inverse.bold );
+			console.log( ' ' + taskBannerText.inverse.bold );
+			console.log( ' ' + spacesBanner.inverse.bold + "\n");
 
 			// Browse tasks
 			Object.keys( tasksMessages[ taskType ] ).map( taskName =>
 			{
 				// Show task name
-				console.log(`node solid ${ taskName }`.yellow.bold);
+				console.log(`   node solid ${ taskName }`.yellow.bold);
 
 				// Show description
 				console.log(
-					tasksMessages[ taskType ][ taskName ].split("\n\t\t").join("\n")
+					tasksMessages[ taskType ][ taskName ]
+					.split("\n\t\t").join("\n ")
+					.replace(/(\t)/gmi, '    ')
 				);
 			});
 		});
@@ -165,4 +167,4 @@ module.exports = {
 		// Quit so we do not get sparky log
 		process.exit();
 	}
-}
+};
