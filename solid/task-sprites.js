@@ -263,7 +263,7 @@ module.exports = {
 		// If we do not have any sprites, we are done
 		if (totalSprites === 0) resolve();
 
-		console.log(`  →  Generating ${ totalSprites } sprite${ totalSprites > 1 ? 's' : ''} ...`.cyan);
+		console.log(`  → Generating ${ totalSprites } sprite${ totalSprites > 1 ? 's' : ''} ...`.cyan);
 	})
 
 }
