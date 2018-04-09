@@ -14,6 +14,13 @@ module.exports = {
 	main: false
 };
 
+// Load fuse-box-css if we are not in production.
+// This patch CSS code-splitting
+if (process.env.NODE_ENV !== 'production')
+{
+	require('fuse-box-css');
+}
+
 
 // ----------------------------------------------------------------------------- BOOTSTRAP CSS
 

@@ -50,6 +50,9 @@ const tasksMessages = {
 
 			${'--noTypeCheck'.bold}
 				- Disable type checking, not advised.
+
+			${'--noWatch'.bold}
+				- Disable watch and HMR, just build dev scripts and quit.
 		`,
 
 		'production' : `

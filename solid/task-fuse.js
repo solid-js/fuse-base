@@ -47,8 +47,10 @@ const _initCLIOptions = (pOptionsOverride) =>
 		uglify		: false,
 		reload		: false,
 		port		: 4445,
+		quiet 		: false,
 		noTypeCheck	: false,
-		noLessCheck	: false
+		noLessCheck	: false,
+		noWatch		: false
 	}, pOptionsOverride);
 };
 
@@ -147,9 +149,12 @@ const _initCssConfig = () =>
 			// Disable IE-compat so data-uri can be huge
 			ieCompat: false,
 
+			// Enable strict math. Every math computation have to be inside parenthesis.
+			// This allow to use calc() without literal operator.
+			// http://lesscss.org/usage/#command-line-usage
+			strictMath: true,
+
 			// Use relative URLs so url path don't get lost
-			// FIXME : Does this work in css bundle file mode ?
-			// FIXME : Does everything works with sub-folders URLs ?
 			relativeUrls: true
 		}),
 
@@ -193,13 +198,13 @@ const _initCssConfig = () =>
 		CSSResourcePlugin({
 
 			// Write resources to that folder
-			dist: `${solidConstants.distPath}${solidConstants.resourcesPath}`,
+			dist: `${ solidConstants.distPath }${ solidConstants.resourcesPath }`,
 
 			// Rewriting resources paths
 			resolve: (f) => `${deployedEnvProperties.base}${solidConstants.resourcesPath}${f}?${packageJson.version}`,
 
 			// Include images as Base64 into bundle
-			inline: solidConstants.inlineEveryResourcesInCSS
+			inline: fuseConfig.inlineEveryResourcesInCSS
 		})
 	];
 
@@ -261,28 +266,6 @@ const _initFuseConfig = () =>
 
 		// Init plugins common to all bundles
 		plugins: [
-
-			// TODO : Il y a un soucis de génération de cssOutput et monoBundle ici
-
-			// If we are not in CSS output mode
-			// Or if we are in mono bundle mode
-			// We configure the same CSS plugin pipe for every bundles
-			(!fuseConfig.generateCSSFiles || fuseConfig.monoBundle !== false)
-			&&
-			[
-				// Include all CSS plugins
-				...cssPlugins,
-
-				// Then the CSS plugin
-				// We generate a bundle.css file, only if we are in mono bundle mode
-				// Otherwise we let a void CSSPlugin config in the main plugins pipeline
-				// So fuse-box-css does not crashes
-				_generateCssPluginConfig(
-					(fuseConfig.monoBundle !== false && fuseConfig.generateCSSFiles)
-					? fuseConfig.monoBundle
-					: null
-				)
-			],
 
 			// EnvPlugin for process.env emulation in the browser
 			// @see https://fuse-box.org/page/env-plugin
@@ -371,10 +354,48 @@ const _initFuseConfig = () =>
 let allBundles = [];
 
 /**
+ * Setup bundle plugins and code splitting
+ * @param pBundle Fuse Bundle instance
+ * @param pBundlePath Path of the Bundle from srcPath. * to target every bundles.
+ * @param pOutputBundleName Output bundle name without extension.
+ */
+const _setupBundle = (pBundle, pBundlePath, pOutputBundleName) =>
+{
+	// Setup specific CSS output for this bundle if we are in cssOutput mode
+	pBundle.plugin(
+		// Catch less files from this bundle or ignore if null
+		`${ pBundlePath }/**.less`,
+
+		// All CSS plugins
+		...cssPlugins,
+
+		// Generate CSS plugin to output a file for this bundle
+		_generateCssPluginConfig(
+			fuseConfig.generateCSSFiles
+			? pOutputBundleName
+			: null
+		),
+	);
+
+	// Configure code splitting
+	pBundle.splitConfig({
+
+		// Relative path from main bundle to load code split bundles
+		browser: deployedEnvProperties.base + solidConstants.bundlesPath
+	});
+};
+
+/**
  * Init all bundles
  */
 const _initBundlesConfig = () =>
 {
+	// Patch mono bundle if it's a boolean and not a string
+	if (fuseConfig.monoBundle === true)
+	{
+		fuseConfig.monoBundle = 'bundle';
+	}
+
 	// Glog string to target included folders
 	const includedFoldersGlob = `+(${ solidConstants.includedFoldersWithoutImports.join('|') })`;
 
@@ -416,24 +437,8 @@ const _initBundlesConfig = () =>
 			// Create a new set of instructions for this bundle
 			let instructions = [];
 
-			// Setup specific CSS output for this bundle if we are in cssOutput mode
-			fuseConfig.generateCSSFiles && bundle.plugin(
-				// Catch less files from this bundle
-				`${currentBundleFolder}/**.less`,
-
-				// All CSS plugins
-				...cssPlugins,
-
-				// Generate CSS plugin to ouput a file for this bundle
-				_generateCssPluginConfig( outputBundleName ),
-			);
-
-			// Configure code splitting
-			bundle.splitConfig({
-
-				// Relative path from main bundle to load code split bundles
-				browser: deployedEnvProperties.base + solidConstants.bundlesPath
-			});
+			// Setup bundle plugins and code splitting
+			_setupBundle( bundle, currentBundleFolder, outputBundleName );
 
 			// Add auto-started entry point and remove vendors dependencies
 			instructions.push(`!> [${ solidConstants.entryPoint }]`);
@@ -468,12 +473,8 @@ const _initBundlesConfig = () =>
 		const bundle = fuse.bundle( fuseConfig.monoBundle )
 		allBundles.push( bundle );
 
-		// Configure code splitting
-		bundle.splitConfig({
-
-			// Relative path from main bundle to load code split bundles
-			browser: deployedEnvProperties.base + solidConstants.bundlesPath
-		});
+		// Setup bundle plugins and code splitting
+		_setupBundle( bundle, '*', fuseConfig.monoBundle );
 
 		// Set bundle instructions
 		bundle.instructions([
@@ -492,8 +493,8 @@ const _initBundlesConfig = () =>
 	 * WATCH AND DEV MODE
 	 */
 
-	// If we are in dev mode
-	if ( !options.quantum )
+	// If we are in dev mode and if watch mode is allowed
+	if ( !options.quantum && !options.noWatch )
 	{
 		// Enable embedded server for HMR reloading
 		fuse.dev({

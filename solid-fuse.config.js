@@ -7,7 +7,7 @@
  *
  * Set to false if you want to split each app bundle into a different compiled JS bundle.
  */
-exports.monoBundle = 'bundle';
+exports.monoBundle = false; //'bundle';
 
 /**
  * Set to false to include all CSS files in JS bundles.

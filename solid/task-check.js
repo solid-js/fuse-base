@@ -87,8 +87,8 @@ module.exports = {
 			app.completed( proc =>
 			{
 				// Log bundle checked
-				if (completedBundles === 0) console.log('');
-				verbose && console.log(`  → Bundle ${proc.bundle.name} compiled !`.green);
+				//if (completedBundles === 0) console.log('');
+				//verbose && console.log(`  → Bundle ${proc.bundle.name} compiled !`.green);
 
 				// Count until every bundle are compiled
 				if ( ++completedBundles >= pBundles.length )
@@ -142,7 +142,7 @@ module.exports = {
 				// Lint with lessc, do not compile anything
 				let lessLint = ChildProcess.spawn(
 					'./node_modules/less/bin/lessc',
-					['--no-ie-compat', '--lint', '--no-color', lessFile]
+					['--strict-math=on', '--lint', '--no-color', lessFile]
 				);
 
 				// Less linter process finished
