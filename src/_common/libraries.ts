@@ -7,6 +7,15 @@
  */
 module.exports = () =>
 {
+	// ------------------------------------------------------------------------- NERV DEV TOOLS
+
+	// Load nerv devtools for react dev tools, in dev mode only
+	if (process.env.NODE_ENV !== 'production')
+	{
+		require('nerv-devtools');
+	}
+
+
 	// ------------------------------------------------------------------------- GSAP
 
 	// Create GSAP scope
