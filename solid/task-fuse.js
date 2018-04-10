@@ -137,14 +137,17 @@ const _initCssConfig = () =>
 		fuseConfig.generateCSSFiles = options.quantum;
 	}
 
+	// Enable sourceMaps if we are in CSS bundle file mode
+	// Disable sourceMaps when uglifying
+	const generateSourceMaps = (fuseConfig.generateCSSFiles && !options.uglify);
+
 	// All css plugins following LESS and default CSS config
 	cssPlugins = [
 
 		// @see : http://fuse-box.org/plugins/less-plugin
 		LESSPlugin({
 
-			// Enable sourceMaps if we are in CSS bundle file mode
-			sourceMap: fuseConfig.generateCSSFiles,
+			sourceMap: generateSourceMaps,
 
 			// Disable IE-compat so data-uri can be huge
 			ieCompat: false,
@@ -189,8 +192,7 @@ const _initCssConfig = () =>
 
 			// PostCSS options
 			{
-				sourceMaps: fuseConfig.generateCSSFiles,
-				from: 0
+				sourceMaps: generateSourceMaps
 			}
 		),
 
@@ -201,7 +203,15 @@ const _initCssConfig = () =>
 			dist: `${ solidConstants.distPath }${ solidConstants.resourcesPath }`,
 
 			// Rewriting resources paths
-			resolve: (f) => `${deployedEnvProperties.base}${solidConstants.resourcesPath}${f}?${packageJson.version}`,
+			resolve: (f) => (
+
+				// Relative from bundles to CSS Files
+				fuseConfig.generateCSSFiles
+				? `${solidConstants.bundleToResourcesRelativePath}${f}?${packageJson.version}`
+
+				// But relative from base for JS injected
+				: `${deployedEnvProperties.base}${solidConstants.resourcesPath}${f}?${packageJson.version}`
+			),
 
 			// Include images as Base64 into bundle
 			inline: fuseConfig.inlineEveryResourcesInCSS
@@ -221,6 +231,12 @@ let fuse;
  */
 const _initFuseConfig = () =>
 {
+	// Patch mono bundle if it's a boolean and not a string
+	if (fuseConfig.monoBundle === true)
+	{
+		fuseConfig.monoBundle = 'bundle';
+	}
+
 	// Init FuseBox config
 	fuse = FuseBox.init({
 
@@ -390,12 +406,6 @@ const _setupBundle = (pBundle, pBundlePath, pOutputBundleName) =>
  */
 const _initBundlesConfig = () =>
 {
-	// Patch mono bundle if it's a boolean and not a string
-	if (fuseConfig.monoBundle === true)
-	{
-		fuseConfig.monoBundle = 'bundle';
-	}
-
 	// Glog string to target included folders
 	const includedFoldersGlob = `+(${ solidConstants.includedFoldersWithoutImports.join('|') })`;
 

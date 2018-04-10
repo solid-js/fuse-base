@@ -1,11 +1,10 @@
+import * as React from "nervjs";
 import {App} from "solidify-lib/core/App";
 import {Router} from "solidify-lib/navigation/Router";
 import {GlobalConfig} from "../_common/data/GlobalConfig";
 import {AppView} from "./components/appView/AppView";
 import {SolidBundles} from "solidify-lib/helpers/SolidBundles";
 import {EnvUtils} from "solidify-lib/utils/EnvUtils";
-import * as React from "react";
-import * as ReactDOM from "react-dom";
 
 // App bundle name on local module scope
 let appBundleName:string;
@@ -152,7 +151,7 @@ export class Main extends App
 	protected ready ()
 	{
 		// React app view
-		this._appView = ReactDOM.render(
+		this._appView = React.render(
 			<AppView />,
 			GlobalConfig.instance.root
 		) as AppView;

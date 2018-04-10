@@ -17,7 +17,8 @@ export interface Props
 
 export interface States
 {
-
+  // Declare states with ? to allow them to be set without sending all state back
+  // myStateProp  ?:  string;
 }
 
 
@@ -31,7 +32,10 @@ export class AppView extends ReactView<Props, States>
 
 	prepare ()
 	{
-
+	  // Init state here, you can set from props
+    this.initState({
+      // ...
+    });
 	}
 
 

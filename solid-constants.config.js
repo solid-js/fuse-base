@@ -19,6 +19,10 @@ exports.bundlesPath = 'assets/bundles/';
 // Compiled resources folder (inside dist)
 exports.resourcesPath = 'assets/resources/';
 
+// Resources folder relative to bundle folder
+// Used when exporting CSS Files, url() target relative to CSS file
+exports.bundleToResourcesRelativePath = '../resources/';
+
 // Pages folder path within bundles.
 exports.pagesPath = 'pages/';
 
