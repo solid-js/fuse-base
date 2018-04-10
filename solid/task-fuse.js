@@ -184,8 +184,8 @@ const _initCssConfig = () =>
 
 				// Clean output CSS
 				require('postcss-clean')({
-					// Keeps breaks on uglify mode and beautify otherwise
-					format: ( options.uglify ? 'keep-breaks' : 'beautify' ),
+					// Uglify or beautify
+					format: ( options.uglify ? false : 'beautify' ),
 					advanced: true
 				})
 			],
@@ -344,8 +344,8 @@ const _initFuseConfig = () =>
 					: false
 				),
 
-				// Generate a manifest.json file containing bundles list if no index.html is built
-				manifest: ( fuseConfig.generateWebIndex ? false : 'quantum.json' ),
+				// Generate a manifest.json file containing bundles list
+				manifest: 'quantum.json',
 
 				// Disable replace type of which breaks TweenLite and Zepto ...
 				replaceTypeOf: false,
@@ -711,12 +711,25 @@ module.exports = {
 			.write(`{"version":0,"sources":[],"mappings":[]}`);
 		}
 
-
 		// ---- RUN PHASE
 		options.quiet || console.log(`Starting Fuse.\n`.yellow);
 
 		// Run fuse, run !
 		await fuse.run();
+
+		// If we generate CSS and are in uglify mode
+		if ( fuseConfig.generateCSSFiles && options.quantum && options.uglify )
+		{
+			// Remove CSS maps
+			Files.getFiles(`${solidConstants.distPath}${solidConstants.bundlesPath}*.css.map`).remove();
+
+			// And remove all comments from CSS
+			Files.getFiles(`${solidConstants.distPath}${solidConstants.bundlesPath}*.css`).all(
+				file => Files.getFiles( file ).alter(
+					content => content.replace(/(\/\*.*\*\/)/gmi, '')
+				)
+			);
+		}
 
 		// All good
 		resolve();
