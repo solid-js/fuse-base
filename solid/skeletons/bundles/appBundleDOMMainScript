@@ -66,16 +66,22 @@ export class Main extends App
 		//GlobalConfig.instance.inject( ... );
 	}
 
+	/**
+	 * Init env dependent stuff.
+	 */
+	protected initEnv ():void
+	{
+		// Will add env detection classes helpers to the body.
+		EnvUtils.addClasses();
+	}
+
 
 	// ------------------------------------------------------------------------- ROUTES
 
 	/**
 	 * Init routes system
 	 */
-	protected initRoutes ():void
-	{
-
-	}
+	protected initRoutes ():void { }
 
 
 	// ------------------------------------------------------------------------- READY

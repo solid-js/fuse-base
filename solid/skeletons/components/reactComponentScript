@@ -1,5 +1,5 @@
 import "./%%capitalComponentName%%.less";
-import * as React from "react";
+import * as React from "nervjs";
 import {ReactView} from "solidify-lib/react/ReactView";
 
 // ----------------------------------------------------------------------------- STRUCT
@@ -11,8 +11,8 @@ export interface Props
 
 export interface States
 {
-  // Declare states with ? to allow them to be set without sending all state back
-  // myStateProp  ?:  string;
+	// Declare states with ? to allow them to be set without sending all state back
+	// myStateProp  ?:  string;
 }
 
 
@@ -22,10 +22,10 @@ export class %%capitalComponentName%% extends ReactView<Props, States>
 
 	prepare ()
 	{
-	  // Init state here, you can set from props
-    this.initState({
-      // ...
-    });
+		// Init state here, you can set from props
+		this.initState({
+		  // ...
+		});
 	}
 
 

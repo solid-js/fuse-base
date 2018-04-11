@@ -21,7 +21,7 @@ module.exports = {
 		Files.getFolders('.fusebox').delete();
 
 		// Remove every compiled bundles
-		Files.getFolders(`${ solidConstants.distPath }${ solidConstants.bundlesPath }*.(js|css|map)`).delete();
+		Files.getFolders(`${ solidConstants.distPath }${ solidConstants.bundlesPath }`).delete();
 
 		// Remove compiled html if we have one
 		fuseConfig.generateWebIndex
