@@ -169,7 +169,7 @@ module.exports = {
 			// No selected env
 			if (currentEnv == null)
 			{
-				_showError('noSelectedEnv', reject);
+				_showError( 'noSelectedEnv', reject );
 			}
 
 			// Get current env properties
@@ -178,7 +178,7 @@ module.exports = {
 			// Unable to get current properties
 			if (currentEnvProperties == null)
 			{
-				_showError(reject);
+				_showError( 'envDoesNotExists', reject );
 			}
 		}
 
