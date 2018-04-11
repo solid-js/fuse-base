@@ -1,5 +1,5 @@
 import "./HomePage.less";
-import * as React from "nervjs";
+import { createElement } from "react";
 import {ReactPage, ReactPageProps} from "solidify-lib/react/ReactPage";
 import {Router} from "solidify-lib/navigation/Router";
 

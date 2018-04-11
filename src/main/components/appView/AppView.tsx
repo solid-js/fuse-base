@@ -1,5 +1,5 @@
 import "AppView.less";
-import * as React from "nervjs";
+import { createElement } from "react";
 import {ReactView} from "solidify-lib/react/ReactView";
 import {
 	ETransitionType,

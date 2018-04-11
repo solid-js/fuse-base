@@ -1,4 +1,5 @@
-import * as React from "nervjs";
+import { createElement } from "react";
+import { render } from "react-dom";
 import {App} from "solidify-lib/core/App";
 import {Router} from "solidify-lib/navigation/Router";
 import {GlobalConfig} from "../_common/data/GlobalConfig";
@@ -151,10 +152,7 @@ export class Main extends App
 	protected ready ()
 	{
 		// React app view
-		this._appView = React.render(
-			<AppView />,
-			GlobalConfig.instance.root
-		) as AppView;
+		this._appView = render( <AppView />, GlobalConfig.instance.root ) as AppView;
 
 		// Start router
 		Router.start();

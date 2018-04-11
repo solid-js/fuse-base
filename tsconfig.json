@@ -4,7 +4,9 @@
     "target": "es6",
 
     "moduleResolution": "node",
+
     "jsx": "react",
+		"jsxFactory": "createElement",
 
 		"lib": ["es6", "dom", "es2015.promise"],
 
