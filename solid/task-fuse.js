@@ -116,11 +116,11 @@ const _generateCssPluginConfig = (cssFileName) =>
 			outFile: `${solidConstants.distPath}${solidConstants.bundlesPath}${cssFileName}.css`,
 
 			// Inject CSS File from JS
-			inject: (file) => (
-				( fuseConfig.injectCSSFilesFromJS === 'quantum' )
-				? (options.quantum ? `${solidConstants.bundlesPath}${file}` : false)
-				: (fuseConfig.injectCSSFilesFromJS ? `${solidConstants.bundlesPath}${file}` : false)
-			),
+			inject: (
+				fuseConfig.injectCSSFilesFromJS
+				? (file) => `${solidConstants.bundlesPath}${file}`
+				: false
+			)
 		})
 	);
 };

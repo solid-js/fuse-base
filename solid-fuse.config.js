@@ -11,23 +11,19 @@ exports.monoBundle = false; //'bundle';
 
 /**
  * Set to false to include all CSS files in JS bundles.
- *
  * Set to true to generate one CSS bundle next to each js bundle.
- *
  * Set to 'quantum' to enable only in quantum mode.
  */
 exports.generateCSSFiles = false; // true; // 'quantum';
 
 /**
+ * Only if you set exports.generateCSSFiles to true.
+ *
  * Set to true if you want your generated CSS Files auto-imported at startup from JS bundles.
  * Otherwise, you will have to import them manually from HTML markup, which is recommended.
- *
- * Set to false if you don't generate CSS Files.
- *
- * Set to 'quantum' to enable only in quantum mode.
  * @type {boolean}
  */
-exports.injectCSSFilesFromJS = false; // true; // 'quantum';
+exports.injectCSSFilesFromJS = false; // true;
 
 /**
  * Will force every resource to be inline in Base64.
