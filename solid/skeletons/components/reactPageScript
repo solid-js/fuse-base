@@ -1,5 +1,6 @@
 import "./%%capitalComponentName%%.less";
 import { createElement } from "react";
+const React = { createElement };
 import {ReactPage, ReactPageProps} from "solidify-lib/react/ReactPage";
 
 // ----------------------------------------------------------------------------- STRUCT
