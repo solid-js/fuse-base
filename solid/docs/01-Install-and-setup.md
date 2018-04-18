@@ -14,16 +14,6 @@ We advice to use [NVM](https://github.com/creationix/nvm) if you are on Linux or
 - `node solid setup` and follow instructions.
 
 
-### Install errors
-
-##### Npm install show error `"./util/has_lib.sh freetype" returned exit status 0`
-- Do not mind, it will work :)
-
-##### Any npm module issue ?
-- Remove node_modules and force reinstall with `npm run please`
-
-
-
 # Setup
 
 ##### Create your environment

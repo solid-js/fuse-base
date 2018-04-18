@@ -1,4 +1,5 @@
 import { createElement } from "react";
+const React = { createElement };
 import { render } from "react-dom";
 import {App} from "solidify-lib/core/App";
 import {Router} from "solidify-lib/navigation/Router";
