@@ -13,6 +13,7 @@ exports.monoBundle = false; //'bundle';
  * Set to false to include all CSS files in JS bundles.
  * Set to true to generate one CSS bundle next to each js bundle.
  * Set to 'quantum' to enable only in quantum mode.
+ * In 'quantum' mode, empty CSS files will be created to avoid markup condition when loading CSS.
  */
 exports.generateCSSFiles = false; // true; // 'quantum';
 

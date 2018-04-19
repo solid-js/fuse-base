@@ -97,6 +97,9 @@ const _initStaticDependenciesList = () =>
 // List of all CSS Plugins
 let cssPlugins;
 
+// Generate empty CSS files pour dev mode
+let generateEmptyCSSFilesForDev = false;
+
 /**
  * Generate CSS Plugin config with a specific bundle name
  * Omit cssFileName parameter to create an embedded in JS CSS Plugin configuration
@@ -135,6 +138,7 @@ const _initCssConfig = () =>
 	if (fuseConfig.generateCSSFiles === 'quantum')
 	{
 		fuseConfig.generateCSSFiles = options.quantum;
+		generateEmptyCSSFilesForDev = !options.quantum;
 	}
 
 	// Enable sourceMaps if we are in CSS bundle file mode
@@ -265,8 +269,8 @@ const _initFuseConfig = () =>
 		// Use hashes only when generating web index and with uglify
 		hash: ( fuseConfig.generateWebIndex && options.uglify ),
 
-		// Enable sourcemaps if we don't uglify output
-		sourceMaps: !options.uglify,
+		// No source maps here, we do it on bundles
+		sourceMaps: false,
 
 		// Enable debugging from options
 		log: !options.quiet,
@@ -392,6 +396,9 @@ const _setupBundle = (pBundle, pBundlePath, pOutputBundleName) =>
 			: null
 		),
 	);
+
+	// Enable source maps on dev
+	pBundle.sourceMaps( !options.quantum );
 
 	// Configure code splitting
 	pBundle.splitConfig({
@@ -716,6 +723,18 @@ module.exports = {
 
 		// Run fuse, run !
 		await fuse.run();
+
+		// If we are in dev mode and we do not have CSS files built because of it
+		// We generate empty CSS Files so markup isn't lost about CSS files in dev mode
+		if ( generateEmptyCSSFilesForDev )
+		{
+			// Create an empty CSS file for each bundle, but vendor
+			allBundles.map( bundle =>
+			{
+				if (bundle.name === solidConstants.vendorsBundleName) return;
+				Files.new(`${solidConstants.distPath}${solidConstants.bundlesPath}${bundle.name}.css`).write('');
+			});
+		}
 
 		// If we generate CSS and are in uglify mode
 		if ( fuseConfig.generateCSSFiles && options.quantum && options.uglify )
