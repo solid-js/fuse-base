@@ -41,7 +41,7 @@ Sparky.task('dev', () => require('./solid/task-fuse').dev());
 /**
  * Start Fuse bundling with production mode.
  */
-Sparky.task('production', () => require('./solid/task-fuse').production());
+Sparky.task('production', ['sprites'], () => require('./solid/task-fuse').production());
 
 
 // ----------------------------------------------------------------------------- CLEAN
