@@ -25,7 +25,7 @@ export class %%capitalComponentName%% extends ReactView<Props, States>
 	{
 		// Init state here, you can set from props
 		this.initState({
-		  // ...
+			// ...
 		});
 	}
 
