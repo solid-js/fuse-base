@@ -100,7 +100,7 @@ module.exports = {
 		// ------------------------------------------------------------------------- GENERATE STYLE SHEET
 
 		// Function called to generate a stylesheet
-		const generateStylesheets = (pSpriteData, pSpriteName, pStylesheetOptions, pStylesheetOutputPath) =>
+		const generateStylesheets = (pSpriteData, pSpriteBuffer, pSpriteName, pStylesheetOptions, pStylesheetOutputPath) =>
 		{
 			// Create clean styleSheet data for handlebars skeletons
 			const cleanStylesheetData = {
@@ -141,6 +141,9 @@ module.exports = {
 					currentSkeleton.template( cleanStylesheetData )
 				);
 			}
+
+			// Write sprite PNG file
+			Files.new(`${pStylesheetOutputPath}.png`).write( pSpriteBuffer );
 		}
 
 
@@ -212,10 +215,10 @@ module.exports = {
 					// Compositor options from config file
 					compositorOptions: spriteConfig.compositorOptions,
 
-					// Method to generate sprite sheet
-					stylesheet : (spriteData) =>
+					// Method to render sprite sheet files
+					render : (spriteData, pSpriteBuffer) =>
 					{
-						generateStylesheets(spriteData, spriteName, stylesheetOptions, outputPath);
+						generateStylesheets(spriteData, pSpriteBuffer, spriteName, stylesheetOptions, outputPath);
 					}
 				};
 

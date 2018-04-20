@@ -47,10 +47,10 @@
 {
 	.{{../spritePrefix}}-{{name}}-vars();
 	.{{../spritePrefix}}-vars();
-	width   : @textureWidth * @ratio;
-	height  : @textureHeight * @ratio;
-	background-position : @textureX * @ratio @textureY * @ratio;
-	background-size     : @spriteWidth * @ratio @spriteHeight * @ratio;
+	width   : (@textureWidth * @ratio);
+	height  : (@textureHeight * @ratio);
+	background-position : (@textureX * @ratio) (@textureY * @ratio);
+	background-size     : (@spriteWidth * @ratio) (@spriteHeight * @ratio);
 }
 
 // CSS Injected declaration
