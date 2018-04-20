@@ -1,8 +1,14 @@
+/**
+ * This file is only loaded in Dev mode.
+ * It manage how the Hot Module Reloading behave.
+ * If you want to add a Component as a Stateful component, to avoid it to be
+ * refreshed each time an other component is changed :
+ * Add this on the bottom of the file :
+ * if (process.env.NODE_ENV !== 'production') window['__HMRState'].registerStatefulComponent( $ExportedFileClass );
+ */
 
 // Get FuseBox object for typecript
 const FuseBox = window['FuseBox'];
-
-
 
 export class HMR
 {
@@ -32,14 +38,16 @@ export class HMR
 		// If this is a CSS file
 		if ( type === 'css' )
 		{
-			if ( !FuseBox.exists( path ) ) return true;
+			// Refresh whole frame if this file is not in the default package
+			if ( !FuseBox.exists( path ) && !FuseBox.exists( 'default/' + path ) ) return false;
 
 			// Replace new CSS file in memory
 			FuseBox.flush( name => (name === path) );
 			FuseBox.dynamic( path, content );
 
 			// Re-inject this CSS file without reloading JS
-			FuseBox.import( path );
+			// Always refresh from default package
+			FuseBox.import( 'default/' + path );
 			return true;
 		}
 

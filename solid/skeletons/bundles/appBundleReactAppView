@@ -141,4 +141,4 @@ export class AppView extends ReactView<Props, States>
 
 // Register this component as a stateful component, to keep state between reloads
 // Only works with components present only once in DOM
-if (process.env.NODE_ENV !== 'production') window['__HMRState'].registerStatefulComponent( StyleGuideAppView );
+if (process.env.NODE_ENV !== 'production') window['__HMRState'].registerStatefulComponent( AppView );
