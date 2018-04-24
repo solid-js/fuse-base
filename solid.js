@@ -57,6 +57,12 @@ Sparky.task('clean', () => require('./solid/task-clean').clean());
 Sparky.task('cleanSprites', () => require('./solid/task-clean').cleanSprites());
 
 /**
+ * Clean and update.
+ * Useful after `git pull`
+ */
+Sparky.task('afterPull', () => require('./solid/task-clean').afterPull());
+
+/**
  * Tries to patches common problems.
  */
 Sparky.task('noProblemo', () => require('./solid/task-clean').noProblemo());

@@ -462,7 +462,7 @@ const _initBundlesConfig = () =>
 
 			// In mono or multi bundle mode
 			// Add included path
-			instructions.push(`+ [${ currentBundleFolder }/${ includedFoldersGlob }/*/*.${ extensionsGlob }]`);
+			instructions.push(`+ [${ currentBundleFolder }/${ includedFoldersGlob }/**/*.${ extensionsGlob }]`);
 
 			// Browse other bundles to remove their files from this bundle
 			appBundlesNames.map( otherAppBundleName =>

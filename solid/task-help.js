@@ -78,6 +78,15 @@ const tasksMessages = {
 		'cleanSprites' : `
 			Clean generated sprites.
 		`,
+		'afterPull' : `
+			Update after a ${'git pull'.bold} with coworkers
+			- Updates NPM modules
+			- Clean every generated files and caches
+			- Remove generated sprites
+			- Recreate sprites
+			- Re-launch dev mode
+			Useful after ${'git pull'.bold}
+		`,
 		'noProblemo' : `
 			Tries to solve common problems :
 			- Remove and re-install all node modules

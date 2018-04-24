@@ -50,6 +50,40 @@ module.exports = {
 	},
 
 	/**
+	 * Updates NPM modules
+	 * Clean Fuse cache
+	 * Clean and re-generate sprites
+	 * Start dev mode
+	 *
+	 * Useful after `git pull`
+	 *
+	 * @return {Promise<void>}
+	 */
+	afterPull: async () =>
+	{
+		// Reinstall node_modules with full-blast method
+		console.log('  → Updating node modules ...'.cyan);
+		let npmUpdate = require('child_process').spawnSync('npm', ['up']);
+		console.log(
+			(npmUpdate.stderr || '').toString()
+			||
+			(npmUpdate.stdout || '').toString()
+		);
+		console.log('  → Done !\n'.green);
+
+		// Clean everything
+		await Sparky.exec('clean');
+		await Sparky.exec('cleanSprites');
+
+		// Re-generate sprites
+		await Sparky.exec('sprites');
+
+		// Tries dev mode
+		console.log('  → Retrying dev mode ...'.cyan);
+		await Sparky.exec('dev');
+	},
+
+	/**
 	 * Tries to patches common problems.
 	 */
 	noProblemo: async () =>

@@ -60,7 +60,7 @@ exports.commonBundleName = '_common';
 exports.commonOutputFileName = 'common';
 
 // Folders to include in every bundles, even if they are not implicitly imported.
-exports.includedFoldersWithoutImports = ['molecules', 'components', 'pages'];
+exports.includedFoldersWithoutImports = ['molecules', 'components', 'pages', 'models'];
 
 // List of all component compatible folders, for scaffolder only
 exports.componentCompatibleFolders = ['molecules', 'components'];
