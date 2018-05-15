@@ -8,6 +8,9 @@ const _showSolidHelp = () =>
 	require('./task-help').help();
 };
 
+
+// ----------------------------------------------------------------------------- PUBLIC SCOPE
+
 /**
  * Public API
  */

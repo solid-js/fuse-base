@@ -11,8 +11,9 @@ const { Files } = require('@zouloux/files');
 const solidConstants = require('./solid-constants.config');
 const fuseConfig = require('./solid-fuse.config');
 
-// Init solid tasks
+// Init solid tasks and overrides
 require('./solid/solid-tasks').init();
+require('./solid/solid-overrides').init();
 
 
 // ----------------------------------------------------------------------------- SETUP
