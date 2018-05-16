@@ -35,8 +35,17 @@ npm-debug.log*
 # ------------------------------------------------------------------------------ IDE FILES
 
 # IntelliJ IDE
-# TODO : Keep coding style ?
-.idea/
+.idea/*/
+.idea/*.*
+!.idea/codeStyles
+!.idea/.name
+!.idea/jsLibraryMappings.xml
+!.idea/misc.xml
+!.idea/modules.xml
+!.idea/typescript-compiler.xml
+!.idea/php.xml
+!.idea/*.iml
+!.idea/vcs.xml
 
 # Other IDEs
 .project

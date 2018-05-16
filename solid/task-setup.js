@@ -10,11 +10,30 @@ module.exports = {
 		const packageJson = require('../package');
 
 		let projectName = packageJson.name;
+		let projectNameForIDE = Files.getFiles('.idea/.name').read();
 		let projectVersion = packageJson.version;
 		let projectAuthor = packageJson.author;
 
-		// Get project infos if this is the first setup
-		if (packageJson.name === "solid-fuse-base")
+		// Get IDE infos if this is the first setup
+		if (projectNameForIDE === 'Solidify - Project')
+		{
+			// TODO -> Définir le nom pour l'IDE
+			// TODO : Changer le contenu de ".name"
+			// TODO : Renommer "Solidify - Project.iml"
+			// TODO : Altérer le chemin dans "modules.xml"
+
+			/*
+			// Ask user for project name
+			await Inquirer.prompt({
+				type: 'input',
+				message: 'Project name for IDE ? (formatted : "Category - Project")',
+				name: 'projectNameForIDE'
+			}).then( answer => projectNameForIDE = answer.projectNameForIDE);
+			*/
+		}
+
+		// Get package infos if this is the first setup
+		if (projectName === "solid-fuse-base")
 		{
 			// Ask user for project name
 			await Inquirer.prompt({
@@ -48,6 +67,7 @@ module.exports = {
 
 			return packageObject
 		});
+
 
 		// Setup default env
 		Files.new( solidConstants.envPath ).write('default');
