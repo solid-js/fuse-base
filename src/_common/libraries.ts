@@ -7,15 +7,6 @@
  */
 module.exports = () =>
 {
-	// ------------------------------------------------------------------------- NERV DEV TOOLS
-
-	// Load nerv devtools for react dev tools, in dev mode only
-	if (process.env.NODE_ENV !== 'production')
-	{
-		require('nerv-devtools');
-	}
-
-
 	// ------------------------------------------------------------------------- GSAP
 
 	// Create GSAP scope
@@ -28,30 +19,36 @@ module.exports = () =>
 	window['gsap'] = gsap;
 
 	// GSAP core
-	gsap['TweenLite'] = require('gsap/TweenLite');
-	gsap['TimelineLite'] = require('gsap/TimelineLite');
+	gsap['TweenLite'] = require('gsap/umd/TweenLite');
+	gsap['TimelineLite'] = require('gsap/umd/TimelineLite');
 
 
 	// Easings
-	gsap['EasePack'] = require('gsap/EasePack');
+	gsap['EasePack'] = require('gsap/umd/EasePack');
 
 	// Plugins
-	gsap['AttrPlugin'] = require('gsap/AttrPlugin');
-	//gsap['BezierPlugin'] = require('gsap/BezierPlugin');
-	gsap['ColorPropsPlugin'] = require('gsap/ColorPropsPlugin');
-	gsap['CSSPlugin'] = require('gsap/CSSPlugin');
-	//gsap['CSSRulePlugin'] = require('gsap/CSSRulePlugin');
-	gsap['DirectionalRotationPlugin'] = require('gsap/DirectionalRotationPlugin');
-	//gsap['Draggable'] = require('gsap/Draggable');
-	//gsap['EaselPlugin'] = require('gsap/EaselPlugin');
-	//gsap['EndArrayPlugin'] = require('gsap/EndArrayPlugin');
-	//gsap['jquery'] = require('gsap/jquery.gsap');
-	gsap['ModifiersPlugin'] = require('gsap/ModifiersPlugin');
-	//gsap['PixiPlugin'] = require('gsap/PixiPlugin');
-	//gsap['RaphaelPlugin'] = require('gsap/RaphaelPlugin');
-	gsap['RoundPropsPlugin'] = require('gsap/RoundPropsPlugin');
-	gsap['ScrollToPlugin'] = require('gsap/ScrollToPlugin');
-	//gsap['TextPlugin'] = require('gsap/TextPlugin');
+	gsap['AttrPlugin'] = require('gsap/umd/AttrPlugin');
+	//gsap['BezierPlugin'] = require('gsap/umd/BezierPlugin');
+	gsap['ColorPropsPlugin'] = require('gsap/umd/ColorPropsPlugin');
+	gsap['CSSPlugin'] = require('gsap/umd/CSSPlugin');
+	//gsap['CSSRulePlugin'] = require('gsap/umd/CSSRulePlugin');
+	gsap['DirectionalRotationPlugin'] = require('gsap/umd/DirectionalRotationPlugin');
+	//gsap['Draggable'] = require('gsap/umd/Draggable');
+	//gsap['EaselPlugin'] = require('gsap/umd/EaselPlugin');
+	//gsap['EndArrayPlugin'] = require('gsap/umd/EndArrayPlugin');
+	//gsap['jquery'] = require('gsap/umd/jquery.gsap');
+	gsap['ModifiersPlugin'] = require('gsap/umd/ModifiersPlugin');
+	//gsap['PixiPlugin'] = require('gsap/umd/PixiPlugin');
+	//gsap['RaphaelPlugin'] = require('gsap/umd/RaphaelPlugin');
+	gsap['RoundPropsPlugin'] = require('gsap/umd/RoundPropsPlugin');
+	gsap['ScrollToPlugin'] = require('gsap/umd/ScrollToPlugin');
+	//gsap['TextPlugin'] = require('gsap/umd/TextPlugin');
+
+	// TODO : A update une fois que les @types/GSAP 2.0.0 sont prêts
+	// TODO : Car là, le tree shaking ne fonctionne pas
+	// TODO : Une fois que tout ça ok, on pourra virer les ligne du dessus
+
+	// window['gsap'] = require('gsap');
 
 
 	// ------------------------------------------------------------------------- ZEPTO
@@ -61,7 +58,6 @@ module.exports = () =>
 	require('zepto/src/event.js');
 	require('zepto/src/form.js');
 	require('zepto/src/ie.js');
-	require('zepto/src/selector.js');
+	//require('zepto/src/selector.js');
 	require('zepto/src/ajax.js');
-
 };

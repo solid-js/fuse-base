@@ -742,10 +742,18 @@ module.exports = {
 			// Remove CSS maps
 			Files.getFiles(`${solidConstants.distPath}${solidConstants.bundlesPath}*.css.map`).remove();
 
-			// And remove all comments from CSS
+			// And compress CSS a bit more
 			Files.getFiles(`${solidConstants.distPath}${solidConstants.bundlesPath}*.css`).all(
 				file => Files.getFiles( file ).alter(
-					content => content.replace(/(\/\*.*\*\/)/gmi, '')
+					content => content
+						// Remove all comments, including banners
+						.replace(/(\/\*.*\*\/)/gmi, '')
+						// Remove new lines and useless spaces
+						.replace(/(\n\s*)/gmi, '')
+						// Remove useless spaces before {
+						.replace(/(\s\{)/gmi, '{')
+						// Remove useless spaces between prop and value
+						.replace(/(\:\s)/gmi, ':')
 				)
 			);
 		}
