@@ -42,8 +42,18 @@ patchUselessWarnings = () =>
 		// Relay method to original
 		originalAddWarning.apply(this, arguments);
 	};
-
 }
+
+/**
+ * Setup Files API verbosity to clean terminal a bit
+ */
+setupFilesVerbosity = () =>
+{
+	Files.setVerbose((pLogContent, pLogLevel) =>
+	{
+		pLogLevel > 0 && console.log(`    → ${pLogContent}`.gray);
+	});
+};
 
 
 // ----------------------------------------------------------------------------- PUBLIC SCOPE
@@ -60,5 +70,6 @@ module.exports = {
 	{
 		patchFileLogs();
 		patchUselessWarnings();
+		setupFilesVerbosity();
 	}
 };

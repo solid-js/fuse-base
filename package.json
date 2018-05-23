@@ -1,6 +1,6 @@
 {
   "name": "solid-fuse-base",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "description": "A project made with Solidify JS -> https://github.com/solid-js",
   "repository": "git@github.com:solid-js/fuse-base.git",
   "main": "solid.js",
@@ -17,7 +17,7 @@
     "@types/react": "^16.3.14",
     "@types/react-dom": "^16.0.5",
     "@types/zepto": "^1.0.29",
-    "@zouloux/files": "^0.5.11",
+    "@zouloux/files": "^0.5.12",
     "@zouloux/node-sprite-generator": "^0.12.0",
     "autoprefixer": "^8.2.0",
     "colors": "^1.2.1",
