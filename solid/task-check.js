@@ -163,7 +163,7 @@ module.exports = {
 					}
 
 					// File checked, log on verbose mode
-					verbose && console.log(`	✓ ${ shortFileName }`.grey);
+					verbose && console.log(`    ✓ ${ shortFileName }`.grey);
 
 					// Every files are compiled
 					if (++checkedLessFiles >= totalLessFiles)

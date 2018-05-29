@@ -11,26 +11,70 @@ const fuseConfig = require('../solid-fuse.config');
 module.exports = {
 
 	/**
+	 * Clean all caches
+	 */
+	cleanCaches: () =>
+	{
+		// Clear cache before each command
+		Files.getFolders('.fusebox').delete();
+	},
+
+	/**
+	 * Clean compiled bundles and maps
+	 */
+	cleanBundles: () =>
+	{
+		// If there is no bundle folder
+		if (solidConstants.bundlesPath == '')
+		{
+			// Then remove only generated bundles securely
+			Files.getFiles(`${ solidConstants.distPath }${ solidConstants.bundlesPath }*.@(js|map|css)`).delete();
+
+			// Also remove css-sourcemap which can appear dependeing on config
+			Files.getFolders(`${ solidConstants.distPath }${ solidConstants.bundlesPath }css-sourcemaps/`).delete();
+		}
+
+		// Otherwise we can wipe the entire folder
+		else Files.getFolders(`${ solidConstants.distPath }${ solidConstants.bundlesPath }`).delete();
+	},
+
+	/**
+	 * Clean compiled resources
+	 */
+	cleanResources: () =>
+	{
+		// If there is no resource folder
+		( solidConstants.resourcesPath == '' )
+
+		// Then remove only generated resources securely
+		? Files.getFiles(`${ solidConstants.distPath }${ solidConstants.resourcesPath }*.@(woff|woff|eot|ttf|png|jpg|gif)`).delete()
+
+		// Otherwise we can wipe the entire folder
+		: Files.getFolders(`${ solidConstants.distPath }${ solidConstants.resourcesPath }`).delete()
+	},
+
+	/**
+	 * Clean web index if fuse is configured to create an index file
+	 */
+	cleanWebIndex: () =>
+	{
+		// Remove compiled html if we have one
+		fuseConfig.generateWebIndex
+		&&
+		Files.getFiles(`${ solidConstants.distPath }index.html`).delete();
+	},
+
+	/**
 	 * Remove all FuseBox caches and clean output directories.
 	 */
 	clean: () =>
 	{
 		console.log('  → Cleaning ...'.cyan);
 
-		// Clear cache before each command
-		Files.getFolders('.fusebox').delete();
-
-		// Remove every compiled bundles
-		Files.getFolders(`${ solidConstants.distPath }${ solidConstants.bundlesPath }`).delete();
-
-		// Remove compiled html if we have one
-		fuseConfig.generateWebIndex
-		&&
-		Files.getFiles(`${ solidConstants.distPath }index.html`).delete();
-
-		// Remove resources
-		// Remove this line if there are other files into resource folder
-		Files.getFolders(`${ solidConstants.distPath }${ solidConstants.resourcesPath }`).delete();
+		module.exports.cleanCaches();
+		module.exports.cleanBundles();
+		module.exports.cleanResources();
+		module.exports.cleanWebIndex();
 
 		console.log('  → Done !'.green);
 	},

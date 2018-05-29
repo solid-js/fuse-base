@@ -6,6 +6,9 @@
  * If needed you can still teak some options here, be careful ! :)
  */
 
+/**
+ * NOTE : Every folder path needs to end with a trailing slash.
+ */
 
 // Source folder
 exports.srcPath = 'src/';
@@ -16,11 +19,11 @@ exports.distPath = 'dist/';
 // Bundle path from dist path
 exports.bundlesPath = 'assets/bundles/';
 
-// Compiled resources folder (inside dist)
+// Compiled resources folder from dist path
 exports.resourcesPath = 'assets/resources/';
 
 // Resources folder relative to bundle folder
-// Used when exporting CSS Files, url() target relative to CSS file
+// Used when exporting CSS Files, url() target is relative to CSS file
 exports.bundleToResourcesRelativePath = '../resources/';
 
 // Pages folder path within bundles.

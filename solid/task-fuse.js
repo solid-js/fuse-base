@@ -28,6 +28,9 @@ const packageJson = require('../package.json');
 // Load solid constants
 const solidConstants = require('../solid-constants.config');
 
+// Load clean task
+const cleanTask = require('./task-clean');
+
 
 // ----------------------------------------------------------------------------- CLI OPTIONS
 
@@ -315,7 +318,7 @@ const _initFuseConfig = () =>
 				path: deployedEnvProperties.base + solidConstants.bundlesPath,
 
 				// Index file name, relative to bundle path, cheap trick
-				target: '../../index.html'
+				target: path.relative( solidConstants.distPath + solidConstants.bundlesPath, solidConstants.distPath + 'index.html' )
 			}),
 
 			// Compress and optimize bundle with Quantum on production
@@ -708,7 +711,7 @@ module.exports = {
 		options.quiet || console.log(`Cleaning old bundles.`.yellow);
 
 		// Remove every previously compiled bundles
-		Files.getFolders(`${solidConstants.distPath}${solidConstants.bundlesPath}`).delete();
+		cleanTask.cleanBundles();
 
 		// If we are in dev mode and generating a vendors bundle
 		if ( !options.quantum && fuseConfig.monoBundle === false)
