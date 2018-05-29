@@ -1,3 +1,4 @@
+const { Files } = require('@zouloux/files');
 
 // ----------------------------------------------------------------------------- PROXIES AND DIRTY STUFF
 
@@ -5,7 +6,7 @@
 /**
  * Remove huge file list from console
  */
-patchFileLogs = () =>
+const patchFileLogs = () =>
 {
 	// Proxy the file list for each bundles from the Log class
 	const LogClass = require('fuse-box/Log').Log;
@@ -23,7 +24,7 @@ patchFileLogs = () =>
 /**
  * Remove useless .less.js warnings from console
  */
-patchUselessWarnings = () =>
+const patchUselessWarnings = () =>
 {
 	// Proxy addWarning method to remove less.js warnings from BundleProducer
 	const BundleProducerClass = require('fuse-box/core/BundleProducer').BundleProducer
@@ -47,7 +48,7 @@ patchUselessWarnings = () =>
 /**
  * Setup Files API verbosity to clean terminal a bit
  */
-setupFilesVerbosity = () =>
+const setupFilesVerbosity = () =>
 {
 	Files.setVerbose((pLogContent, pLogLevel) =>
 	{
