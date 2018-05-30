@@ -12,6 +12,7 @@ const solidConstants = require('../solid-constants.config');
 // Sprite namming
 const spritePrefix              = 'sprite';
 const separator                 = '-';
+const configExt                 = '.config.js';
 
 // Default sprite config
 const defaultSpriteConfig = {
@@ -166,7 +167,7 @@ module.exports = {
 				let spriteConfig;
 				try
 				{
-					spriteConfig = require(`../${ path.dirname(folder) }/sprite-${ path.basename(folder) }.config.js`);
+					spriteConfig = require(`../${ path.dirname(folder) }/${ spritePrefix}${ separator }${ spriteName }${ configExt }`);
 				}
 
 				// Default sprite config
@@ -177,7 +178,7 @@ module.exports = {
 				}
 
 				// Get images list
-				const images = Files.getFiles( path.join(folder, '*.+(jpg|jpeg|png|gif)') ).files;
+				const imageFiles = Files.getFiles( path.join(folder, '*.+(jpg|jpeg|png|gif)') );
 
 				// Bundle sprite folder path
 				const bundleSpritePath = `${ bundle }/${solidConstants.spritesPath}`;
@@ -201,7 +202,7 @@ module.exports = {
 				const nsgOptions = {
 
 					// List of all images to include
-					src: images,
+					src: imageFiles.files,
 
 					// Compiled PNG sprite file path
 					spritePath: `${outputPath}.png`,
@@ -223,9 +224,11 @@ module.exports = {
 				};
 
 				// When a sprite is generated
-				const completeHandler = ( error ) =>
+				const completeHandler = ( error, cache ) =>
 				{
-					console.log(`	Sprite ${spriteName} generated.`.grey);
+					(cache != null)
+					? console.log(`    → Sprite ${spriteName} already in cache.`.grey)
+					: console.log(`    → Sprite ${spriteName} generated.`.grey)
 
 					// If there is an imagemin config
 					if ('imagemin' in spriteConfig)
@@ -256,6 +259,32 @@ module.exports = {
 						Promise.all( optimizeImages() ).then( resolve );
 					}
 				}
+
+				// Compute hash for images files
+				const currentSpriteImagesHash = imageFiles.generateFileListHash(true, false);
+
+				// Compute hash for config file
+				const currentSpriteConfigHash = (
+					Files.getFiles(`${ bundleSpritePath }${ spritePrefix }${ separator }${ spriteName }${ configExt }`)
+					.generateFileListHash(true, false)
+				)
+
+				// Concat hashes
+				const currentSpriteHash = currentSpriteImagesHash + currentSpriteConfigHash;
+
+				// Target cache file which is storing current hashes
+				const hashCacheFile = Files.getFiles(`${outputPath}.cache`);
+
+				// Check if hashes changed
+				if (hashCacheFile.exists() && hashCacheFile.read() === currentSpriteHash)
+				{
+					// If there is no changes, complete without recreating sprite
+					setTimeout(() => completeHandler(false, true), 10);
+					return;
+				}
+
+				// Write hash to cache
+				hashCacheFile.write( currentSpriteHash );
 
 				// Compile and check errors
 				nsg(nsgOptions, completeHandler);

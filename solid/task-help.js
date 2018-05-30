@@ -27,7 +27,7 @@ const tasksMessages = {
 
 	'Fuse bundles and compiling' : {
 		'dev' : `
-			Run fuse, compile all bundles and watch.
+			Generate sprites, run fuse, compile all bundles and watch.
 			Will check Typescript files and show Less errors inside the browser.
 
 			${'--quantum'.bold}
@@ -56,7 +56,7 @@ const tasksMessages = {
 		`,
 
 		'production' : `
-			Compile sprites and all bundles for production (Quantum + Uglify enabled).
+			Generate sprites and all bundles for production (Quantum + Uglify enabled).
 			Will check Less and Typescript files before compiling.
 
 			${'--quiet'.bold}
@@ -119,7 +119,8 @@ const tasksMessages = {
 
 	'Sprites and images' : {
 		'sprites' : `
-			Clean and compile sprites. 
+			Clean and compile sprites.
+			Will not regenerate sprites if files and configuration is the same.
 		`,
 
 		'imagemin' : `

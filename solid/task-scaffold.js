@@ -427,9 +427,6 @@ module.exports = {
 
 		( resolve ) =>
 		{
-			// Disable files verbosity
-			Files.setVerbose( false );
-
 			// Get scaffolder to present listing to user
 			let scaffolderTypes = scaffolders.map( scaffolder => scaffolder.name );
 

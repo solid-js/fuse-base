@@ -649,6 +649,17 @@ const _initDeployerAndDeploy = () =>
 	solidDeploy.deploy();
 };
 
+// ----------------------------------------------------------------------------- SPRITES
+
+/**
+ * Init sprites and generate them with cache.
+ */
+const _initSpritesAndGenerateIfChanged = async () =>
+{
+	const taskSprites = require('./task-sprites');
+
+	await taskSprites.run();
+}
 
 // ----------------------------------------------------------------------------- PUBLIC SCOPE
 
@@ -661,16 +672,19 @@ module.exports = {
 	 * Init Fuse bundler
 	 * @param pOptionsOverride Override CLI options with these parameters
 	 */
-	init: (pOptionsOverride) =>
+	init: async (pOptionsOverride) =>
 	{
-		// Disable files verbose
-		Files.setVerbose( false );
+		// Wait a bit so Fuse has time to show console init
+		await new Promise(res => setTimeout(res, 30));
 
 		// Init CLI Options
 		_initCLIOptions( pOptionsOverride );
 
 		// Init deploy properties and deploy
 		_initDeployerAndDeploy();
+
+		// Init sprites and generate if changed
+		await _initSpritesAndGenerateIfChanged();
 
 		// Get bundles and pages list
 		_initStaticDependenciesList();
@@ -786,7 +800,7 @@ module.exports = {
 	dev: async () =>
 	{
 		// Init and run
-		module.exports.init();
+		await module.exports.init();
 		await module.exports.run();
 	},
 
@@ -796,7 +810,7 @@ module.exports = {
 	production: async () =>
 	{
 		// Init with prod overrides
-		module.exports.init({
+		await module.exports.init({
 			// Enable quantum and uglify in production
 			quantum : true,
 			uglify : true,

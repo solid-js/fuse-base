@@ -121,9 +121,6 @@ module.exports = {
 	 */
 	run: () =>
 	{
-		// Disable file verbosity
-		Files.setVerbose( false );
-
 		// Browse every images that are not inside a sprite folder
 		const promises = Files.getFiles(
 			`${ solidConstants.srcPath }*/!(${ path.basename( solidConstants.spritesPath ) })/**/${ imagesMiniMatch }`

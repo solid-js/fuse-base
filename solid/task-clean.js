@@ -88,7 +88,7 @@ module.exports = {
 		console.log('  → Cleaning sprites ...'.cyan);
 
 		// Remove generated LESS / Typescript and PNG
-		Files.getFiles(`${ solidConstants.srcPath }*/${ solidConstants.spritesPath }*.+(less|ts|png)`).delete();
+		Files.getFiles(`${ solidConstants.srcPath }*/${ solidConstants.spritesPath }*.+(less|ts|png|cache)`).delete();
 
 		console.log('  → Done !'.green);
 	},

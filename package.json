@@ -1,14 +1,14 @@
 {
   "name": "solid-fuse-base",
-  "version": "1.6.5",
+  "version": "1.7.0",
   "description": "A project made with Solidify JS -> https://github.com/solid-js",
   "repository": "git@github.com:solid-js/fuse-base.git",
   "main": "solid.js",
   "dependencies": {
     "gsap": "^2.0.0",
     "normalize.css": "^8.0.0",
-    "react": "^16.3.2",
-    "react-dom": "^16.3.2",
+    "react": "^16.4.0",
+    "react-dom": "^16.4.0",
     "solidify-lib": "^1.7.2",
     "zepto": "^1.2.0"
   },
@@ -17,9 +17,9 @@
     "@types/react": "^16.3.14",
     "@types/react-dom": "^16.0.5",
     "@types/zepto": "^1.0.29",
-    "@zouloux/files": "^0.5.12",
+    "@zouloux/files": "^0.5.13",
     "@zouloux/node-sprite-generator": "^0.12.0",
-    "autoprefixer": "^8.2.0",
+    "autoprefixer": "^8.5.2",
     "colors": "^1.2.1",
     "fuse-box": "^3.2.2",
     "fuse-box-typechecker": "^2.8.0",
@@ -30,10 +30,10 @@
     "inquirer": "^5.2.0",
     "less": "^3.0.4",
     "postcss-clean": "^1.1.0",
-    "tslib": "^1.9.1",
+    "tslib": "^1.9.2",
     "typescript": "^2.8.3",
     "uglify-es": "^3.3.9",
-    "uglify-js": "^3.3.27"
+    "uglify-js": "^3.3.28"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

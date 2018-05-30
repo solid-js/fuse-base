@@ -22,6 +22,7 @@ src/resources.ts
 src/*/sprites/*.less
 src/*/sprites/*.png
 src/*/sprites/*.ts
+src/*/sprites/*.cache
 
 
 # ------------------------------------------------------------------------------ LOGS FILES
