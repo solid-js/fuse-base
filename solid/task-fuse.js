@@ -228,7 +228,8 @@ const _initCssConfig = () =>
 			// When resource file mapping changed
 			filesMapping: (files) =>
 			{
-				console.log('FILE MAPPING');
+				console.log(`  → Updated resources list.`.yellow);
+
 				// Create a new typescript file which stores source path and resource path
 				Files.new(`${ solidConstants.srcPath }/resources.ts`).write(`
 					export const Resources = {
