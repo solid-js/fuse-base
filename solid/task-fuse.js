@@ -6,8 +6,7 @@ const {
 	QuantumPlugin,
 	LESSPlugin,
 	PostCSSPlugin,
-	CSSPlugin,
-	CSSResourcePlugin
+	CSSPlugin
 } = require("fuse-box");
 
 // Node path utils
@@ -30,6 +29,9 @@ const solidConstants = require('../solid-constants.config');
 
 // Load clean task
 const cleanTask = require('./task-clean');
+
+// Load solid CSSResourcePlugin which patch async file copying and add fileMapping option
+const { SolidCSSResourcePlugin } = require('./solid-cssresourceplugin');
 
 
 // ----------------------------------------------------------------------------- CLI OPTIONS
@@ -204,7 +206,7 @@ const _initCssConfig = () =>
 		),
 
 		// @see : http://fuse-box.org/plugins/css-resource-plugin
-		CSSResourcePlugin({
+		SolidCSSResourcePlugin({
 
 			// Write resources to that folder
 			dist: `${ solidConstants.distPath }${ solidConstants.resourcesPath }`,
@@ -221,7 +223,19 @@ const _initCssConfig = () =>
 			),
 
 			// Include images as Base64 into bundle
-			inline: fuseConfig.inlineEveryResourcesInCSS
+			inline: fuseConfig.inlineEveryResourcesInCSS,
+
+			// When resource file mapping changed
+			filesMapping: (files) =>
+			{
+				console.log('FILE MAPPING');
+				// Create a new typescript file which stores source path and resource path
+				Files.new(`${ solidConstants.srcPath }/resources.ts`).write(`
+					export const Resources = {
+						${ files.map( file => `"${ file.from }" : "${ file.to }"`).join(",\n\t") }
+					}`
+				.replace(/(\n\t\t\t\t\t)/gmi, "\n"))
+			}
 		})
 	];
 

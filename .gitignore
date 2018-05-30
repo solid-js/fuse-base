@@ -16,6 +16,7 @@ src/_common/data/config.ts
 src/_common/atoms.ts
 src/bundles.ts
 src/*/pages.ts
+src/resources.ts
 
 # Generated sprites
 src/*/sprites/*.less
