@@ -16,7 +16,12 @@ echo "Done !"
 echo ""
 
 echo "Installing node dependencies..."
-npm install >> install.log 2>&1
+npm install
+echo "Done !"
+echo ""
+
+echo "Removing install script..."
+rm -f install.sh
 echo "Done !"
 echo ""
 
