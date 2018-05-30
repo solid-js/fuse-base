@@ -41,6 +41,7 @@ npm-debug.log*
 .idea/*.*
 !.idea/codeStyles
 !.idea/.name
+!.idea/libraries
 !.idea/jsLibraryMappings.xml
 !.idea/misc.xml
 !.idea/modules.xml
