@@ -9,6 +9,7 @@ echo "Installing archive..."
 unzip -q fuse-base.zip
 rm fuse-base.zip
 mv fuse-base-master/* ./
+mv fuse-base-master/.idea ./.idea
 mv fuse-base-master/.gitignore ./
 rm -r fuse-base-master/
 echo "Done !"
