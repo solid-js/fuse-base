@@ -4,8 +4,14 @@ const { Files } = require('@zouloux/files');
 // Load solid constants
 const solidConstants = require('../solid-constants.config');
 
-// Verbose config
+// Notification module
+const solidNotif = require('./solid-notif');
+
+// Local dependencies
 let verbose = true;
+let fuseBox;
+let options;
+
 
 
 /**
@@ -16,10 +22,14 @@ module.exports = {
 	/**
 	 * Init Solid checker
 	 * @param pVerbose Enable console logs
+	 * @param pFuseBox FuseBox instance
+	 * @param pOptions CLI options
 	 */
-	init: (pVerbose) =>
+	init: (pVerbose, pFuseBox, pOptions) =>
 	{
 		verbose = pVerbose;
+		fuseBox = pFuseBox;
+		options = pOptions;
 	},
 
 	/**
@@ -47,19 +57,35 @@ module.exports = {
 		verbose && console.log('');
 
 		// Shortcut method to run Type Checking with alerts if anything failed
-		const runTypeCheck = () =>
+		const runTypeCheck = async (pRunAsync) =>
 		{
 			// Type checking can be long, so we show this to know what is going on
 			console.log(`\n  → Checking Typescript bundles ...`.cyan);
 
+			// Play check starting sound
+			(!options.muted && pRunAsync)
+			&&
+			solidNotif.playSound( 'Pop' );
+
 			// Run type checker
-			const totalErrors = typeHelper.runSync();
+			const totalErrors = (
+				pRunAsync
+				? await typeHelper.runPromise()
+				: typeHelper.runSync()
+			);
+
+			// Play check ended sound (success or error)
+			(!options.muted && pRunAsync)
+			&&
+			solidNotif.playSound(
+				totalErrors > 0 ? 'Sosumi' : 'Tink'
+			);
 
 			// If we have errors
 			// Play a sound from the terminal if there is an error
 			(totalErrors > 0 && verbose)
 			? console.log("\007")
-			: console.log(`  → Bundles checked !`.green);
+			: console.log(`\n  → Bundles checked !`.green);
 			verbose && console.log('');
 
 			// Quit with an error if we are in quantum mode
@@ -73,7 +99,7 @@ module.exports = {
 		if (pBundles == null)
 		{
 			// Exec directly the type checker and do not init type check on bundles
-			runTypeCheck();
+			runTypeCheck( false );
 			return;
 		}
 
@@ -86,10 +112,6 @@ module.exports = {
 			// When an app complete compilation
 			app.completed( proc =>
 			{
-				// Log bundle checked
-				//if (completedBundles === 0) console.log('');
-				//verbose && console.log(`  → Bundle ${proc.bundle.name} compiled !`.green);
-
 				// Count until every bundle are compiled
 				if ( ++completedBundles >= pBundles.length )
 				{
@@ -97,7 +119,7 @@ module.exports = {
 					completedBundles = 0;
 
 					// Run typecheck on all bundle at once
-					runTypeCheck( proc.bundle.name );
+					runTypeCheck( true );
 				}
 			});
 		});

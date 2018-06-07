@@ -53,6 +53,7 @@ const _initCLIOptions = (pOptionsOverride) =>
 		reload		: false,
 		port		: 4445,
 		quiet 		: false,
+		muted		: false,
 		noTypeCheck	: false,
 		noLessCheck	: false,
 		noWatch		: false
@@ -575,7 +576,7 @@ const _initCheckers = () =>
 		solidCheck = require('./task-check');
 
 		// Init with solid config and verbosity
-		solidCheck.init( !options.quiet );
+		solidCheck.init( !options.quiet, fuse, options );
 	}
 
 	// Show message if Typescript checking is disabled

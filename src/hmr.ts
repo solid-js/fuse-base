@@ -1,31 +1,55 @@
 /**
  * This file is only loaded in Dev mode.
  * It manage how the Hot Module Reloading behave.
+ *
+ * IMPORTANT : Do not import or require this file.
+ * IMPORTANT : It has to be removed from bundles on production.
+ * IMPORTANT : See instructions bellow to use it correctly.
+ *
+ * ---- If you want your state to persist between reloads (tabs on a component for example)
+ *
  * If you want to add a Component as a Stateful component, to avoid it to be
- * refreshed each time an other component is changed :
+ * refreshed each time an other component is changed ?
  * Add this on the bottom of the file :
- * if (process.env.NODE_ENV !== 'production') window['__HMRState'].registerStatefulComponent( $ExportedFileClass );
+ *
+ * if (process.env.NODE_ENV !== 'production') window['__HMR'].registerStatefulComponent( $ExportedFileClass );
+ *
+ *
+ * ---- If you want everything to reload when changing a file (Three.js app for example)
+ *
+ * If you want a component to reload the entire page each time it is updated ?
+ * Add this on the first level of the file :
+ *
+ * if (process.env.NODE_ENV !== 'production') window['__HMR'].registerReloadPath( __filename );
+ *
+ *
+ * If you want all files inside a folder to reload the page when updated ?
+ * Add this on the first level of a loaded file inside this folder :
+ *
+ * if (process.env.NODE_ENV !== 'production') window['__HMR'].registerReloadPath( __dirname );
  */
 
 // Get FuseBox object for typecript
 const FuseBox = window['FuseBox'];
 
+
 export class HMR
 {
 	// Window key of this singleton
-	static WINDOW_KEY = '__HMRState';
+	static WINDOW_KEY = '__HMR';
 
 	// Stored stateful components states to keep them between reloadings
-	protected _statefulComponentsStates = [];
+	protected _statefulComponentsStates 					= [];
+
+	// Stored path of files which trigger a full page reload
+	protected _reloadPaths					:string[] 		= [];
+
 
 	/**
 	 * Constructor
 	 */
 	constructor ()
 	{
-		// Store as singleton
-		window[ HMR.WINDOW_KEY ] = this;
-
 		// Add this as a FuseBox plugin
 		FuseBox.addPlugin( this );
 	}
@@ -35,6 +59,19 @@ export class HMR
 	 */
 	hmrUpdate ({ type, path, content, dependants })
 	{
+		// Check if this file needs a full page reload
+		const filteredReloadPath = this._reloadPaths.filter(
+			reloadPath => path.indexOf(reloadPath) === 0
+		);
+
+		// If this file needs a full page reload
+		if ( filteredReloadPath.length > 0 )
+		{
+			// Wait a bit, because, you know...
+			setTimeout(() => location.reload( true ), 500);
+			return true;
+		}
+
 		// If this is a CSS file
 		if ( type === 'css' )
 		{
@@ -107,7 +144,20 @@ export class HMR
 			_hmr._statefulComponentsStates[ componentName ] = this.state;
 		};
 	}
+
+	/**
+	 * Register a path of full page reload.
+	 * When a file starting with this path will be updated, a full page reload will trigger.
+	 * @param pReloadPath Path of the file or folder to trigger full page reload when updated.
+	 */
+	registerReloadPath ( pReloadPath )
+	{
+		this._reloadPaths.push( pReloadPath );
+	}
 }
 
-// Déclare HMR object once, as singleton
-if ( !(HMR.WINDOW_KEY in window) ) new HMR();
+// Déclare HMR object once, as singleton, stored in window
+if ( !(HMR.WINDOW_KEY in window) )
+{
+	window[ HMR.WINDOW_KEY ] = new HMR();
+}

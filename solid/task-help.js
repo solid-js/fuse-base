@@ -48,6 +48,9 @@ const tasksMessages = {
 			${'--quiet'.bold}
 				- Disable console logs.
 
+			${'--muted'.bold}
+				- Disable sounds on MacOs.
+
 			${'--noTypeCheck'.bold}
 				- Disable type checking, not advised.
 
