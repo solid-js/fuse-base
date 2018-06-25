@@ -483,6 +483,10 @@ const _initBundlesConfig = () =>
 			// Add included path
 			instructions.push(`+ [${ currentBundleFolder }/${ includedFoldersGlob }/**/*.${ extensionsGlob }]`);
 
+			// Add Main files to force parsing of less and typescript bundle entries.
+			// Needed for resources parsing
+			instructions.push(`+ [${ currentBundleFolder }/Main.${ extensionsGlob }]`);
+
 			// Browse other bundles to remove their files from this bundle
 			appBundlesNames.map( otherAppBundleName =>
 			{
@@ -517,6 +521,10 @@ const _initBundlesConfig = () =>
 
 			// Add auto-started entry point with all vendors dependencies
 			`> ${ solidConstants.entryPoint }`,
+
+			// Add Main files to force parsing of less and typescript bundle entries.
+			// Needed for resources parsing
+			`> **/Main.${ extensionsGlob }`,
 
 			// Add included path from every bundles and include vendor dependencies
 			`+ */${ includedFoldersGlob }/*/*.${ extensionsGlob }`

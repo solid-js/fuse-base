@@ -253,7 +253,7 @@ module.exports = {
 					// If every sprite has compiled
 					else if (--totalSprites === 0)
 					{
-						console.log(`  →  Done !`.green);
+						console.log(`  → Done !`.green);
 
 						// Optimise images
 						Promise.all( optimizeImages() ).then( resolve );
