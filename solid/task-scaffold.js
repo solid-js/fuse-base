@@ -371,7 +371,7 @@ const scaffolders = [
 			let filename = '';
 			await Inquirer.prompt({
 				type: 'input',
-				message: 'What is the dash-case filename of the font, with font variant ? (ex : helvetica-neue-bold)',
+				message: 'What is the lower-dash-case filename of the font, with font variant ? (ex : helvetica-neue-bold)',
 				name: 'filename'
 			}).then( answer => filename = answer.filename );
 
@@ -387,7 +387,7 @@ const scaffolders = [
 			let fontVariant = '';
 			await Inquirer.prompt({
 				type: 'input',
-				message: 'What is the camelCase font variant ? (ex : bold or regular)',
+				message: 'What is the lowerCamelCase font variant ? (ex : bold or regular)',
 				name: 'fontVariant'
 			}).then( answer => fontVariant = CapitalizeFirst(answer.fontVariant, false) );
 
@@ -406,7 +406,7 @@ const scaffolders = [
 			// Show import instructions
 			showSuccess('Font face created !');
 			showInstructions([
-				`Import your font as (reference) in ${ `${ solidConstants.srcPath }${ solidConstants.commonBundleName }/Main.less`.bold }`
+				`Import your font as in ${ `${ solidConstants.srcPath }${ solidConstants.commonBundleName }/Main.less`.bold }`
 			]);
 		}
 	},
