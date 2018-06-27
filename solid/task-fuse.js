@@ -232,8 +232,8 @@ const _initCssConfig = () =>
 				console.log(`  → Updated resources list.`.yellow);
 
 				// Create a new typescript file which stores source path and resource path
-				Files.new(`${ solidConstants.srcPath }/resources.ts`).write(`
-					export const Resources = {
+				Files.new(`${ solidConstants.distPath }${ solidConstants.bundlesPath }/resources.js`).write(`
+					window['__resourcesMapping'] = {
 						${ files.map( file => `"${ file.from }" : "${ file.to }"`).join(",\n\t") }
 					}`
 				.replace(/(\n\t\t\t\t\t)/gmi, "\n"))
@@ -446,8 +446,21 @@ const _initBundlesConfig = () =>
 	// Create vendor bundle if we are not in mono bundle mode
 	if ( !fuseConfig.monoBundle )
 	{
+		// Vendors instructions, by default we only get all libraries
+		const vendorsInstructions = [`~ ${ solidConstants.entryPoint }`];
+
+		// Browse split libraries from vendors
+		Object.keys( fuseConfig.libsToSplitFromVendors ).map( libSplitBundleName =>
+		{
+			// Remove all of them from vendors bundle
+			fuseConfig.libsToSplitFromVendors[ libSplitBundleName ].map(
+				libToSplit => vendorsInstructions.push(`- ${libToSplit}`)
+			);
+		});
+
+		// Add vendor bundle with instructions
 		allBundles.push(
-			fuse.bundle( solidConstants.vendorsBundleName, `~ ${ solidConstants.entryPoint }` )
+			fuse.bundle( solidConstants.vendorsBundleName, vendorsInstructions.join("\n") )
 		);
 	}
 
@@ -498,10 +511,21 @@ const _initBundlesConfig = () =>
 				}
 			});
 
+			// Browse split libraries from vendors
+			Object.keys( fuseConfig.libsToSplitFromVendors ).map( libSplitBundleName =>
+			{
+				// If those libs are not split in this bundle, do not continue
+				if ( libSplitBundleName !== outputBundleName ) return;
+
+				// Add those libs into this bundle
+				fuseConfig.libsToSplitFromVendors[ libSplitBundleName ].map(
+					libToSplit => instructions.push(`+ ${libToSplit}`)
+				);
+			});
+
 			// Set instructions to the current bundle
 			bundle.instructions( instructions.join("\n") );
 		});
-
 	}
 
 	/**

@@ -1,6 +1,6 @@
 {
   "name": "solid-fuse-base",
-  "version": "1.7.5",
+  "version": "1.8.0",
   "description": "A project made with Solidify JS -> https://github.com/solid-js",
   "repository": "git@github.com:solid-js/fuse-base.git",
   "main": "solid.js",

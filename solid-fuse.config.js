@@ -58,6 +58,18 @@ exports.generateWebIndex = true;
 exports.useEmbeddedDevServer = true;
 
 /**
+ * Split some libraries from vendors into another bundle.
+ * Example, you want three to be inside a specific split bundle loaded asynchronously and not into vendors
+ * to optimise application loading.
+ * Useless if monoBundle mode is enabled.
+ */
+exports.libsToSplitFromVendors = {
+	// Key : bundle to split libraries into
+	// Value : array of lib names to inject into this bundle and remove from vendors bundle.
+	//'experience' : [ 'three', 'webvr-polyfill' ]
+};
+
+/**
  * Import pages as static dependencies, with a require statement in place of an import.
  *
  * require() will include the page and its dependencies to its parent bundle.
