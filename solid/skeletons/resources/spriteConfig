@@ -15,7 +15,10 @@ module.exports = {
 		padding: 2,
 
 		// Sprite scaling. Default is 1
-		scaling: 1
+		scaling: 1,
+
+		// Force power of two dimensions for GPU optimisation
+		powerOfTwo: false
 	},
 
 	compositorOptions: {
