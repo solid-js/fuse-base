@@ -90,6 +90,19 @@ const askWhichComponentFolder = () =>
 }
 
 /**
+ * Ask for the page folder
+ */
+const askWhichPageFolder = () =>
+{
+	return Inquirer.prompt({
+		type: 'list',
+		name: 'subFolder',
+		message : 'Which page folder ?',
+		choices: solidConstants.pagesPath
+	});
+}
+
+/**
  * Ask for the component name
  */
 const askComponentName = () =>
@@ -119,7 +132,10 @@ const scaffoldComponent = ( scriptTemplate ) => new Promise( async ( resolve ) =
 	let subFolder = '';
 	if (scriptTemplate === 'reactPageScript')
 	{
-		subFolder = 'pages'
+		await askWhichPageFolder().then( answer =>
+		{
+			subFolder = answer.subFolder;
+		})
 	}
 
 	// Get sub-folder for components

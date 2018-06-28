@@ -26,8 +26,8 @@ exports.resourcesPath = 'assets/resources/';
 // Used when exporting CSS Files, url() target is relative to CSS file
 exports.bundleToResourcesRelativePath = '../resources/';
 
-// Pages folder path within bundles.
-exports.pagesPath = 'pages/';
+// Pages folders path within bundles.
+exports.pagesPath = ['pages/', 'popins/'];
 
 // Path to sprites folder from src
 exports.spritesPath = 'sprites/';
@@ -63,7 +63,7 @@ exports.commonBundleName = '_common';
 exports.commonOutputFileName = 'common';
 
 // Folders to include in every bundles, even if they are not implicitly imported.
-exports.includedFoldersWithoutImports = ['molecules', 'components', 'pages', 'models'];
+exports.includedFoldersWithoutImports = ['molecules', 'components', 'pages', 'popins', 'models'];
 
 // List of all component compatible folders, for scaffolder only
 exports.componentCompatibleFolders = ['molecules', 'components'];
@@ -72,4 +72,4 @@ exports.componentCompatibleFolders = ['molecules', 'components'];
 exports.includedExtensions = ['ts', 'tsx', 'less'];
 
 // Folders to scaffold in app bundles
-exports.appBundleFoldersToScaffold = ['molecules', 'pages', 'components', 'models', 'data', 'sprites'];
+exports.appBundleFoldersToScaffold = ['molecules', 'pages', 'popins', 'components', 'models', 'data', 'sprites'];

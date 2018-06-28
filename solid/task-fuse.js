@@ -84,16 +84,27 @@ const _initStaticDependenciesList = () =>
 	// Browse bundles
 	appBundlesNames.map( appBundleName =>
 	{
-		// Get all pages for this bundle from file system
-		allPagesByBundles[ appBundleName ] = Files.getFolders(`${solidConstants.srcPath}${appBundleName}/${solidConstants.pagesPath}*`).all(
-			pagePath => ({
-				// Page name with CapitalCamelCase
-				name: CapitalizeFirst( path.basename(pagePath), true ),
+		// Browse all page paths
+		solidConstants.pagesPath.map( pagePath =>
+		{
+			// Get all pages for this bundle from file system
+			const pages = Files.getFolders(`${solidConstants.srcPath}${appBundleName}/${pagePath}*`).all(
+				pagePath => ({
+					// Page name with CapitalCamelCase
+					name: CapitalizeFirst( path.basename(pagePath), true ),
 
-				// Folder path of this page (without the file)
-				path: pagePath.substr(solidConstants.srcPath.length + appBundleName.length + 1, pagePath.length)
-			})
-		);
+					// Folder path of this page (without the file)
+					path: pagePath.substr(solidConstants.srcPath.length + appBundleName.length + 1, pagePath.length)
+				})
+			);
+
+			// Concat pages list with other pages types
+			allPagesByBundles[ appBundleName ] = (
+				(appBundleName in allPagesByBundles)
+				? allPagesByBundles[ appBundleName ].concat( pages )
+				: pages
+			);
+		})
 	});
 };
 
