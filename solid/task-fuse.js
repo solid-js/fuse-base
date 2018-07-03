@@ -6,7 +6,8 @@ const {
 	QuantumPlugin,
 	LESSPlugin,
 	PostCSSPlugin,
-	CSSPlugin
+	CSSPlugin,
+	RawPlugin
 } = require("fuse-box");
 
 // Node path utils
@@ -332,6 +333,9 @@ const _initFuseConfig = () =>
 				// Base path from deployed env properties
 				BASE : deployedEnvProperties.base
 			}),
+
+			// RawPlugin to import data as string from files
+			RawPlugin( solidConstants.filesToImportAsStrings ),
 
 			// Generate index.html from template
 			// @see https://fuse-box.org/page/web-index-plugin

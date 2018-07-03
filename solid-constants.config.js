@@ -62,6 +62,9 @@ exports.commonBundleName = '_common';
 // Common JS bundle output file name
 exports.commonOutputFileName = 'common';
 
+// Files types to import as string
+exports.filesToImportAsStrings = ['*.fs', '*.vs', '*.txt'];
+
 // Folders to include in every bundles, even if they are not implicitly imported.
 exports.includedFoldersWithoutImports = ['molecules', 'components', 'pages', 'popins', 'models'];
 
