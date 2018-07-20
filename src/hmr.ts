@@ -73,7 +73,7 @@ export class HMR
 		}
 
 		// If this is a CSS file
-		if ( type === 'css' )
+		if ( type === 'css')
 		{
 			// Refresh whole frame if this file is not in the default package
 			if ( !FuseBox.exists( path ) && !FuseBox.exists( 'default/' + path ) ) return false;
@@ -88,8 +88,46 @@ export class HMR
 			return true;
 		}
 
+		// If this is an hosted css file, we'll need to replace link tag
+		// IMPORTANT : We advise to use solid-fuse.config.js > generateCSSFiles = 'quantum' or false
+		else if ( type === 'hosted-css' )
+		{
+			// Target all tags
+			const linkTags = document.getElementsByTagName('link');
+			for (let i=0; i < linkTags.length; i++)
+			{
+				// Target this tag
+				let currentLinkTag = linkTags[i] as HTMLLinkElement;
+
+				// Keep only stylesheet tags
+				if (currentLinkTag.getAttribute('rel').toLowerCase() !== 'stylesheet') continue;
+
+				// Get href and remove question mark
+				let linkHref = currentLinkTag.getAttribute('href');
+				if (linkHref.indexOf('?') > -1)
+				{
+					linkHref = linkHref.split('?')[0];
+				}
+
+				// If this link style is pointing to a file looking like the modified hosted css file
+				if (linkHref.indexOf(path) == linkHref.length - path.length)
+				{
+					// Remove link tag from dom
+					const parent = currentLinkTag.parentElement;
+
+					// Add re-add it to reload it
+					currentLinkTag.remove();
+					window.setTimeout(() =>
+					{
+						parent.appendChild( currentLinkTag )
+					}, 1);
+				}
+			}
+			return true;
+		}
+
 		// No reload
-		else return false;
+		return false;
 	}
 
 	/**
