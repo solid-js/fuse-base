@@ -243,10 +243,13 @@ const _initCssConfig = () =>
 			{
 				console.log(`  → Updated resources list.`.yellow);
 
+				// We patch backward slashes as forward slashes for windows
+				const patchSlashes = r => r.replace(/\\/gmi, '/');
+
 				// Create a new typescript file which stores source path and resource path
 				Files.new(`${ solidConstants.distPath }${ solidConstants.bundlesPath }/resources.js`).write(`
 					window['__resourcesMapping'] = {
-						${ files.map( file => `"${ file.from }" : "${ file.to }"`).join(",\n\t") }
+						${ files.map( file => `"${ patchSlashes(file.from) }" : "${ patchSlashes(file.to) }"`).join(",\n\t") }
 					}`
 				.replace(/(\n\t\t\t\t\t)/gmi, "\n"))
 			}
