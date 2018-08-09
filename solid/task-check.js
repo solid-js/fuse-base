@@ -164,7 +164,7 @@ module.exports = {
 				// Lint with lessc, do not compile anything
 				let lessLint = ChildProcess.spawn(
 					'./node_modules/less/bin/lessc',
-					['--strict-math=on', '--lint', '--no-color', lessFile]
+					['--lint', '--no-color', lessFile]
 				);
 
 				// Less linter process finished

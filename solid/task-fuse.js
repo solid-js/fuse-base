@@ -174,11 +174,6 @@ const _initCssConfig = () =>
 			// Disable IE-compat so data-uri can be huge
 			ieCompat: false,
 
-			// Enable strict math. Every math computation have to be inside parenthesis.
-			// This allow to use calc() without literal operator.
-			// http://lesscss.org/usage/#command-line-usage
-			strictMath: true,
-
 			// Use relative URLs so url path don't get lost
 			relativeUrls: true
 		}),
