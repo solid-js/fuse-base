@@ -7,7 +7,8 @@ const {
 	LESSPlugin,
 	PostCSSPlugin,
 	CSSPlugin,
-	RawPlugin
+	RawPlugin,
+	CSSResourcePlugin
 } = require("fuse-box");
 
 // Node path utils
@@ -31,8 +32,10 @@ const solidConstants = require('../solid-constants.config');
 // Load clean task
 const cleanTask = require('./task-clean');
 
+// TODO : Faire une PR pour la partie copie synchrone si c'est encore d'actu
+
 // Load solid CSSResourcePlugin which patch async file copying and add fileMapping option
-const { SolidCSSResourcePlugin } = require('./solid-cssresourceplugin');
+//const { SolidCSSResourcePlugin } = require('./solid-cssresourceplugin');
 
 
 // ----------------------------------------------------------------------------- CLI OPTIONS
@@ -214,7 +217,7 @@ const _initCssConfig = () =>
 		),
 
 		// @see : http://fuse-box.org/plugins/css-resource-plugin
-		SolidCSSResourcePlugin({
+		CSSResourcePlugin({
 
 			// Write resources to that folder
 			dist: `${ solidConstants.distPath }${ solidConstants.resourcesPath }`,
@@ -244,7 +247,7 @@ const _initCssConfig = () =>
 				// Create a new typescript file which stores source path and resource path
 				Files.new(`${ solidConstants.distPath }${ solidConstants.bundlesPath }/resources.js`).write(`
 					window['__resourcesMapping'] = {
-						${ files.map( file => `"${ patchSlashes(file.from) }" : "${ patchSlashes(file.to) }"`).join(",\n\t") }
+						${ files.map( file => `"${ patchSlashes(file.from) }" : "${ solidConstants.resourcesPath + patchSlashes(file.to) }"`).join(",\n\t") }
 					}`
 				.replace(/(\n\t\t\t\t\t)/gmi, "\n"))
 			}
