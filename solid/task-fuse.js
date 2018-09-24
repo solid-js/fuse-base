@@ -776,14 +776,6 @@ module.exports = {
 			await solidCheck.less( true );
 		}
 
-		// Check Typescript files and exit on error if quantum is enabled
-		// So Typescript will be before actual compilation
-		if ( !options.noTypeCheck && options.quantum )
-		{
-			// Setup Typescript checker on current bundles
-			solidCheck.typescript( true );
-		}
-
 
 		// ---- CLEAN PHASE
 		options.quiet || console.log(`Cleaning old bundles.`.yellow);
@@ -804,6 +796,14 @@ module.exports = {
 
 		// Run fuse, run !
 		await fuse.run();
+
+		// Check Typescript files and exit on error if quantum is enabled
+		// So Typescript will be before actual compilation
+		if ( !options.noTypeCheck && options.quantum )
+		{
+			// Setup Typescript checker on current bundles
+			solidCheck.typescript( true );
+		}
 
 		// If we are in dev mode and we do not have CSS files built because of it
 		// We generate empty CSS Files so markup isn't lost about CSS files in dev mode
