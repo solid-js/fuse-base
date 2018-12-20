@@ -36,7 +36,7 @@ export class %%capitalComponentName%% extends ReactView<Props, States>
 	render ()
 	{
 		return <div
-			className={ ['%%capitalComponentName%%', ...this.props.classNames].filter(val => val).join(' ') }
+			className={ ['%%capitalComponentName%%', ...this.props.classNames].filter(v => v).join(' ') }
 			ref="root"
 		>
 			%%capitalComponentName%%
