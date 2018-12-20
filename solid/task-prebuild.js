@@ -1,5 +1,6 @@
 // File manager
 const { Files } = require('@zouloux/files');
+const path = require('path');
 
 // Load solid constants
 const solidConstants = require('../solid-constants.config');
@@ -225,5 +226,54 @@ module.exports = {
 				}).join("\n")
 			)
 		);
+	},
+
+
+	/**
+	 * Generate fonts less file
+	 *
+	 * This file contains all f
+	 */
+	preBuildFonts: () =>
+	{
+		// Where fonts are stored
+		const fontsFolder = `${solidConstants.srcPath}${solidConstants.commonBundleName}/${solidConstants.fontsPath}`;
+
+		// All fonts files to import
+		let fontsFilesToImport = [];
+
+		// Get All fonts familiy files
+		let fontFiles = Files.getFiles(`${fontsFolder}*.less`).files;
+
+		let fontFileName = '';
+
+		// For each fonts mixins files
+		fontFiles.map( (FontFile) =>
+		{
+			// Do not follow Fonts.less
+			if (FontFile === `${fontsFolder}${solidConstants.fontsStyleFile}`) return;
+
+			// Extract bundle name from single bundle app path
+			fontFileName = `${path.basename(FontFile)}`;
+
+			// Push name in array
+			fontsFilesToImport.push(fontFileName);
+		});
+
+		// Define template
+		const fontsTemplate = () => (`
+			/**
+			 * WARNING
+			 * Auto-generated file, do not edit !
+			 * This file list all fonts mixins front fonts/ folder to import in the project.
+			 */
+			 ${ fontsFilesToImport.map( fontFile => `\n@import './${fontFile}';`).join('')}
+			`).replace(fileTabRegex, "\n")
+
+		// Create new file
+		Files.new(`${fontsFolder}${solidConstants.fontsStyleFile}`).write(
+			fontsTemplate()
+		)
 	}
+
 };

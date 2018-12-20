@@ -674,6 +674,9 @@ const _preBuild = () =>
 
 	// Pre-build atoms typescript file
 	solidPreBuild.preBuildAtoms();
+
+	// Pre-build fonts list style file
+	solidPreBuild.preBuildFonts();
 };
 
 
