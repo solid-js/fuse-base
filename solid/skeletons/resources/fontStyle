@@ -7,9 +7,9 @@
 	font-family: '%%fontFamilyName%%';
 
   // Load font files
-	src:	url('./%%fontFamilyName%%/%%fontFamilyName%%.eot?#iefix')								format('embedded-opentype'),
-				url('./%%fontFamilyName%%/%%fontFamilyName%%.woff')											format('woff'),
-				url('./%%fontFamilyName%%/%%fontFamilyName%%.ttf')											format('truetype');
+	src:	url('@{fontBasePath}/%%fontFamilyName%%/%%fontFamilyName%%.eot?#iefix')	format('embedded-opentype'),
+				url('@{fontBasePath}/%%fontFamilyName%%/%%fontFamilyName%%.woff')				format('woff'),
+				url('@{fontBasePath}/%%fontFamilyName%%/%%fontFamilyName%%.ttf')				format('truetype');
 
   // Declare style
 	font-weight: normal;
@@ -17,7 +17,7 @@
 }
 
 // Font variant mixin
-.%%fontClassName%%-%%fontVariant%% ()
+.%%fontClassName%% ()
 {
 	font-family : '%%fontFamilyName%%', sans-serif;
 	.fontSmooth();

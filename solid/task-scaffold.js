@@ -3,9 +3,13 @@ const path = require('path');
 const { Files } = require('@zouloux/files');
 const { QuickTemplate } = require('./helper-template');
 const { CapitalizeFirst } = require('./helper-capitalize');
+const changeCase = require('change-case');
 
 // Load solid constants
 const solidConstants = require('../solid-constants.config');
+
+// Load solid prebuild
+const solidPrebuild = require('./task-prebuild');
 
 // ----------------------------------------------------------------------------- LOGS
 
@@ -380,52 +384,50 @@ const scaffolders = [
 				'Put them into a folder named with the same name.',
 				`Move this folder into ${ fontsFolder.bold } directory.`,
 			], [
-				`Ex : ${ fontsFolder }helvetica-neue-bold/helvetica-neue-bold.{eot,ttf,woff}`.bold,
+				`Ex: ${ fontsFolder }helvetica-neue-bold/helvetica-neue-bold.{eot,ttf,woff}`.bold,
 			]);
 
-			// Get file name
-			let filename = '';
+			// Get font name
+			let fontName = '';
 			await Inquirer.prompt({
 				type: 'input',
-				message: 'What is the lower-dash-case filename of the font, with font variant ? (ex : helvetica-neue-bold)',
-				name: 'filename'
-			}).then( answer => filename = answer.filename );
+				message: 'What\'s the font-name of the font? (ex: helvetica-neue WITHOUT regular)',
+				name: 'fontName'
+			}).then( answer => fontName = changeCase.pascalCase(answer.fontName) );
 
-			// Get mixin name
-			let mixinName = '';
+			// Get font modifier (regular, bold...)
+			let fontModifier = '';
 			await Inquirer.prompt({
 				type: 'input',
-				message: 'What CamelCase mixin name do you want, without font variant ? (ex : HelveticaNeue)',
-				name: 'mixinName'
-			}).then( answer => mixinName = CapitalizeFirst(answer.mixinName, true) );
+				message: 'What\'s the font modifier? (ex: regular, bold...)',
+				name: 'fontModifier'
+			}).then( answer => fontModifier = changeCase.lowerCase(answer.fontModifier));
 
-			// Get font variant
-			let fontVariant = '';
-			await Inquirer.prompt({
-				type: 'input',
-				message: 'What is the lowerCamelCase font variant ? (ex : bold or regular)',
-				name: 'fontVariant'
-			}).then( answer => fontVariant = CapitalizeFirst(answer.fontVariant, false) );
+			// Build font class name
+			let fontClassName = fontModifier.length > 0 ? `${fontName}-${fontModifier}` : `${fontName}`
 
-			// Scaffold file
-			Files.new(`${fontsFolder}${mixinName}-${fontVariant}.less`).write(
+			// Build font family name
+			let fontFamilyName = `${changeCase.paramCase( fontClassName )}`
+
+			// Create new file
+			Files.new(`${fontsFolder}${fontClassName}.less`).write(
 				QuickTemplate(
 					Files.getFiles(`${ solidConstants.skeletonsPath }resources/fontStyle`).read(),
 					{
-						fontFamilyName: filename,
-						fontClassName: mixinName,
-						fontVariant: fontVariant
+						fontFamilyName: fontFamilyName,
+						fontClassName: fontClassName,
 					}
 				)
 			);
 
 			// Show import instructions
-			showSuccess('Font face created !');
-			showInstructions([
-				`Import your font as in ${ `${ solidConstants.srcPath }${ solidConstants.commonBundleName }/Main.less`.bold }`
-			]);
+			showSuccess('Font face created!');
+
+			// Generate the new Fonts.less file including new font
+			solidPrebuild.preBuildFonts();
 		}
 	},
+
 
 	// Separator
 	{ name: new Inquirer.Separator() },

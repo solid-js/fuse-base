@@ -32,6 +32,9 @@ exports.pagesPath = ['pages/', 'popins/'];
 // Path to sprites folder from src
 exports.spritesPath = 'sprites/';
 
+// Path to fonts folder from src
+exports.fontsPath = 'fonts/';
+
 // Path to skeletons
 exports.skeletonsPath = 'solid/skeletons/';
 
@@ -49,6 +52,9 @@ exports.atomsPath = 'atoms/';
 
 // Atoms typescript file path inside common bundle
 exports.atomsTypescriptFile = 'atoms.ts';
+
+// Fonts style file path
+exports.fontsStyleFile = 'fonts.less'
 
 // Default apps entry point
 exports.entryPoint = 'index.ts';
