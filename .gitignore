@@ -15,6 +15,7 @@ src/_common/data/config.ts
 # Generated atoms / bundles.ts / pages.ts / Pre-build files
 src/_common/atoms.ts
 src/_common/fonts/fonts.less
+src/_common/sprites/sprites.less
 src/bundles.ts
 src/*/pages.ts
 src/resources.ts

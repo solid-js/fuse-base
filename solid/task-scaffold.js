@@ -8,8 +8,8 @@ const changeCase = require('change-case');
 // Load solid constants
 const solidConstants = require('../solid-constants.config');
 
-// Load solid prebuild
-const solidPrebuild = require('./task-prebuild');
+// Load solid Pre-build
+const solidPreBuild = require('./task-prebuild');
 
 // ----------------------------------------------------------------------------- LOGS
 
@@ -359,9 +359,9 @@ const scaffolders = [
 			showInstructions([
 				`Add PNG images into ${ folderPath.bold } folder, named with ${ 'dash-case'.bold } convention.`,
 				`Sprite can be configured by editing ${ destinationConfigPath.bold } file.`,
-				`Launch ${ `node solid sprites`.bold } to generate less files.`,
-				`Import your sprite in ${ `${ bundlePath }Main.less`.bold } after a first ${ `node solid sprites`.bold }. `,
+				`Launch ${ `node solid sprites`.bold } to generate less files.`
 			]);
+
 		}
 	},
 
@@ -423,8 +423,8 @@ const scaffolders = [
 			// Show import instructions
 			showSuccess('Font face created!');
 
-			// Generate the new Fonts.less file including new font
-			solidPrebuild.preBuildFonts();
+			// Generate the new fonts.less file including new font import
+			solidPreBuild.preBuildFonts();
 		}
 	},
 

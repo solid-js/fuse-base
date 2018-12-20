@@ -7,6 +7,9 @@ const { optimizeFiles } = require('./task-imagemin');
 // Load solid constants
 const solidConstants = require('../solid-constants.config');
 
+// Load solid Pre-build
+const solidPreBuild = require('./task-prebuild');
+
 // ----------------------------------------------------------------------------- CONFIG
 
 // Sprite namming
@@ -254,6 +257,9 @@ module.exports = {
 					else if (--totalSprites === 0)
 					{
 						console.log(`  → Done !`.green);
+
+						// Generate the new sprites.less file including new import
+						solidPreBuild.preBuildSprites();
 
 						// Optimise images
 						Promise.all( optimizeImages() ).then( resolve );

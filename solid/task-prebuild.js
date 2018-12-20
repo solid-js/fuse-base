@@ -232,7 +232,7 @@ module.exports = {
 	/**
 	 * Generate fonts less file
 	 *
-	 * This file contains all f
+	 * This file contains web-fonts less file import
 	 */
 	preBuildFonts: () =>
 	{
@@ -274,6 +274,55 @@ module.exports = {
 		Files.new(`${fontsFolder}${solidConstants.fontsStyleFile}`).write(
 			fontsTemplate()
 		)
+	},
+
+
+	/**
+	 * Generate sprites less file
+	 *
+	 * This file contains sprites less file import
+	 */
+	preBuildSprites: () =>
+	{
+		// Where sprites are stored
+		const spritesFolder = `${solidConstants.srcPath}${solidConstants.commonBundleName}/${solidConstants.spritesPath}`;
+
+		// All sprites files to import
+		let spritesFilesToImport = [];
+
+		// Get All sprites familiy files
+		let spriteFiles = Files.getFiles(`${spritesFolder}*.less`).files;
+
+		let spriteFileName = '';
+
+		// For each sprites mixins files
+		spriteFiles.map( (FontFile) =>
+		{
+			// Do not follow sprites.less
+			if (FontFile === `${spritesFolder}${solidConstants.spritesStyleFile}`) return;
+
+			// Extract bundle name from single bundle app path
+			spriteFileName = `${path.basename(FontFile)}`;
+
+			// Push name in array
+			spritesFilesToImport.push(spriteFileName);
+		});
+
+		// Define template
+		const spritesTemplate = () => (`
+			/**
+			 * WARNING
+			 * Auto-generated file, do not edit !
+			 * This file list all sprites mixins front sprites/ folder to import in the project.
+			 */
+			 ${ spritesFilesToImport.map( spriteFile => `\n@import './${spriteFile}';`).join('')}
+			`).replace(fileTabRegex, "\n")
+
+		// Create new file
+		Files.new(`${spritesFolder}${solidConstants.spritesStyleFile}`).write(
+			spritesTemplate()
+		)
 	}
+
 
 };
