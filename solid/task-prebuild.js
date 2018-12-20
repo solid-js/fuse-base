@@ -298,7 +298,7 @@ module.exports = {
 		// For each sprites mixins files
 		spriteFiles.map( (FontFile) =>
 		{
-			// Do not follow Fonts.less
+			// Do not follow sprites.less
 			if (FontFile === `${spritesFolder}${solidConstants.spritesStyleFile}`) return;
 
 			// Extract bundle name from single bundle app path
@@ -315,7 +315,7 @@ module.exports = {
 			 * Auto-generated file, do not edit !
 			 * This file list all sprites mixins front sprites/ folder to import in the project.
 			 */
-			 ${ spritesFilesToImport.map( fontFile => `\n@import './${fontFile}';`).join('')}
+			 ${ spritesFilesToImport.map( spriteFile => `\n@import './${spriteFile}';`).join('')}
 			`).replace(fileTabRegex, "\n")
 
 		// Create new file
