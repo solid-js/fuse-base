@@ -7,7 +7,8 @@ import {ReactView} from "solidify-lib/react/ReactView";
 
 export interface Props
 {
-
+	// class element
+	className				:string
 }
 
 export interface States
@@ -34,7 +35,10 @@ export class %%capitalComponentName%% extends ReactView<Props, States>
 
 	render ()
 	{
-		return <div className="%%capitalComponentName%%" ref="root">
+		return <div
+			className={['%%capitalComponentName%%', this.props.className].join(' ') }
+			ref="root"
+		>
 			%%capitalComponentName%%
 		</div>
 	}
