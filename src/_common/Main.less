@@ -11,17 +11,18 @@
 @import (reference) './atoms/Properties.less';
 @import (reference) './atoms/Breakpoints.less';
 
-// Import Pre-build web-fonts file
+// Import Pre-build web-fonts import file
 @import './fonts/fonts.less';
+
+// Import Pre-build sprites import file
+// (import them as reference if you only need mixins)
+@import (reference) "sprites/sprites.less";
 
 // Import mixins, not as reference so you can add css declarations
 @import './mixins/Alignments.less';
 @import './mixins/Backgrounds.less';
 @import './mixins/Patches.less';
 @import './mixins/Texts.less';
-
-// Import sprites (import them as reference if you only need mixins)
-//@import (reference) "./sprites/sprite-main-interface.less";
 
 // Import layout styling
 @import './layout/Body.less';

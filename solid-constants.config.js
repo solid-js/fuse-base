@@ -56,6 +56,9 @@ exports.atomsTypescriptFile = 'atoms.ts';
 // Fonts style file path
 exports.fontsStyleFile = 'fonts.less'
 
+// Sprites style file path
+exports.spritesStyleFile = 'sprites.less'
+
 // Default apps entry point
 exports.entryPoint = 'index.ts';
 
