@@ -153,7 +153,7 @@ export class Main extends App
 	protected ready ()
 	{
 		// React app view
-		this._appView = render( <AppView />, GlobalConfig.instance.root ) as AppView;
+		render( <AppView ref={ r => this._appView = r } />, GlobalConfig.instance.root ) as AppView;
 
 		// Start router
 		Router.start();
