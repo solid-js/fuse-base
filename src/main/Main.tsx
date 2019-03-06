@@ -144,7 +144,7 @@ export class Main extends App
 	// ------------------------------------------------------------------------- READY
 
 	// App view instance
-	protected _appView		:AppView;
+	protected _appView;
 	get appView ():AppView { return this._appView; }
 
 	/**
@@ -153,7 +153,10 @@ export class Main extends App
 	protected ready ()
 	{
 		// React app view
-		render( <AppView ref={ r => this._appView = r } />, GlobalConfig.instance.root ) as AppView;
+		render(
+			<AppView ref={ r => this._appView = r } />,
+			GlobalConfig.instance.root
+		);
 
 		// Start router
 		Router.start();
