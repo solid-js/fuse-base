@@ -8,7 +8,8 @@ const {
 	PostCSSPlugin,
 	CSSPlugin,
 	RawPlugin,
-	CSSResourcePlugin
+	CSSResourcePlugin,
+	SourceMapPlainJsPlugin
 } = require("fuse-box");
 
 // Node path utils
@@ -301,8 +302,8 @@ const _initFuseConfig = () =>
 		// Use hashes only when generating web index and with uglify
 		hash: ( fuseConfig.generateWebIndex && options.uglify ),
 
-		// No source maps here, we do it on bundles
-		sourceMaps: false,
+		// Source map depend of quantum activation
+		sourceMaps: !options.quantum,
 
 		// Enable debugging from options
 		log: !options.quiet,
@@ -397,7 +398,13 @@ const _initFuseConfig = () =>
 
 				// Remove all use strict when uglify is enabled
 				removeUseStrict : options.uglify
-			})
+			}),
+
+			// Active source Map if quantum mode is disable
+			!options.quantum
+			&&
+			// Use source map plugin
+			SourceMapPlainJsPlugin()
 		]
 	});
 };
