@@ -66,6 +66,9 @@ export class Main extends App
 	 */
 	protected initConfig ()
 	{
+		// Add version log in console
+		console.log(`%c version: ${GlobalConfig.instance.version} `, 'background: #222; color: #bada55');
+	
 		// Init specific GlobalConfig here
 		//GlobalConfig.instance.inject( ... );
 	}
