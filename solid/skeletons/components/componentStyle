@@ -1,29 +1,24 @@
-/*! %%capitalComponentName%% */
+/* %%capitalComponentName%% */
 
 // Import module dependencies as reference
 @import (reference) '../../Main.less';
 
-// Component name
-@COMPONENT: %%capitalComponentName%%;
-.%%capitalComponentName%%
-{
+.%%capitalComponentName%% {
+
 	// --------------------------------------------------------------------------- CONFIG
 
+	// Component name
+    @COMPONENT: %%capitalComponentName%%;
 
 	// --------------------------------------------------------------------------- BLOCK
 
-
 	// --------------------------------------------------------------------------- ELEMENTS
-
 
 	// --------------------------------------------------------------------------- MODIFIERS
 
-
 	// --------------------------------------------------------------------------- CHILDREN
 
-
 	// --------------------------------------------------------------------------- PSEUDOS
-
 
 	// --------------------------------------------------------------------------- PATCHES
 

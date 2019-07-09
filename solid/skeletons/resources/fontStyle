@@ -1,15 +1,14 @@
 @import (reference) "../Main.less";
 
 // Declare font-face
-@font-face
-{
+@font-face {
   // Font familiy name
 	font-family: '%%fontFamilyName%%';
 
   // Load font files
-	src:	url('@{fontBasePath}/%%fontFamilyName%%/%%fontFamilyName%%.eot?#iefix')	format('embedded-opentype'),
-				url('@{fontBasePath}/%%fontFamilyName%%/%%fontFamilyName%%.woff')				format('woff'),
-				url('@{fontBasePath}/%%fontFamilyName%%/%%fontFamilyName%%.ttf')				format('truetype');
+	src: url('@{fontBasePath}/%%fontFamilyName%%/%%fontFamilyName%%.woff') format('woff'),
+	url('@{fontBasePath}/%%fontFamilyName%%/%%fontFamilyName%%.eot?#iefix') format('embedded-opentype'),
+	url('@{fontBasePath}/%%fontFamilyName%%/%%fontFamilyName%%.ttf') format('truetype');
 
   // Declare style
 	font-weight: normal;
@@ -17,8 +16,7 @@
 }
 
 // Font variant mixin
-.%%fontClassName%% ()
-{
+.%%fontClassName%% () {
 	font-family : '%%fontFamilyName%%', sans-serif;
 	.fontSmooth();
 }

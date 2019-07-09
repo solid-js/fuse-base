@@ -1,71 +1,27 @@
 import "./%%capitalComponentName%%.less";
-import { createElement } from "react";
-const React = { createElement };
-import {ReactView} from "solidify-lib/react/ReactView";
+import { createElement } from 'react';
 
-// ----------------------------------------------------------------------------- STRUCT
-
-export interface Props
-{
-	// class element
-	classNames				?:string[]
+interface IProps {
+	classNames?: string[]
 }
 
-export interface States
-{
-	// Declare states with ? to allow them to be set without sending all state back
-	// myStateProp  ?:  string;
-}
+export const %%capitalComponentName%% = (props:IProps) => {
+    // component class name
+	const component: string = "%%capitalComponentName%%";
 
+	// ------------------------------------------------------------------------- LOCAL
 
-export class %%capitalComponentName%% extends ReactView<Props, States>
-{
-	// ------------------------------------------------------------------------- INIT
+	// ------------------------------------------------------------------------- PREPARE
 
-	prepare ()
-	{
-		// Init state here, you can set from props
-		this.initState({
-			// ...
-		});
-	}
+    // prepare class block string
+	const classBlock: string = [
+		component,
+		...props.classNames
+	].filter(v => v).join(' ');
 
+	// ------------------------------------------------------------------------- RENDER
 
-	// ------------------------------------------------------------------------- RENDERING
-
-	render ()
-	{
-		return <div
-			className={ ['%%capitalComponentName%%', ...this.props.classNames].filter(v => v).join(' ') }
-			ref="root"
-		>
-			%%capitalComponentName%%
-		</div>
-	}
-
-
-	// ------------------------------------------------------------------------- LIFECYCLE
-
-	componentDidMount ()
-	{
-
-	}
-
-	componentWillUnmount ()
-	{
-
-	}
-
-	componentDidUpdate (pPrevProps:Props, pPrevState:States)
-	{
-
-	}
-
-
-	// ------------------------------------------------------------------------- HANDLERS
-
-
-	// ------------------------------------------------------------------------- STATES
-
-
-}
+	return <div className={classBlock}>
+        {component}
+    </div>
+};
