@@ -5,8 +5,8 @@
   "repository": "git@github.com:solid-js/fuse-base.git",
   "main": "solid.js",
   "dependencies": {
+    "@solid-js/css-flat": "^1.0.1",
     "gsap": "^2.1.2",
-    "normalize.css": "^8.0.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "solidify-lib": "^1.9.9",
