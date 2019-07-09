@@ -40,8 +40,12 @@
     "yargs": "^13.2.2"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "reset": "rm -rf node_modules package-lock.json && npm i"
+    "reset": "rm -rf node_modules package-lock.json && npm i",
+    "test": "./scripts/test.sh",
+    "build": "./scripts/build.sh",
+    "deploy": "./scripts/deploy.sh",
+    "dev": "node solid dev",
+    "production": "node solid production"
   },
   "author": "Alexis Bouhet",
   "license": "MIT"

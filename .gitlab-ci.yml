@@ -1,0 +1,33 @@
+# solid gitlab CI
+image: misterio92/ci-php-node
+
+# Keep dist/ folder in locale cache between jobs (not between pipelines)
+cache:
+  key: "$CI_PIPELINE_ID"
+  paths:
+    - dist/
+
+stages:
+  # Test our scripts
+  - test
+  # install dependencies + sources compilation
+  - build 
+  # deploy bundle to "env" server
+  - deploy
+
+test:
+  stage: test
+  script:
+    - npm ci
+    - npm run test 
+
+build:
+  stage: build
+  script:
+    - npm ci
+    - npm run build
+
+deploy:
+  stage: deploy
+  script:
+    - npm run deploy
