@@ -46,18 +46,16 @@ export class AppView extends ReactView<Props, States> {
                 transitionControl={this.transitionControl.bind(this)}
                 onNotFound={this.pageNotFoundHandler.bind(this)}
             />
+
         </div>
     }
 
     // ------------------------------------------------------------------------- LIFECYCLE
 
     componentDidMount() {
-        // Setup viewStack to show pages from Router automatically
-        Router.registerStack('main', this._viewStack);
 
-        // Listen to routes not found
-        Router.onNotFound.add(this.routeNotFoundHandler, this);
-        Router.onRouteChanged.add(this.routeChangedHandler, this);
+        // initialize router
+        this.initRouter();
     }
 
     componentWillUnmount() {
@@ -67,6 +65,20 @@ export class AppView extends ReactView<Props, States> {
 
     componentDidUpdate(pPrevProps: Props, pPrevState: States) {
 
+    }
+
+    // ------------------------------------------------------------------------- ROUTER
+
+    protected initRouter () {
+        // Setup viewStack to show pages from Router automatically
+        Router.registerStack('main', this._viewStack);
+
+        // Listen to routes not found
+        Router.onNotFound.add(this.routeNotFoundHandler, this);
+        Router.onRouteChanged.add(this.routeChangedHandler, this);
+
+        // Start router
+        Router.start();
     }
 
     // ------------------------------------------------------------------------- HANDLERS
@@ -108,6 +120,7 @@ export class AppView extends ReactView<Props, States> {
      */
     protected routeNotFoundHandler(...rest) {
         console.error('ROUTE NOT FOUND', rest);
+        this.notFoundPageTrigger();
     }
 
     /**
@@ -118,7 +131,21 @@ export class AppView extends ReactView<Props, States> {
         console.error('PAGE NOT FOUND', pPageName);
     }
 
+    // ------------------------------------------------------------------------- TRIGGER
+
+    /**
+     * Not Found Page Trigger
+     */
+    protected notFoundPageTrigger(): void {
+        // get not found page name
+        const pageName = 'NotFoundPage';
+        // get all pages
+        const allPages = require('../../pages');
+        // get not found page
+        const notFoundPage = allPages.filter(page => page.page == pageName)[0];
+        // show not found page
+        this._viewStack.showPage(pageName, notFoundPage.importer, 'index', {});
+    }
+
     // ------------------------------------------------------------------------- STATES
-
-
 }

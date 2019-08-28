@@ -154,7 +154,5 @@ export class Main extends App
 		// React app view
 		render(<AppView />, GlobalConfig.instance.root);
 
-		// Start router
-		Router.start();
 	}
 }
