@@ -26,11 +26,13 @@
     "fuse-box": "^3.7.1",
     "fuse-box-typechecker": "^2.12.0",
     "handlebars": "^4.1.2",
+    "husky": "^3.0.4",
     "imagemin": "^5.3.1",
     "imagemin-jpegtran": "^5.0.2",
     "imagemin-pngquant": "^5.1.0",
     "inquirer": "^5.2.0",
     "less": "^3.10.3",
+    "lint-staged": "^9.2.5",
     "postcss-clean": "^1.1.0",
     "prettier": "^1.18.2",
     "source-map": "^0.7.3",
@@ -46,8 +48,20 @@
     "build": "./scripts/build.sh",
     "deploy": "./scripts/deploy.sh",
     "dev": "node solid dev",
-    "production": "node solid production"
+    "production": "node solid production",
+    "prettier": "prettier --write './src/**/**/*.{tsx,ts,jsx,js,json,md}'"
   },
   "author": "Alexis Bouhet",
-  "license": "MIT"
+  "license": "MIT",
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{tsx,ts,jsx,js,json,md}": [
+      "prettier --write",
+      "git add"
+    ]
+  }
 }
