@@ -1,14 +1,11 @@
-printWidth: 150
-singleQuote: true
-tabWidth: 4
-trailingComma: es6
+printWidth: 80
+trailingComma: "none"
+tabWidth: 2
 semi: true
-arrowParens: always
-
-overrides:
-  - files: "*.json"
-    options:
-      tabWidth: 2
-  - files: "*.yml"
-    options:
-      tabWidth: 2
+singleQuote: true
+quoteProps: "preserve"
+bracketSpacing: false
+jsxBracketSameLine: false
+arrowParens: avoid
+endOfLine: crlf
+proseWrap: never
