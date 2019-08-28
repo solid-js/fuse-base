@@ -68,7 +68,7 @@ export class Main extends App
 	{
 		// Add version log in console
 		console.log(`%c version: ${GlobalConfig.instance.version} `, 'background: #222; color: #bada55');
-		
+
 		// Init specific GlobalConfig here
 		//GlobalConfig.instance.inject( ... );
 	}
@@ -146,20 +146,13 @@ export class Main extends App
 
 	// ------------------------------------------------------------------------- READY
 
-	// App view instance
-	protected _appView;
-	get appView ():AppView { return this._appView; }
-
 	/**
 	 * When everything is ready
 	 */
 	protected ready ()
 	{
 		// React app view
-		render(
-			<AppView ref={ r => this._appView = r } />,
-			GlobalConfig.instance.root
-		);
+		render(<AppView />, GlobalConfig.instance.root);
 
 		// Start router
 		Router.start();
