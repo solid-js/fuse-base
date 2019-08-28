@@ -5,9 +5,10 @@ interface IProps {
 	classNames?: string[]
 }
 
+// component class name
+const component: string = "%%capitalComponentName%%";
+
 export const %%capitalComponentName%% = (props:IProps) => {
-    // component class name
-	const component: string = "%%capitalComponentName%%";
 
 	// ------------------------------------------------------------------------- LOCAL
 
