@@ -1,5 +1,5 @@
 // Load bundle manager
-import {SolidBundles} from "solidify-lib/helpers/SolidBundles";
+import {SolidBundles} from 'solidify-lib/helpers/SolidBundles';
 
 // Init HMR in dev mode
 if (process.env.NODE_ENV !== 'production') require('./hmr');
@@ -9,4 +9,4 @@ if (process.env.NODE_ENV !== 'production') require('./hmr');
 const bundlesRequireList = require('./bundles');
 
 // Start bundles manager
-SolidBundles.init( bundlesRequireList );
+SolidBundles.init(bundlesRequireList);
