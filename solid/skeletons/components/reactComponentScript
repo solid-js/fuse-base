@@ -8,7 +8,7 @@ interface IProps {
 // component class name
 const component: string = "%%capitalComponentName%%";
 
-export const %%capitalComponentName%% = (props:IProps) => {
+export function %%capitalComponentName%% (props:IProps) {
 
 	// ------------------------------------------------------------------------- LOCAL
 
